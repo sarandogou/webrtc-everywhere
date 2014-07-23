@@ -51,5 +51,5 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
  - Binaries and installers: All binaries and installers **from us** are released under **BSD** terms to allow using the project in your commercial products.
  - The source code: **GPLv3**
 
- # Getting help
- The best way to get help is via our <a href="https://groups.google.com/forum/#!forum/webrtc-everywhere" target="_blank">dev-group</a>.
+# Getting help
+The best way to get help is via our <a href="https://groups.google.com/forum/#!forum/webrtc-everywhere" target="_blank">dev-group</a>.
