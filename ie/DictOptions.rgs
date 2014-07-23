@@ -1,0 +1,26 @@
+HKCR
+{
+	webrtceverywhere.DictOptions.1 = s 'DictOptions Class'
+	{
+		CLSID = s '{D6B8C652-7A2A-47B6-8C38-3BD5BB0E2872}'
+	}
+	webrtceverywhere.DictOptions = s 'DictOptions Class'
+	{
+		CLSID = s '{D6B8C652-7A2A-47B6-8C38-3BD5BB0E2872}'
+		CurVer = s 'webrtceverywhere.DictOptions.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D6B8C652-7A2A-47B6-8C38-3BD5BB0E2872} = s 'DictOptions Class'
+		{
+			ProgID = s 'webrtceverywhere.DictOptions.1'
+			VersionIndependentProgID = s 'webrtceverywhere.DictOptions'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{12E5324E-D53E-4C89-BFA4-E3020902DD62}'
+		}
+	}
+}

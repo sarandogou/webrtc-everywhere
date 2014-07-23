@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FEF60750-96B0-4124-9007-B90780B6267D}</ProjectGuid>
+    <RootNamespace>webrtc-everywhere</RootNamespace>
+    <Keyword>AtlProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfAtl>Dynamic</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfAtl>Dynamic</UseOfAtl>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)webrtceverywhere.tlb</TypeLibraryName>
+      <HeaderFileName>webrtceverywhere_i.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>webrtceverywhere_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>webrtceverywhere_p.c</ProxyFileName>
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <RegisterOutput>true</RegisterOutput>
+      <AdditionalDependencies>comsuppw.lib;Oleacc.lib;RpcRT4.lib;$(OutDir)webrtc-everywhere-common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\webrtc-everywhere.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)webrtceverywhere.tlb</TypeLibraryName>
+      <HeaderFileName>webrtceverywhere_i.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>webrtceverywhere_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>webrtceverywhere_p.c</ProxyFileName>
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <RegisterOutput>true</RegisterOutput>
+      <ModuleDefinitionFile>.\webrtc-everywhere.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <AdditionalDependencies>comsuppw.lib;Oleacc.lib;RpcRT4.lib;$(OutDir)webrtc-everywhere-common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="BrowserCallback.cc" />
+    <ClCompile Include="DictOptions.cc" />
+    <ClCompile Include="dllmain.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+    </ClCompile>
+    <ClCompile Include="MediaSourceStates.cc" />
+    <ClCompile Include="MediaStream.cc" />
+    <ClCompile Include="MediaStreamEvent.cc" />
+    <ClCompile Include="MediaStreamTrack.cc" />
+    <ClCompile Include="PeerConnection.cc" />
+    <ClCompile Include="RTCIceCandidate.cc" />
+    <ClCompile Include="RTCPeerConnectionIceEvent.cc" />
+    <ClCompile Include="RTCStats.cc" />
+    <ClCompile Include="RTCStatsReport.cc" />
+    <ClCompile Include="SessionDescription.cc" />
+    <ClCompile Include="SourceInfo.cc" />
+    <ClCompile Include="stdafx.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Utils.cc" />
+    <ClCompile Include="webrtc-everywhere.cc" />
+    <ClCompile Include="WebRTC.cc" />
+    <ClCompile Include="webrtceverywhere_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DictOptions.rgs" />
+    <None Include="MediaSourceStates.rgs" />
+    <None Include="MediaStream.rgs" />
+    <None Include="MediaStreamEvent.rgs" />
+    <None Include="MediaStreamTrack.rgs" />
+    <None Include="PeerConnection.rgs" />
+    <None Include="RTCIceCandidate4.rgs" />
+    <None Include="RTCPeerConnectionIceEvent.rgs" />
+    <None Include="RTCStats.rgs" />
+    <None Include="RTCStatsReport.rgs" />
+    <None Include="SessionDescription.rgs" />
+    <None Include="SourceInfo.rgs" />
+    <None Include="webrtc-everywhere.def" />
+    <None Include="webrtc-everywhere.rgs" />
+    <None Include="WebRTC.rgs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="webrtceverywhere.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BrowserCallback.h" />
+    <ClInclude Include="DictOptions.h" />
+    <ClInclude Include="dllmain.h" />
+    <ClInclude Include="MediaSourceStates.h" />
+    <ClInclude Include="MediaStream.h" />
+    <ClInclude Include="MediaStreamEvent.h" />
+    <ClInclude Include="MediaStreamTrack.h" />
+    <ClInclude Include="PeerConnection.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="RTCIceCandidate.h" />
+    <ClInclude Include="RTCPeerConnectionIceEvent.h" />
+    <ClInclude Include="RTCStats.h" />
+    <ClInclude Include="RTCStatsReport.h" />
+    <ClInclude Include="SessionDescription.h" />
+    <ClInclude Include="SourceInfo.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="WebRTC.h" />
+    <ClInclude Include="webrtceverywhere_i.h" />
+    <ClInclude Include="_IWebRTCEvents_CP.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="webrtc-everywhere.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="WebRTC.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\webrtc-everywhere-common.vcxproj">
+      <Project>{95230956-8581-4f03-a589-c6217119de9e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

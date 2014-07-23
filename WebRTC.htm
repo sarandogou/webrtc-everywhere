@@ -1,0 +1,315 @@
+<HTML>
+<HEAD>
+<TITLE>ATL 8.0 test page for object WebRTC</TITLE>
+    <meta http-equiv="X-UA-Compatible" content="IE=9,chrome=1" />
+</HEAD>
+
+<script type="text/javascript">
+
+    var mediaStream = null;
+    var peerConnection = null;
+    var localStreams = null;
+    var remoteStreams = null;
+    var video = null;
+
+
+function get_plugin() {
+    return document.getElementById('WebrtcEverywhere');
+    //return new ActiveXObject("webrtceverywhere.WebRTC");
+}
+
+function _log_info(msg) {
+    if (window.console && window.console.info) {
+        window.console.info(msg);
+    }
+}
+
+function _stop() {
+    _attachStream(video, null);
+    
+    if (mediaStream) {
+        mediaStream.stop();
+    }
+    localStreams = null;
+    remoteStreams = null;
+    mediaStream = null;
+    if (peerConnection) {
+        peerConnection.close();
+    }
+    peerConnection = null;
+}
+
+var logs = {};
+
+function _peerConnection() {
+    if (mediaStream) {
+        peerConnection = get_plugin().createPeerConnection(
+            { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }, { "url": "stun:stun.l.google.com:19302", "credential": "mypassword", "username": "myusername" }] }, // RTCConfiguration configuration
+            {} // optional MediaConstraints constraints
+            );
+
+        peerConnection.onicecandidate = function onicecandidate(_candidate) {
+            if (_candidate.candidate) {
+                _log_info("onicecandidate(candidate=" + _candidate.candidate + ", sdpMid=" + _candidate.sdpMid + ", sdpMLineIndex=" + _candidate.sdpMLineIndex + ")");
+                peerConnection.addIceCandidate(_candidate, 
+                 function () { _log_info("addIceCandidate ok"); },
+                 function (err) { _log_info("addIceCandidate nok:" + err); }
+                );
+            }
+            else {
+                _log_info("Ice gathering returned null. *iceGatheringState= " + peerConnection.iceGatheringState + " *localDescription= " + peerConnection.localDescription.sdp);
+            }
+        }
+        var onnegotiationneeded = function () {
+            _log_info("onnegotiationneeded");
+        };
+        peerConnection.onnegotiationneeded = function () {
+            _log_info("onnegotiationneeded");
+        }
+        peerConnection.onsignalingstatechange = function () {
+            _log_info("onsignalingstatechange: " + peerConnection.signalingState);
+        }
+        peerConnection.onaddstream = function (e) {
+            _log_info("onaddstream");
+        }
+        peerConnection.onremovestream = function (e) {
+            _log_info("onremovestream");
+        }
+        peerConnection.oniceconnectionstatechange = function () {
+            _log_info("oniceconnectionstatechange: " + peerConnection.iceConnectionState);
+        }
+        
+
+        peerConnection.addStream(mediaStream, {});
+
+        
+        localStreams = peerConnection.getLocalStreams();
+        remoteStreams = peerConnection.getLocalStreams();
+
+        if (localStreams.length > 0) {
+            var strm = peerConnection.getStreamById(localStreams[0].id);
+            if (strm) {
+                strm.clone(); // for fun
+
+                strm.onended = function () {
+                    _log_info("MediaStream::onended()");
+                }
+                strm.onaddtrack = function () {
+                    _log_info("MediaStream::onaddtrack()");
+                }
+                strm.onremovetrack = function () {
+                    _log_info("MediaStream::onremovetrack()");
+                }
+
+                _log_info("found stream with id = " + strm.id);
+                var audioTracks = strm.getAudioTracks();
+                var videoTracks = strm.getVideoTracks();
+                if (audioTracks) {
+                    _log_info("Audio Tracks count: " + audioTracks.length);
+                    for (var i = 0; i < audioTracks.length; ++i) {
+                        var track = strm.getTrackById(audioTracks[i].id);
+                        if (track) {
+                            _log_info("Track: id=" + track.id + ", kind=" + track.kind + ", label=" + track.label);
+                            strm.removeTrack(track);
+                            strm.addTrack(track);
+                        }
+                    }
+                }
+                if (videoTracks) {
+                    _log_info("Video Tracks count: " + videoTracks.length);
+                }
+            }
+        }
+        
+
+        peerConnection.createOffer(
+                function (sdp) {
+                    _log_info("PeerConnection Success: type=" + sdp.type + "\n  and sdp=" + sdp.sdp);
+                    /*peerConnection.setLocalDescription(sdp,
+                        function () { _log_info("setLocalDescription ok"); },
+                        function (err) { _log_info("setLocalDescription nok:" + err); }
+                    );*/
+                },
+                function (error) { alert("PeerConnection Error: " + error); },
+                {} // optional MediaConstraints constraints
+            );
+    }
+}
+
+function _attachStream(element, stream) {
+    if (!element) return;
+    if (element.isWebRtcPlugin) {
+        element.src = stream;
+        return element;
+    }
+    else if (element.nodeName.toLowerCase() === 'video') {
+        if (!element.pluginObj && stream) {
+            // FIXME
+            var _pluginObj = document.createElement('object');
+            var _isIE = (Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window);
+            if (_isIE) {
+                _pluginObj.setAttribute('classid', 'CLSID:7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53');
+            } else {
+                _pluginObj.setAttribute('type', 'application/webrtc-everywhere');
+            }
+            element.pluginObj = _pluginObj;
+            if (_isIE || 1) {
+                _pluginObj.setAttribute('className', element.className);
+                _pluginObj.setAttribute('innerHTML', element.innerHTML);
+                var width = element.getAttribute("width");
+                var height = element.getAttribute("height");
+                var bounds = element.getBoundingClientRect();
+                if (!width) {
+                    width = bounds.right - bounds.left;;
+                }
+                if (!height) {
+                    height = bounds.bottom - bounds.top;
+                }
+                if ("getComputedStyle" in window) {
+                    var computedStyle = window.getComputedStyle(element, null);
+                    if (!width && computedStyle.width != 'auto' && computedStyle.width != '0px') {
+                        width = computedStyle.width;
+                    }
+                    if (!height && computedStyle.height != 'auto' && computedStyle.height != '0px') {
+                        height = computedStyle.height;
+                    }
+                }
+                if (width) _pluginObj.setAttribute('width', width);
+                if (height) _pluginObj.setAttribute('height', height);
+
+                document.body.appendChild(_pluginObj);
+                if (element.parentNode) {
+                    element.parentNode.replaceChild(_pluginObj, element);
+                }
+            }
+            else {
+                //_pluginObj.setAttribute('height', '100%');
+                //_pluginObj.setAttribute('width', '100%');
+                
+                // FIXME
+                document.body.appendChild(_pluginObj);
+                //element.appendChild(_pluginObj);
+            }
+        }
+
+        if (element.pluginObj) {
+            element.pluginObj.src = stream;
+        }
+
+        return element.pluginObj;
+    }
+    else if (element.nodeName.toLowerCase() === 'audio') {
+        return element;
+    }
+}
+
+function _getUserMedia() {
+
+    alert(get_plugin().versionName);
+    //get_plugin().setVideo(myVideo);
+    //var sdp = get_plugin().createSessionDescription({ type:"offer", sdp:"..my sdp" });
+    //if (sdp) {
+    //    alert(sdp.sdp + "//" + sdp.type);
+    //}
+
+    //var peer = get_plugin().createPeerConnection({"iceServers": [{"url": "stun:stun.l.google.com:19302"}]});
+    //if (peer) {
+    //    peer.createOffer(function(e) { alert("Success="+e); });
+    //    alert("peer=ok");
+    //}
+
+    // var candidate = get_plugin().createIceCandidate({ candidate: "candidateStr", sdpMid: "sdpMidStr", sdpMLineIndex: 75 });
+
+    get_plugin().getUserMedia(
+            {
+                audio: true,
+                video: {
+                    mandatory: {
+                        /*minFrameRate: 15,
+                        maxFrameRate: 25,
+
+                        minWidth: 1280,
+                        minHeight: 720,
+                        maxWidth: 1280,
+                        maxHeight: 720*/
+                    },
+
+                    optional: []
+                }
+            }, // constraints
+            function (_mediaStream) {
+                //alert("successCallback:" + _mediaStream.id);
+                mediaStream = _mediaStream;
+                video = _attachStream(video || document.getElementById("myvideo_local"), _mediaStream);
+                //video = video_local;
+                //video_local.src = _mediaStream;
+                video.bindEventListener('play', function () {
+                    _log_info("Actual video dimensions: " + video.videoWidth + "x" + video.videoHeight + 'px.');
+                });
+                
+            },
+            function (error) { alert("errorCallback:" + error); }
+        );
+}
+
+function _screenshot() {
+    var elVideo = document.getElementById("myvideo_local");
+    if (elVideo) {
+        var elCanvas = document.getElementById("mycanvas");
+        var ctx2d = elCanvas.getContext("2d");
+        if (elVideo.videoWidth > 0 && elVideo.videoHeight > 0) {
+            var imageData = ctx2d.createImageData(elVideo.videoWidth, elVideo.videoHeight);
+            if (imageData) {
+                elVideo.fillImageData(imageData);
+                ctx2d.putImageData(imageData, 0, 0); // at (0,0)
+            }
+        }
+    }
+}
+
+window.onload = function () {
+
+    var completeStyle = window.getComputedStyle(myvideo_local, null);
+    /*var eltDIV = document.createElement('div');
+    eltDIV.style.cssText = "width:100px; height:100px; visibility:visible;";
+    eltDIV.onload = function () { alert("OOO"); }
+    //eltDIV.addEventListener("load", function () { alert("OOO"); })
+    document.body.appendChild(eltDIV);
+    eltDIV.innerHTML = "<object id=\"WebrtcEverywhere\" "
+    + (((Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window))? "classid=\"clsid:7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53\"" : "type=\"application/webrtc-everywhere\"")
+    + " width=\"1px\" height=\"1px\" style=\"visibility:visible\"> </object>";
+    */
+    // IE11: "window.ActiveXObject" not defined -> http://msdn.microsoft.com/en-us/library/ie/dn423948%28v=vs.85%29.aspx
+    var pluginObj = document.createElement('object');
+    if ((Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window)) {
+        pluginObj.setAttribute('classid', 'CLSID:7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53');
+    } else {
+        pluginObj.setAttribute('type', 'application/webrtc-everywhere');
+    }
+    pluginObj.setAttribute('id', 'WebrtcEverywhere');
+    document.body.appendChild(pluginObj);
+    pluginObj.setAttribute('width', '0');
+    pluginObj.setAttribute('height', '0');
+}
+
+</script>
+
+<BODY>
+    <canvas id="mycanvas" width="100px" height="100px"></canvas>
+    <video id="myvideo_local" style="background-color: #000000;">
+        <!--object id="video_local" width="500px" height="500px" type="application/webrtc-everywhere"></object-->
+    </video>
+
+    <!--object id="video_local" width="50px" height="50px" type="application/webrtc-everywhere" style="background-color: #000000;"></object-->
+
+    <br />
+    <br />
+    <br />
+
+    <input type="button" id="btn_getUserMedia" value="getUserMedia" onclick='_getUserMedia();' />
+    <input type="button" value="screenshot" onclick='_screenshot();' />
+    <input type="button" value="peerConnection" onclick='_peerConnection();' />
+    <input type="button" value="stop" onclick='_stop();' />
+
+</BODY>
+</HTML>

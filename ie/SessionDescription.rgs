@@ -1,0 +1,26 @@
+HKCR
+{
+	webrtceverywhere.SessionDescription.1 = s 'SessionDescription Class'
+	{
+		CLSID = s '{3F7C50A7-7B5C-4631-8988-17B43A938667}'
+	}
+	webrtceverywhere.SessionDescription = s 'SessionDescription Class'
+	{
+		CLSID = s '{3F7C50A7-7B5C-4631-8988-17B43A938667}'
+		CurVer = s 'webrtceverywhere.SessionDescription.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {3F7C50A7-7B5C-4631-8988-17B43A938667} = s 'SessionDescription Class'
+		{
+			ProgID = s 'webrtceverywhere.SessionDescription.1'
+			VersionIndependentProgID = s 'webrtceverywhere.SessionDescription'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{12E5324E-D53E-4C89-BFA4-E3020902DD62}'
+		}
+	}
+}

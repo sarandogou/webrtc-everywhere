@@ -1,0 +1,10 @@
+; webrtc-everywhere.def : Declares the module parameters.
+
+LIBRARY      "webrtc-everywhere.DLL"
+
+EXPORTS
+	DllCanUnloadNow		PRIVATE
+	DllGetClassObject	PRIVATE
+	DllRegisterServer	PRIVATE
+	DllUnregisterServer	PRIVATE
+	DllInstall		PRIVATE

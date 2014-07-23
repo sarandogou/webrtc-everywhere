@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>2F87B7EF-2A2D-4976-8AD0-89ECB9FFF740</string>
+	<key>IDESourceControlProjectName</key>
+	<string>webrtc-everywhere</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>E254B6ED-4A36-483B-958E-9FFACD22ACF0</key>
+		<string>https://github.com/sarandogou/webrtc-everywhere.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>xcode/webrtc-everywhere/webrtc-everywhere.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>E254B6ED-4A36-483B-958E-9FFACD22ACF0</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/sarandogou/webrtc-everywhere.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>E254B6ED-4A36-483B-958E-9FFACD22ACF0</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E254B6ED-4A36-483B-958E-9FFACD22ACF0</string>
+			<key>IDESourceControlWCCName</key>
+			<string>webrtc-everywhere</string>
+		</dict>
+	</array>
+</dict>
+</plist>

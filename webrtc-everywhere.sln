@@ -1,0 +1,76 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webrtc-everywhere-ie", "ie\webrtc-everywhere-ie.vcxproj", "{FEF60750-96B0-4124-9007-B90780B6267D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webrtc-everywhere-common", "common\webrtc-everywhere-common.vcxproj", "{95230956-8581-4F03-A589-C6217119DE9E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webrtc-everywhere-npapi", "npapi\webrtc-everywhere-npapi.vcxproj", "{332AE24A-F021-4F30-A967-0CB91D94278D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "webrtc-everywhere-console", "common\webrtc-everywhere-console.vcxproj", "{A5BD8595-2B82-42E3-90E8-4405D6425A29}"
+	ProjectSection(ProjectDependencies) = postProject
+		{95230956-8581-4F03-A589-C6217119DE9E} = {95230956-8581-4F03-A589-C6217119DE9E}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6E9402F2-5AC4-466A-ACF5-3A137CA85A1C}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		WebRTC.htm = WebRTC.htm
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CD_ROM|Win32 = CD_ROM|Win32
+		Debug|Win32 = Debug|Win32
+		DVD-5|Win32 = DVD-5|Win32
+		Release|Win32 = Release|Win32
+		SingleImage|Win32 = SingleImage|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FEF60750-96B0-4124-9007-B90780B6267D}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.CD_ROM|Win32.Build.0 = Release|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.Debug|Win32.Build.0 = Debug|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.DVD-5|Win32.Build.0 = Debug|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.Release|Win32.ActiveCfg = Release|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.Release|Win32.Build.0 = Release|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{FEF60750-96B0-4124-9007-B90780B6267D}.SingleImage|Win32.Build.0 = Release|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.CD_ROM|Win32.Build.0 = Release|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.Debug|Win32.Build.0 = Debug|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.DVD-5|Win32.Build.0 = Debug|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.Release|Win32.ActiveCfg = Release|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.Release|Win32.Build.0 = Release|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{95230956-8581-4F03-A589-C6217119DE9E}.SingleImage|Win32.Build.0 = Release|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.CD_ROM|Win32.Build.0 = Release|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.Debug|Win32.Build.0 = Debug|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.DVD-5|Win32.Build.0 = Debug|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.Release|Win32.ActiveCfg = Release|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.Release|Win32.Build.0 = Release|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{332AE24A-F021-4F30-A967-0CB91D94278D}.SingleImage|Win32.Build.0 = Release|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.CD_ROM|Win32.ActiveCfg = Release|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.CD_ROM|Win32.Build.0 = Release|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.Debug|Win32.Build.0 = Debug|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.DVD-5|Win32.ActiveCfg = Debug|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.DVD-5|Win32.Build.0 = Debug|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.Release|Win32.ActiveCfg = Release|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.Release|Win32.Build.0 = Release|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.SingleImage|Win32.ActiveCfg = Release|Win32
+		{A5BD8595-2B82-42E3-90E8-4405D6425A29}.SingleImage|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

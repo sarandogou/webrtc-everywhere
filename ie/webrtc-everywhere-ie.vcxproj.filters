@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{852ec013-933a-4acd-9fcc-59f6799bc7df}</UniqueIdentifier>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DictOptions.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PeerConnection.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionDescription.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="webrtc-everywhere.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WebRTC.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="webrtceverywhere_i.c">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaStream.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserCallback.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCIceCandidate.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaStreamTrack.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceInfo.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaSourceStates.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaStreamEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCPeerConnectionIceEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCStatsReport.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCStats.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="webrtc-everywhere.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="DictOptions.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="PeerConnection.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="SessionDescription.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="webrtc-everywhere.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="WebRTC.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="MediaStream.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCIceCandidate4.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="MediaStreamTrack.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="SourceInfo.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="MediaSourceStates.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="MediaStreamEvent.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCPeerConnectionIceEvent.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCStatsReport.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCStats.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="webrtceverywhere.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="_IWebRTCEvents_CP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DictOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dllmain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PeerConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionDescription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WebRTC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="webrtceverywhere_i.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCIceCandidate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaStreamTrack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SourceInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaSourceStates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaStreamEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCPeerConnectionIceEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCStatsReport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="webrtc-everywhere.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="WebRTC.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

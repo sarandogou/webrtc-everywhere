@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'webrtceverywhere'
+		'webrtc-everywhere.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}

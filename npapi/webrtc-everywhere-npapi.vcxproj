@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{332AE24A-F021-4F30-A967-0CB91D94278D}</ProjectGuid>
+    <RootNamespace>webrtceverywherenpapi</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>np$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>np$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WEBRTCEVERYWHERENPAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(OutDir)webrtc-everywhere-common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)np$(ProjectName).dll</OutputFile>
+      <ModuleDefinitionFile>webrtc-everywhere-npapi.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WEBRTCEVERYWHERENPAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)np$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
+      <ModuleDefinitionFile>webrtc-everywhere-npapi.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="BrowserCallback.cc" />
+    <ClCompile Include="dllmain.cc" />
+    <ClCompile Include="MediaSourceStates.cc" />
+    <ClCompile Include="MediaStream.cc" />
+    <ClCompile Include="MediaStreamEvent.cc" />
+    <ClCompile Include="MediaStreamTrack.cc" />
+    <ClCompile Include="PeerConnection.cc" />
+    <ClCompile Include="Plugin.cc" />
+    <ClCompile Include="RTCIceCandidate.cc" />
+    <ClCompile Include="RTCPeerConnectionIceEvent.cc" />
+    <ClCompile Include="RTCStats.cc" />
+    <ClCompile Include="RTCStatsReport.cc" />
+    <ClCompile Include="SessionDescription.cc" />
+    <ClCompile Include="SourceInfo.cc" />
+    <ClCompile Include="Utils.cc" />
+    <ClCompile Include="WebRTC.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="webrtc-everywhere-npapi.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BrowserCallback.h" />
+    <ClInclude Include="MediaSourceStates.h" />
+    <ClInclude Include="MediaStream.h" />
+    <ClInclude Include="MediaStreamEvent.h" />
+    <ClInclude Include="MediaStreamTrack.h" />
+    <ClInclude Include="NPCommon.h" />
+    <ClInclude Include="PeerConnection.h" />
+    <ClInclude Include="Plugin.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="RTCIceCandidate.h" />
+    <ClInclude Include="RTCPeerConnectionIceEvent.h" />
+    <ClInclude Include="RTCStats.h" />
+    <ClInclude Include="RTCStatsReport.h" />
+    <ClInclude Include="SessionDescription.h" />
+    <ClInclude Include="SourceInfo.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="WebRTC.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="webrtc-everywhere-npapi.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\webrtc-everywhere-common.vcxproj">
+      <Project>{95230956-8581-4f03-a589-c6217119de9e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

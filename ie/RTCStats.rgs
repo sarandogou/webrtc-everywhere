@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {F752E29B-45CB-4753-AA0C-51D1A021143C} = s 'RTCStats Class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{12E5324E-D53E-4C89-BFA4-E3020902DD62}'
+			Version = s '1.0'
+		}
+	}
+}
