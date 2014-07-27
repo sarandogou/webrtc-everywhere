@@ -119,21 +119,21 @@ bool SessionDescription::SetProperty(NPObject *npobj, NPIdentifier propertyName,
 
 	if (!strcmp(name, kPropType) && NPVARIANT_IS_STRING(*value)) {
 		const _Buffer* _sdp = This->m_Sdp ? This->m_Sdp->getSdp() : NULL;
-		std::shared_ptr<_SessionDescription> newSdp = std::make_shared<_SessionDescription>(
+		cpp11::shared_ptr<_SessionDescription> newSdp(new _SessionDescription(
 			_sdp ? _sdp->getPtr() : NULL,
 			_sdp ? _sdp->getSize() : 0,
 			value->value.stringValue.UTF8Characters,
-			value->value.stringValue.UTF8Length);
+			value->value.stringValue.UTF8Length));
 		This->m_Sdp = newSdp;
 		ret_val = true;
 	}
 	else if (!strcmp(name, kPropSdp) && NPVARIANT_IS_STRING(*value)) {
 		const _Buffer* _type = This->m_Sdp ? This->m_Sdp->getType() : NULL;
-		std::shared_ptr<_SessionDescription> newSdp = std::make_shared<_SessionDescription>(
+		cpp11::shared_ptr<_SessionDescription> newSdp(new _SessionDescription(
 			value->value.stringValue.UTF8Characters,
 			value->value.stringValue.UTF8Length,
 			_type ? _type->getPtr() : NULL,
-			_type ? _type->getSize() : 0);
+			_type ? _type->getSize() : 0));
 		This->m_Sdp = newSdp;
 		ret_val = true;
 	}

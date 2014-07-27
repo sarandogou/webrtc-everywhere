@@ -9,6 +9,8 @@
 #	include "windows.h"
 #	include <comutil.h>
 #	include "talk/base/win32socketinit.h"
+# elif WE_UNDER_MAC
+#	include "talk/base/maccocoasocketserver.h"
 #endif
 
 #include "talk/base/ssladapter.h"
@@ -48,6 +50,14 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 		talk_base::ThreadManager::Instance()->SetCurrentThread(&w32_thread);
 #endif
 #endif
+        
+#if WE_UNDER_MAC
+#if 0 // NOT_USING_MAC_SERVER
+        static talk_base::MacCocoaSocketServer ss;
+        static talk_base::SocketServerScope ss_scope(&ss);
+#endif
+#endif
+        
 		talk_base::InitializeSSL();
 		talk_base::InitializeSSLThread();
         g_bInitialized = true;
@@ -477,7 +487,7 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 
 	
 #if !defined (BI_RGB)
-#	define BI_RGB
+#	define BI_RGB 0L
 #endif
 	
 	hdr_file.bfSize = *bmp_size_ptr;
@@ -495,7 +505,7 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 	hdr_info.biSizeImage = stride * height;
 	hdr_info.biClrImportant = 0;
 	hdr_info.biClrUsed = 0;
-#if WE_UNDER_WINDOWS
+#if WE_UNDER_WINDOWS || WE_UNDER_APPLE
 	hdr_info.biHeight *= -1;
 #endif
 

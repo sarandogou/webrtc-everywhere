@@ -50,19 +50,25 @@ _VideoRenderer::_VideoRenderer(int width, int height, cpp11::function<void()> fn
 
 _VideoRenderer::~_VideoRenderer()
 {
-    if (m_rendered_track) {
-		m_rendered_track->RemoveRenderer(this);
-	}
+    {
+        _AutoLock<_VideoRenderer> lock(this);
+        if (m_rendered_track) {
+            m_rendered_track->RemoveRenderer(this);
+        }
+        m_image.reset();
+    }
 #if WE_UNDER_APPLE
-    // wait until async video rendering finish
-	dispatch_group_wait(m_group, DISPATCH_TIME_FOREVER);
+    {
+        _AutoLock<_VideoRenderer> lock(this);
+        // wait until async video rendering finish
+        dispatch_group_wait(m_group, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.6 * NSEC_PER_SEC)));
+        //dispatch_group_wait(m_group, DISPATCH_TIME_FOREVER);
+    }
 #endif
 
 	{
-		_AutoLock<_VideoRenderer> lock(this);
-
+        _AutoLock<_VideoRenderer> lock(this);
 		m_rendered_track = NULL;
-		m_image.reset();
 
 #if WE_UNDER_WINDOWS
 

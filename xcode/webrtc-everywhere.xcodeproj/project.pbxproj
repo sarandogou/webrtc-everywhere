@@ -402,6 +402,7 @@
 				EC2AEBDB19734BFF00360EC6 /* Frameworks */,
 				EC2AEBDC19734BFF00360EC6 /* Headers */,
 				EC23B4091974F2A6000DFA4B /* ShellScript */,
+				ECE4C39D1984F38E00FFD159 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -451,6 +452,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# clean up any previous products/symbolic links in the Internet Plug-Ins folder\nif [ -a \"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\" ]; then\nrm -Rf \"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\"\nfi\n\n# Depending on the build configuration, either copy or link to the most recent product\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n# if we're debugging, add a symbolic link to the plug-in\nln -sf \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \\\n\"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\"\nelif [ \"${CONFIGURATION}\" == \"Release\" ]; then\n# if we're compiling for release, just copy the plugin to the Internet Plug-ins folder\ncp -Rfv \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \\\n\"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\"\nfi";
+		};
+		ECE4C39D1984F38E00FFD159 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here\nset -ex\n\n[ \"$ACTION\" = build ] || exit 0\n[ \"$BUILD_VARIANTS\" = \"normal\" ] || exit 0\n[ \"$CONFIGURATION\" = \"Release\" ] || exit 0\n\ndir=\"$TEMP_FILES_DIR/disk\"\ndmg=\"$BUILT_PRODUCTS_DIR/$PROJECT_NAME-$NATIVE_ARCH-$MACOSX_DEPLOYMENT_TARGET.dmg\"\n\nrm -rf \"$dir\"\nmkdir \"$dir\"\ncp -Rfv \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \"$dir\"\nln -s \"${USER_LIBRARY_DIR}/Internet Plug-Ins\" \"$dir/Internet Plug-Ins\"\nrm -f \"$dmg\"\n\nhdiutil create -srcfolder \"$dir\" -volname \"$PRODUCT_NAME\" \"$dmg\"\nhdiutil internet-enable -yes \"$dmg\"\n\nrm -rf \"$dir\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
