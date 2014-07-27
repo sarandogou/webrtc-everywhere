@@ -424,7 +424,7 @@ quantum:
 WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height, void** bmp_pptr, size_t *bmp_size_ptr)
 {
 	// http://en.wikipedia.org/wiki/BMP_file_format
-#if WE_UNDER_WINDOWS && 0
+#if WE_UNDER_WINDOWS
 	typedef BITMAPFILEHEADER BMPFILEHEADER;
 	typedef BITMAPINFOHEADER BMPINFOHEADER;
 #else
