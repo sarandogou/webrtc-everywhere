@@ -43,8 +43,6 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
 ... to be continued
 
 # Release notes
- - **1.0.1**
-	- Initial release **without** support for DataChannel
  - **1.1.0**
 	- Add new JavaScript function: <b>Webrtc::getScreenShot()</b>. This function converts the RGB32 raw image to bitmap then to base64. The process is instantaneous and the base64 image could be used in JavaScript like this:
   ```
@@ -58,7 +56,8 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
     	- [Issue #6](../../issues/6): The active element tag flashes when the window is resized or scrolled
     	- [Issue #7](../../issues/7): drawImage() function is toooo slooow
     	- [Issue #8](../../issues/8): Color alignment issue in drawImage()
-
+ - **1.0.1**
+	- Initial release **without** support for DataChannel
 # License
  - Binaries and installers: All binaries and installers **from us** are released under **BSD** terms to allow using the project in your commercial products.
  - The source code: **GPLv3**
