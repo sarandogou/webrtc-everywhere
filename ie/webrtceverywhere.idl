@@ -34,7 +34,8 @@ interface IWebRTC : IDispatch{
 	[propget, id(51), helpstring("property videoWidth")] HRESULT videoWidth([out, retval] LONG* pVal);
 	[propget, id(52), helpstring("property videoHeight")] HRESULT videoHeight([out, retval] LONG* pVal);
 	[id(53), helpstring("method fillImageData")] HRESULT fillImageData([in] VARIANT imageData);
-	[propget, id(54), helpstring("property isWebRtcPlugin")] HRESULT isWebRtcPlugin([out, retval] VARIANT_BOOL* pVal);	
+	[id(54), helpstring("method getScreenShot")] HRESULT getScreenShot([out, retval] BSTR* base64BitmapData);
+	[propget, id(55), helpstring("property isWebRtcPlugin")] HRESULT isWebRtcPlugin([out, retval] VARIANT_BOOL* pVal);	
 };
 
 [

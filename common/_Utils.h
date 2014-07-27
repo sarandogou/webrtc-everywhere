@@ -30,6 +30,9 @@ public:
     static const _UniqueObject* UniqueObjFind(long id);
     static void UniqueObjAdd(const _UniqueObject* obj);
     static void UniqueObjRemove(long id);
+
+	static WeError ConvertToBase64(const void* in_ptr, size_t in_size, void **out_pptr, size_t *out_size_ptr, void* (*MemAllocFn)(size_t n) = NULL);
+	static WeError ConvertToBMP(const void* rgb32_ptr, size_t width, size_t height, void** bmp_pptr, size_t *bmp_size_ptr);
     
 private:
 #if _MSC_VER

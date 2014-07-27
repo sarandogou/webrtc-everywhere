@@ -200,6 +200,7 @@ public:
 
 	STDMETHOD(put_src)(__in VARIANT newVal);
 	STDMETHOD(fillImageData)(__in VARIANT imageData);
+	STDMETHOD(getScreenShot)(__out BSTR* base64BitmapData);
 	STDMETHOD(get_videoWidth)(__out LONG* pVal);
 	STDMETHOD(get_videoHeight)(__out LONG* pVal);
 	STDMETHOD(get_isWebRtcPlugin)(__out VARIANT_BOOL* pVal);

@@ -1,7 +1,14 @@
 <HTML>
 <HEAD>
 <TITLE>ATL 8.0 test page for object WebRTC</TITLE>
-    <meta http-equiv="X-UA-Compatible" content="IE=9,chrome=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=9,chrome=1" />
+
+<style type="text/css">
+    .overlay {
+        position: absolute;
+        margin-top: -0px;
+    }
+</style>
 </HEAD>
 
 <script type="text/javascript">
@@ -154,6 +161,7 @@ function _attachStream(element, stream) {
             }
             element.pluginObj = _pluginObj;
             if (_isIE || 1) {
+                _pluginObj.style = element.style;
                 _pluginObj.setAttribute('className', element.className);
                 _pluginObj.setAttribute('innerHTML', element.innerHTML);
                 var width = element.getAttribute("width");
@@ -225,13 +233,13 @@ function _getUserMedia() {
                 audio: true,
                 video: {
                     mandatory: {
-                        /*minFrameRate: 15,
-                        maxFrameRate: 25,
+                        minFrameRate: 15,
+                        maxFrameRate: 25.5,
 
                         minWidth: 1280,
                         minHeight: 720,
                         maxWidth: 1280,
-                        maxHeight: 720*/
+                        maxHeight: 720
                     },
 
                     optional: []
@@ -253,32 +261,33 @@ function _getUserMedia() {
 }
 
 function _screenshot() {
-    var elVideo = document.getElementById("myvideo_local");
-    if (elVideo) {
-        var elCanvas = document.getElementById("mycanvas");
-        var ctx2d = elCanvas.getContext("2d");
-        if (elVideo.videoWidth > 0 && elVideo.videoHeight > 0) {
-            var imageData = ctx2d.createImageData(elVideo.videoWidth, elVideo.videoHeight);
-            if (imageData) {
-                elVideo.fillImageData(imageData);
-                ctx2d.putImageData(imageData, 0, 0); // at (0,0)
+    if (video) {
+        if (video.videoWidth > 0 && video.videoHeight > 0) {
+            var elCanvas = document.getElementById("mycanvas");
+            var ctx2d = elCanvas.getContext("2d");
+            if (typeof video.getScreenShot !== "undefined") {
+                var bmpBase64 = video.getScreenShot();
+                if (bmpBase64) {
+                    var image = new Image();
+                    image.onload = function () {
+                        ctx2d.drawImage(image, 0, 0, elCanvas.width, elCanvas.height);
+                    };
+                    image.src = "data:image/png;base64," + bmpBase64;
+                }
+            }
+            else {
+                var imageData = ctx2d.createImageData(video.videoWidth, video.videoHeight);
+                if (imageData) {
+                    video.fillImageData(imageData);
+                    ctx2d.putImageData(imageData, 0, 0); // at (0,0)
+                }
             }
         }
     }
 }
 
 window.onload = function () {
-
     var completeStyle = window.getComputedStyle(myvideo_local, null);
-    /*var eltDIV = document.createElement('div');
-    eltDIV.style.cssText = "width:100px; height:100px; visibility:visible;";
-    eltDIV.onload = function () { alert("OOO"); }
-    //eltDIV.addEventListener("load", function () { alert("OOO"); })
-    document.body.appendChild(eltDIV);
-    eltDIV.innerHTML = "<object id=\"WebrtcEverywhere\" "
-    + (((Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window))? "classid=\"clsid:7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53\"" : "type=\"application/webrtc-everywhere\"")
-    + " width=\"1px\" height=\"1px\" style=\"visibility:visible\"> </object>";
-    */
     // IE11: "window.ActiveXObject" not defined -> http://msdn.microsoft.com/en-us/library/ie/dn423948%28v=vs.85%29.aspx
     var pluginObj = document.createElement('object');
     if ((Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window)) {
@@ -294,22 +303,26 @@ window.onload = function () {
 
 </script>
 
-<BODY>
-    <canvas id="mycanvas" width="100px" height="100px"></canvas>
-    <video id="myvideo_local" style="background-color: #000000;">
-        <!--object id="video_local" width="500px" height="500px" type="application/webrtc-everywhere"></object-->
-    </video>
+<body>
+    <div>
+        <div style="border:0px solid #000; margin-top: 42px; z-index: 10">
+            <video id="myvideo_local" style="background-color: #000000; margin-top: 42px; z-index: 10">
+                <!--object id="video_local" width="500px" height="500px" type="application/webrtc-everywhere"></object-->
+            </video>
+        </div>
+        <div>
+            <iframe class="overlay" style="border:0px solid #009; z-index: 1000"> </iframe>
+            <div id="div2" class="overlay" style='border:0px solid #009; z-index: 10000'>
+                <input type="button" value="getUserMedia" onclick='_getUserMedia();' /> &nbsp;
+                <input type="button" value="screenshot" onclick='_screenshot();' /> &nbsp;
+                <input type="button" value="peerConnection" onclick='_peerConnection();' /> &nbsp;
+                <input type="button" value="stop" onclick='_stop();' /> &nbsp;
+            </div>
+        </div>
+    </div>
+    <canvas id="mycanvas" width="250px" height="250px" style="margin-top: 72px; border:1px solid #000; z-index: 10"></canvas>
+
 
     <!--object id="video_local" width="50px" height="50px" type="application/webrtc-everywhere" style="background-color: #000000;"></object-->
-
-    <br />
-    <br />
-    <br />
-
-    <input type="button" id="btn_getUserMedia" value="getUserMedia" onclick='_getUserMedia();' />
-    <input type="button" value="screenshot" onclick='_screenshot();' />
-    <input type="button" value="peerConnection" onclick='_peerConnection();' />
-    <input type="button" value="stop" onclick='_stop();' />
-
-</BODY>
+</body>
 </HTML>

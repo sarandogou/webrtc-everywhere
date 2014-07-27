@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Wed Jul 23 09:29:21 2014
+/* at Sat Jul 26 08:10:45 2014
  */
 /* Compiler settings for webrtceverywhere.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -373,6 +373,9 @@ EXTERN_C const IID IID_IWebRTC;
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE fillImageData( 
             /* [in] */ VARIANT imageData) = 0;
         
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE getScreenShot( 
+            /* [retval][out] */ BSTR *base64BitmapData) = 0;
+        
         virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_isWebRtcPlugin( 
             /* [retval][out] */ VARIANT_BOOL *pVal) = 0;
         
@@ -498,6 +501,10 @@ EXTERN_C const IID IID_IWebRTC;
             IWebRTC * This,
             /* [in] */ VARIANT imageData);
         
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *getScreenShot )( 
+            IWebRTC * This,
+            /* [retval][out] */ BSTR *base64BitmapData);
+        
         /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_isWebRtcPlugin )( 
             IWebRTC * This,
             /* [retval][out] */ VARIANT_BOOL *pVal);
@@ -579,6 +586,9 @@ EXTERN_C const IID IID_IWebRTC;
 
 #define IWebRTC_fillImageData(This,imageData)	\
     ( (This)->lpVtbl -> fillImageData(This,imageData) ) 
+
+#define IWebRTC_getScreenShot(This,base64BitmapData)	\
+    ( (This)->lpVtbl -> getScreenShot(This,base64BitmapData) ) 
 
 #define IWebRTC_get_isWebRtcPlugin(This,pVal)	\
     ( (This)->lpVtbl -> get_isWebRtcPlugin(This,pVal) ) 

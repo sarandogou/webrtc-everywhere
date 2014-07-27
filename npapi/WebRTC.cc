@@ -31,6 +31,8 @@
 #define kFuncAddEventListener				"addEventListener"
 #define kFuncGetSources						"getSources"
 #define kFuncFillImageData					"fillImageData"
+#define kFuncGetScreenShot					"getScreenShot"
+
 
 extern NPNetscapeFuncs* BrowserFuncs;
 extern const char* kPluginVersion;
@@ -121,7 +123,8 @@ bool WebRTC::HasMethod(NPObject* obj, NPIdentifier methodName)
 		!strcmp(name, kFuncBindEventListener) ||
 		!strcmp(name, kFuncAddEventListener) ||
 		!strcmp(name, kFuncGetSources) ||
-		!strcmp(name, kFuncFillImageData)
+		!strcmp(name, kFuncFillImageData) ||
+		!strcmp(name, kFuncGetScreenShot)
 		;
     BrowserFuncs->memfree(name);
     return ret_val;
@@ -319,11 +322,11 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 								for (long comp = 0; comp < 4; ++comp) { // (a, r, g, b) -> (r, g, b, a)
 									sprintf(s, "%ld", (int32_t)index + comp);
 									INT32_TO_NPVARIANT(imageDataPtr[index + ((comp + 0) & 3)], var);
-                                    if (!(ret_val = varData.value.objectValue->_class->setProperty(varData.value.objectValue, BrowserFuncs->getstringidentifier(s), &var))) {
-                                        break;
-                                    }
+									if (!(ret_val = varData.value.objectValue->_class->setProperty(varData.value.objectValue, BrowserFuncs->getstringidentifier(s), &var))) {
+										break;
+									}
 									//if (!(ret_val = BrowserFuncs->setproperty(This->m_npp, varData.value.objectValue, BrowserFuncs->getstringidentifier(s), &var))) {
-										//break;
+									//break;
 									//}
 								}
 							}
@@ -332,7 +335,46 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 				}
 			}
 		}
-	}    
+	}
+	else if (!strcmp(name, kFuncGetScreenShot)) {
+		int videoWidth = This->GetVideoWidth();
+		int videoHeight = This->GetVideoHeight();
+		WeError err = WeError_Success;
+
+		if (videoHeight > 0 && videoWidth > 0) {
+			size_t videoSize = (videoWidth * videoHeight) << 2;
+			if (!This->m_pTempVideoBuff || This->m_pTempVideoBuff->getSize() < videoSize){
+				SafeDelete(&This->m_pTempVideoBuff);
+				err = _Buffer::New(NULL, videoSize, &This->m_pTempVideoBuff);
+			}
+			if (err == WeError_Success) {
+				if (This->CopyFromFrame(const_cast<void*>(This->m_pTempVideoBuff->getPtr()), videoSize) != videoSize) {
+					memset(const_cast<void*>(This->m_pTempVideoBuff->getPtr()), 0, videoSize);
+				}
+				const uint8_t* imageDataPtr = (const uint8_t*)This->m_pTempVideoBuff->getPtr();
+
+				// Convert to Bitmap
+				void* bmp_ptr = NULL;
+				size_t bmp_size;
+				if ((err = _Utils::ConvertToBMP(imageDataPtr, videoWidth, videoHeight, &bmp_ptr, &bmp_size)) != WeError_Success) {
+					if (bmp_ptr) free(bmp_ptr);
+				}
+				if (err == WeError_Success) {
+					// Convert to base64
+					void* np_base64_ptr = NULL;
+					size_t base64_size;
+					err = _Utils::ConvertToBase64(bmp_ptr, bmp_size, &np_base64_ptr, &base64_size, &Utils::MemAlloc);
+					free(bmp_ptr);
+					if (err == WeError_Success) {
+						STRINGZ_TO_NPVARIANT((char*)np_base64_ptr, *result); np_base64_ptr = NULL;
+						ret_val = true;
+					}
+					Utils::MemFree(&np_base64_ptr);
+				}
+			}
+			
+		}
+	}
 
     BrowserFuncs->memfree(name);
     return ret_val;

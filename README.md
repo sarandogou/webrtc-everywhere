@@ -11,6 +11,8 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-resolution" target="_blank">Choose camera resolution</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-audio" target="_blank">Audio-only getUserMedia() output to local audio element</a>
+ - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
+ - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection" target="_blank">Peer connection</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection-audio" target="_blank">Audio-only peer connection</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/multiple" target="_blank">Multiple peer connections</a>
@@ -22,9 +24,6 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/create-offer" target="_blank">Display createOffer output</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/trickle-ice" target="_blank">ICE candidate gathering</a>
 
-next #2 samples work but are toooo sloooow (to be fixed):
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a>
 
 # Using our plugin in your own project
  - Download and install the plugin for <a href="https://ns313841.ovh.net/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> or <a href="https://ns313841.ovh.net/webrtc/setup.exe" target="_blank">Windows</a>
@@ -46,6 +45,19 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
 # Release notes
  - **1.0.1**
 	- Initial release **without** support for DataChannel
+ - **1.1.0**
+	- Add new JavaScript function: <b>Webrtc::getScreenShot()</b>. This function converts the RGB32 raw image to bitmap then to base64. The process is instantaneous and the base64 image could be used in JavaScript like this:
+  ```
+	var image = new Image();
+	image.onload = function () {
+		document.getElementById("mycanvas").getContext("2d").drawImage(image, 0, 0, width, height);
+	};
+	image.src = "data:image/png;base64," + base64;
+  ```
+   - Bug fix:
+    	- [Issue #6](../../issues/6): The active element tag flashes when the window is resized or scrolled
+    	- [Issue #7](../../issues/7): drawImage() function is toooo slooow
+    	- [Issue #8](../../issues/8): Color alignment issue in drawImage()
 
 # License
  - Binaries and installers: All binaries and installers **from us** are released under **BSD** terms to allow using the project in your commercial products.

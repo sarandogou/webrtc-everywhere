@@ -363,6 +363,54 @@ STDMETHODIMP CWebRTC::fillImageData(__in VARIANT imageData)
 	return hr;
 }
 
+STDMETHODIMP CWebRTC::getScreenShot(__out BSTR* base64BitmapData)
+{
+	*base64BitmapData = NULL;
+
+	int videoWidth = GetVideoWidth();
+	int videoHeight = GetVideoHeight();
+
+	if (videoHeight <= 0 || videoWidth <= 0) {
+		return S_OK;
+	}
+
+	size_t videoSize = (videoWidth * videoHeight) << 2;
+	if (!m_pTempVideoBuff || m_pTempVideoBuff->getSize() < videoSize){
+		SafeDelete(&m_pTempVideoBuff);
+		if ((_Buffer::New(NULL, videoSize, &m_pTempVideoBuff))) {
+			CHECK_HR_RETURN(E_OUTOFMEMORY);
+		}
+	}
+
+	if (CopyFromFrame(const_cast<void*>(m_pTempVideoBuff->getPtr()), videoSize) != videoSize) {
+		memset(const_cast<void*>(m_pTempVideoBuff->getPtr()), 0, videoSize);
+	}
+	const uint8_t* imageDataPtr = (const uint8_t*)m_pTempVideoBuff->getPtr();
+	
+	WeError err;
+
+	// Convert to Bitmap
+	void* bmp_ptr = NULL;
+	size_t bmp_size;
+	if ((err = _Utils::ConvertToBMP(imageDataPtr, videoWidth, videoHeight, &bmp_ptr, &bmp_size)) != WeError_Success) {
+		if (bmp_ptr) free(bmp_ptr);
+		CHECK_HR_RETURN(E_FAIL);
+	}
+	// Convert to base64
+	void* base64_ptr = NULL;
+	size_t base64_size;
+	err = _Utils::ConvertToBase64(bmp_ptr, bmp_size, &base64_ptr, &base64_size);
+	free(bmp_ptr);
+	HRESULT hr = E_FAIL;
+	if (err == WeError_Success) {
+		hr = Utils::CopyAnsiStr((LPCSTR)base64_ptr, base64BitmapData);
+	}
+	if (base64_ptr) free(base64_ptr);
+	CHECK_HR_RETURN(hr);
+
+	return S_OK;
+}
+
 STDMETHODIMP CWebRTC::get_isWebRtcPlugin(__out VARIANT_BOOL* pVal)
 {
 	*pVal = VARIANT_TRUE;

@@ -90,7 +90,7 @@ HRESULT Utils::VariantToInteger(VARIANT var, long &integer)
 HRESULT Utils::VariantToDouble(VARIANT var, double &val)
 {
 	CComVariant _var;
-	HRESULT hr = VariantChangeType(&_var, &var, 0, VT_I4);
+	HRESULT hr = VariantChangeType(&_var, &var, 0, VT_R8);
 	CHECK_HR_RETURN(hr);
 	val = _var.dblVal;
 	return S_OK;
@@ -253,6 +253,7 @@ HRESULT Utils::BuildMediaConstraints(__in VARIANT varConstraints, __out std::sha
 	std::string strName, strVal;
 	DISPID dispid;
 	HRESULT hr;
+	char s[25];
 	hr = spConstraints->GetNextDispID(fdexEnumAll, DISPID_STARTENUM, &dispid);
 	while (hr != S_FALSE) {
 		CHECK_HR_RETURN(hr = spConstraints->GetMemberName(dispid, &bstrName));
@@ -264,14 +265,12 @@ HRESULT Utils::BuildMediaConstraints(__in VARIANT varConstraints, __out std::sha
 		else if (Utils::VariantIsInteger(var)) {
 			long v;
 			CHECK_HR_RETURN(hr = Utils::VariantToInteger(var, v));
-			char s[25];
 			sprintf(s, "%ld", v);
 			strVal = std::string(s);
 		}
 		else if (Utils::VariantIsFloat(var)) {
 			double v;
 			CHECK_HR_RETURN(hr = Utils::VariantToDouble(var, v));
-			char s[25];
 			sprintf(s, "%f", v);
 			strVal = std::string(s);
 		}

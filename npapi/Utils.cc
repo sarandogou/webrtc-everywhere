@@ -245,7 +245,7 @@ NPError Utils::BuildMediaConstraints(NPP npp, NPObject* varConstraints, cpp11::s
 	if (BrowserFuncs->enumerate(npp, varConstraints, &identifiers, &count) != true){
 		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
 	}
-
+	char s[25];
 	for (uint32_t i = 0; i < count; ++i) {
 		NPUTF8* propName = BrowserFuncs->utf8fromidentifier(identifiers[i]);
 		if (!propName) {
@@ -264,12 +264,10 @@ NPError Utils::BuildMediaConstraints(NPP npp, NPObject* varConstraints, cpp11::s
 			strVal = var.value.boolValue ? "true" : "false";
 		}
 		else if (var.type == NPVariantType_Int32) {
-			char s[25];
 			sprintf(s, "%d", var.value.intValue);
 			strVal = std::string(s);
 		}
 		else if (var.type == NPVariantType_Double) {
-			char s[25];
 			sprintf(s, "%lf", var.value.doubleValue);
 			strVal = std::string(s);
 		}
