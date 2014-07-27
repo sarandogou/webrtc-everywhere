@@ -58,6 +58,7 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
     	- [Issue #8](../../issues/8): Color alignment issue in drawImage()
  - **1.0.1**
 	- Initial release **without** support for DataChannel
+
 # License
  - Binaries and installers: All binaries and installers **from us** are released under **BSD** terms to allow using the project in your commercial products.
  - The source code: **GPLv3**
