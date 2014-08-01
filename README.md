@@ -13,6 +13,7 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-audio" target="_blank">Audio-only getUserMedia() output to local audio element</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
+ - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/face" target="_blank">getUserMedia() + Face tracking</a> (<font color="red">requires version 1.2.0</font>)
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection" target="_blank">Peer connection</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection-audio" target="_blank">Audio-only peer connection</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/multiple" target="_blank">Multiple peer connections</a>
