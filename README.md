@@ -14,6 +14,7 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/face" target="_blank">getUserMedia() + Face tracking</a> (<font color="red">requires version 1.2.0</font>)
+ - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/datachannel" target="_blank">Data channels</a> (<font color="red">requires version 1.2.0</font>)
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection" target="_blank">Peer connection</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection-audio" target="_blank">Audio-only peer connection</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/multiple" target="_blank">Multiple peer connections</a>
@@ -24,6 +25,8 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/constraints" target="_blank">Constraints and stats</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/create-offer" target="_blank">Display createOffer output</a>
  - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/trickle-ice" target="_blank">ICE candidate gathering</a>
+ - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/trickle-ice" target="_blank">DTMF</a> (<font color="red">requires version 1.2.0</font>)
+ 
 
 
 # Using our plugin in your own project
@@ -44,6 +47,12 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
 ... to be continued
 
 # Release notes
+ - **1.2.0**
+ 	- Adds <a href="http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannel" target="_blank">DataChannel</a> API with support for **Strings**, **BLOBs** and **ArrayBuffers** (Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array and Float64Array).
+ 	- Adds support for <a href="http://www.w3.org/TR/webrtc/#rtcdtmfsender" target="_blank">DTMFSender</a> API.
+ 	- Implements secure prompt in getUserMedia. Websites served over **htpps** are stored in local file encrypted using **DES-CBC**. The encryption keys are defined at build time.
+   - Bug fix: [Issue #3](../../issues/3), [Issue #10](../../issues/10) and [Issue #11](../../issues/11)
+
  - **1.1.0**
 	- Add new JavaScript function: <b>Webrtc::getScreenShot()</b>. This function converts the RGB32 raw image to bitmap then to base64. The process is instantaneous and the base64 image could be used in JavaScript like this:
   ```
