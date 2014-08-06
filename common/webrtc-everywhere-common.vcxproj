@@ -88,7 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.;../thirdparties/win32/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../thirdparties/win32/include;../thirdparties\common\include\webrtc-sdk;../thirdparties\common\include\webrtc-sdk\third_party\nss\nss\lib;../thirdparties\common\include\webrtc-sdk\third_party\nss\nss\lib\util;../thirdparties\common\include\webrtc-sdk\third_party\nss\nspr\pr\include;../thirdparties\common\include\webrtc-sdk\third_party\nss\nspr\lib\ds;../thirdparties\common\include\webrtc-sdk\third_party\nss\nspr\lib\libc\include;../thirdparties\common\include\webrtc-sdk\third_party\nss\nss\lib\cryptohi;../thirdparties\common\include\webrtc-sdk\third_party\nss\nss\lib\certdb;../thirdparties\common\include\webrtc-sdk\third_party\nss\nss\lib\pkcs7;../thirdparties\common\include\webrtc-sdk\third_party\nss\nss\lib\smime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

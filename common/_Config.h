@@ -15,7 +15,7 @@
 #	define kPluginVersionMajor 1
 #endif
 #if !defined(kPluginVersionMinor)
-#	define kPluginVersionMinor 1
+#	define kPluginVersionMinor 2
 #endif
 #if !defined(kPluginVersionMicro)
 #	define kPluginVersionMicro 0

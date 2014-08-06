@@ -57,8 +57,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,2,0,0
+ PRODUCTVERSION 1,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -73,14 +73,14 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
-            VALUE "FileVersion", "1.0.0.1"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
-            VALUE "InternalName", "webrtc-everywhere.dll"
-            VALUE "OriginalFilename", "webrtc-everywhere.dll"
-            VALUE "ProductName", "TODO: <Product name>"
-            VALUE "ProductVersion", "1.0.0.1"
+			VALUE "CompanyName", "Sarandogou"
+			VALUE "FileDescription", "WebRTC plugin for Safari, IE, Chrome, Opera and Firefox"
+			VALUE "FileVersion", "1.2.0.0"
+			VALUE "LegalCopyright", "(c) 2014 Sarandogou.  All rights reserved."
+            VALUE "InternalName", "webrtc-everywhere-ie.dll"
+            VALUE "OriginalFilename", "webrtc-everywhere-ie.dll"
+			VALUE "ProductName", "WebRTC Everywhere Plugin"
+			VALUE "ProductVersion", "1.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -162,4 +162,3 @@ IDR_RTCDATACHANNELEVENT REGISTRY                "RTCDataChannelEvent.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,0
- PRODUCTVERSION 1,1,0,0
+ FILEVERSION 1,2,0,0
+ PRODUCTVERSION 1,2,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -71,13 +71,13 @@ BEGIN
         BEGIN
 			VALUE "CompanyName", "Sarandogou"
             VALUE "FileDescription", "WebRTC plugin for Safari, IE, Chrome, Opera and Firefox"
-            VALUE "FileVersion", "1.1.0.0"
+            VALUE "FileVersion", "1.2.0.0"
             VALUE "InternalName", "npwebrtc-everywhere.dll"
             VALUE "LegalCopyright", "(c) 2014 Sarandogou.  All rights reserved."
             VALUE "MIMEType", "application/webrtc-everywhere"
             VALUE "OriginalFilename", "npwebrtc-everywhere.dll"
             VALUE "ProductName", "WebRTC Everywhere Plugin"
-            VALUE "ProductVersion", "1.1.0.0"
+            VALUE "ProductVersion", "1.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
