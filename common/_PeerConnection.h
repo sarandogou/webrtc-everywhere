@@ -14,6 +14,9 @@ class _MediaStream;
 class _PeerConnection;
 class _SessionDescription;
 class _MediaStreamTrackBase;
+class _MediaStreamTrack;
+class _RTCDTMFSender;
+class _RTCDataChannel;
 
 namespace webrtc {
 class VideoCaptureModule;
@@ -52,7 +55,9 @@ public:
 	bool removeStream(webrtc::MediaStreamInterface* stream);
 	bool close();
 	bool getStats(webrtc::MediaStreamTrackInterface* selector = NULL, _RTCStatsCallback successCallback = nullPtr, _RTCPeerConnectionErrorCallback failureCallback = nullPtr);
-	
+	cpp11::shared_ptr<_RTCDTMFSender> createDTMFSender(webrtc::AudioTrackInterface *track);
+	cpp11::shared_ptr<_RTCDataChannel> CreateDataChannel(const std::string& label, const webrtc::DataChannelInit* config);
+
 protected:
 	virtual ~_RTCPeerConnection();
 
@@ -67,6 +72,7 @@ protected:
 	virtual void OnIceChange();
 	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* candidate);
 	virtual void OnIceComplete();
+	virtual void OnDataChannel(webrtc::DataChannelInterface* data_channel);
 
 private:
 	talk_base::scoped_refptr<webrtc::PeerConnectionInterface> m_peer_connection;
@@ -107,7 +113,8 @@ public:
 	bool RemoveStream(_MediaStream* stream);
 	bool Close();
 	bool GetStats(_MediaStreamTrackBase* selector = NULL, _RTCStatsCallback successCallback = nullPtr, _RTCPeerConnectionErrorCallback failureCallback = nullPtr);
-	
+	cpp11::shared_ptr<_RTCDTMFSender> CreateDtmfSender(_MediaStreamTrack *track);
+	cpp11::shared_ptr<_RTCDataChannel> CreateDataChannel(const char* label, cpp11::shared_ptr<_RTCDataChannelInit> dataChannelDict = nullPtr);
 
 	// callbacks
 	WE_INLINE void SetCallback_onnegotiationneeded(_onnegotiationneededCallback _onnegotiationneeded) { onnegotiationneeded = _onnegotiationneeded; }
@@ -116,7 +123,8 @@ public:
 	WE_INLINE void SetCallback_onaddstream(_onaddstreamCallback _onaddstream) { onaddstream = _onaddstream; }
 	WE_INLINE void SetCallback_onremovestream(_onremovestreamCallback _onremovestream) { onremovestream = _onremovestream; }
 	WE_INLINE void SetCallback_oniceconnectionstatechange(_oniceconnectionstatechangeCallback _oniceconnectionstatechange) { oniceconnectionstatechange = _oniceconnectionstatechange; }
-	
+	WE_INLINE void SetCallback_ondatachannel(_ondatachannelCallback _ondatachannel) { ondatachannel = _ondatachannel; }
+
 private:
 	bool DeInit();
 
@@ -137,6 +145,7 @@ private:
 	_onaddstreamCallback onaddstream;
 	_onremovestreamCallback onremovestream;
 	_oniceconnectionstatechangeCallback oniceconnectionstatechange;
+	_ondatachannelCallback ondatachannel;
 
 #if _MSC_VER
 #pragma warning(pop)

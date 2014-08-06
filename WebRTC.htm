@@ -153,6 +153,7 @@ function _attachStream(element, stream) {
         if (!element.pluginObj && stream) {
             // FIXME
             var _pluginObj = document.createElement('object');
+            _pluginObj.innerHTML = '<param name=\"windowless\" value=\"false\">';
             var _isIE = (Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window);
             if (_isIE) {
                 _pluginObj.setAttribute('classid', 'CLSID:7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53');
@@ -290,12 +291,13 @@ window.onload = function () {
     var completeStyle = window.getComputedStyle(myvideo_local, null);
     // IE11: "window.ActiveXObject" not defined -> http://msdn.microsoft.com/en-us/library/ie/dn423948%28v=vs.85%29.aspx
     var pluginObj = document.createElement('object');
+    pluginObj.innerHTML = '<param name=\"windowless\" value=\"false\">';
+    pluginObj.setAttribute('id', 'WebrtcEverywhere');
     if ((Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject")) || ("ActiveXObject" in window)) {
         pluginObj.setAttribute('classid', 'CLSID:7FD49E23-C8D7-4C4F-93A1-F7EACFA1EC53');
     } else {
         pluginObj.setAttribute('type', 'application/webrtc-everywhere');
     }
-    pluginObj.setAttribute('id', 'WebrtcEverywhere');
     document.body.appendChild(pluginObj);
     pluginObj.setAttribute('width', '0');
     pluginObj.setAttribute('height', '0');
@@ -323,6 +325,8 @@ window.onload = function () {
     <canvas id="mycanvas" width="250px" height="250px" style="margin-top: 72px; border:1px solid #000; z-index: 10"></canvas>
 
 
-    <!--object id="video_local" width="50px" height="50px" type="application/webrtc-everywhere" style="background-color: #000000;"></object-->
+    <!--object id="video_local" width="50px" height="50px" classid="clsid:7fd49e23-c8d7-4c4f-93a1-f7eacfa1ec53" style="background-color: #000000;">
+        <param name="windowless" value=true>
+    </object-->
 </body>
 </HTML>

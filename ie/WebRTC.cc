@@ -16,11 +16,38 @@
 #include "../common/_Debug.h"
 
 #include <activscp.h>
+#include <D3D9.h>
+#include <D3D10_1.h> // Requires Windows Vista or later
+#include <DXGI.h> // Requires Windows 7 or later
+
+// http://msdn.microsoft.com/en-us/library/windows/desktop/bb694526(v=vs.85).aspx
+typedef HRESULT(WINAPI *fnD3D10CreateDevice1)(
+	_In_   IDXGIAdapter *pAdapter,
+	_In_   D3D10_DRIVER_TYPE DriverType,
+	_In_   HMODULE Software,
+	_In_   UINT Flags,
+	_In_   D3D10_FEATURE_LEVEL1 HardwareLevel,
+	_In_   UINT SDKVersion,
+	_Out_  ID3D10Device1 **ppDevice
+	);
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ff471318(v=vs.85).aspx
+typedef HRESULT(WINAPI *fnCreateDXGIFactory1)(
+	_In_   REFIID riid,
+	_Out_  void **ppFactory
+	);
+
 
 CWebRTC::CWebRTC()
 	: _AsyncEventDispatcher()
 	, _RTCDisplay()
 	, m_pTempVideoBuff(NULL)
+	, m_spPresentSite(NULL)
+	, m_spSurfacePresenter(NULL)
+	, m_spContainer(NULL)
+	, m_spDoc(NULL)
+	, m_spWindow(NULL)
+	, m_nBackBuffWidth(0)
+	, m_nbackBuffHeight(0)
 {
 	m_bWindowOnly = TRUE;
 }
@@ -30,6 +57,145 @@ HRESULT CWebRTC::FinalConstruct()
 	_Utils::Initialize();
 	TakeFakePeerConnectionFactory();
 	return S_OK;
+}
+
+void CWebRTC::FinalRelease()
+{
+	StopVideoRenderer();
+	SetDispatcher(NULL);
+	m_callbacks_onplay.clear();
+	SafeDelete(&m_pTempVideoBuff);
+	m_spPresentSite = NULL;
+	m_spSurfacePresenter = NULL;
+	m_spText = NULL;
+	m_spContainer = NULL;
+	m_spDoc = NULL;
+	m_spWindow = NULL;
+	ReleaseFakePeerConnectionFactory();
+}
+
+// IOleObjectImpl::SetClientSite()
+STDMETHODIMP CWebRTC::SetClientSite(_Inout_opt_ IOleClientSite *pClientSite)
+{
+	HRESULT hr = IOleObjectImpl::SetClientSite(pClientSite); // call base function
+	if (SUCCEEDED(hr) && m_spClientSite) {
+		HRESULT _hr = m_spClientSite->QueryInterface(IID_PPV_ARGS(&m_spPresentSite));
+		if (FAILED(_hr)) {
+			// IViewObjectPresentSite only supported on IE9 and later
+		}
+		else {
+			/*hr = */m_spPresentSite->SetCompositionMode(VIEW_OBJECT_COMPOSITION_MODE_SURFACEPRESENTER);
+		}
+
+		HRESULT hr = S_OK;
+
+		_hr = m_spClientSite->GetContainer(&m_spContainer);
+		if (SUCCEEDED(_hr)) {
+			_hr = m_spContainer->QueryInterface(IID_PPV_ARGS(&m_spDoc));
+			if (SUCCEEDED(_hr)) {
+				_hr = m_spDoc->get_parentWindow(&m_spWindow);
+				if (SUCCEEDED(_hr)) {
+					_hr = m_spWindow->get_location(&m_spLocation);
+				}
+			}
+		}
+
+		if (m_spWindow) {
+			_hr = Utils::InstallScripts(m_spWindow);
+		}
+	}
+	return hr;
+}
+
+// IPersistPropertyBagImpl::Load
+STDMETHODIMP CWebRTC::Load(__RPC__in_opt IPropertyBag *pPropBag, __RPC__in_opt IErrorLog *pErrorLog)
+{
+	CComVariant var;
+	HRESULT hr = pPropBag->Read(L"windowless", &var, pErrorLog);
+	if (SUCCEEDED(hr) && var.vt == VT_BSTR) {
+		// Check if windowless drawing is possible (requires IE9 or later)
+		if (m_spPresentSite) {
+			m_bWindowOnly = wcscmp(_T("false"), var.bstrVal) == 0 ? TRUE : FALSE;
+		}
+	}
+	return S_OK;
+}
+
+// IOleInPlaceObject::SetObjectRects
+STDMETHODIMP CWebRTC::SetObjectRects(__RPC__in LPCRECT lprcPosRect, __RPC__in LPCRECT lprcClipRect)
+{
+	HRESULT hr = IOleInPlaceObjectWindowlessImpl::SetObjectRects(lprcPosRect, lprcClipRect); // IOleInPlaceObject::SetObjectRects(lprcPosRect, lprcClipRect); // call base function
+	if (SUCCEEDED(hr) && m_spPresentSite && !m_bWindowOnly) {
+		LONG w = lprcPosRect->right - lprcPosRect->left;
+		LONG h = lprcPosRect->bottom - lprcPosRect->top;
+		if (w > 0 && h > 0) {
+			CComPtr<ISurfacePresenter> spSurfacePresenter;
+			CComPtr<ID3D10Device1> device = NULL;
+			HMODULE d3d10_1_dll = LoadLibraryA("d3d10_1.dll");
+			HMODULE dxgi_dll = NULL;
+			HRESULT _hr;
+			if (d3d10_1_dll) {
+				fnD3D10CreateDevice1 implD3D10CreateDevice1 = (fnD3D10CreateDevice1)GetProcAddress(d3d10_1_dll, "D3D10CreateDevice1");
+				if (implD3D10CreateDevice1) {
+					CComPtr<IDXGIAdapter> adapter = NULL;
+					dxgi_dll = LoadLibraryA("dxgi.dll");
+					if (dxgi_dll && 0) {
+						fnCreateDXGIFactory1 implCreateDXGIFactory1 = (fnCreateDXGIFactory1)GetProcAddress(dxgi_dll, "CreateDXGIFactory1");
+						if (implCreateDXGIFactory1) {
+							_hr = implCreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&adapter);
+						}
+					}
+					_hr = implD3D10CreateDevice1(
+						adapter,
+						D3D10_DRIVER_TYPE_HARDWARE,
+						NULL,
+						D3D10_CREATE_DEVICE_PREVENT_INTERNAL_THREADING_OPTIMIZATIONS | D3D10_CREATE_DEVICE_BGRA_SUPPORT,
+						D3D10_FEATURE_LEVEL_10_0,
+						D3D10_1_SDK_VERSION,
+						&device);
+				}
+			}
+			_hr = m_spPresentSite->CreateSurfacePresenter(
+				device,
+				w,
+				h,
+				1,
+				DXGI_FORMAT_B8G8R8A8_UNORM,
+				VIEW_OBJECT_ALPHA_MODE_PREMULTIPLIED,
+				&spSurfacePresenter);
+			if (SUCCEEDED(_hr)) {
+				D3D10_TEXTURE2D_DESC desc;
+				desc.Width = w;
+				desc.Height = h;
+				desc.MipLevels = 1;
+				desc.ArraySize = 1;
+				desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				desc.SampleDesc.Count = 1;
+				desc.SampleDesc.Quality = 0;
+				desc.Usage = D3D10_USAGE_DYNAMIC;
+				desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+				desc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+				desc.MiscFlags = 0;
+
+				CComPtr<ID3D10Texture2D> spText = NULL;
+				hr = device->CreateTexture2D(&desc, NULL, &spText);
+				if (SUCCEEDED(hr)) {
+					m_spSurfacePresenter = spSurfacePresenter;
+					m_spText = spText;
+					m_nBackBuffWidth = w;
+					m_nbackBuffHeight = h;
+				}
+			}
+
+			if (d3d10_1_dll) {
+				FreeLibrary(d3d10_1_dll);
+			}
+			if (dxgi_dll) {
+				FreeLibrary(dxgi_dll);
+			}
+		}
+	}
+	return hr;
 }
 
 // _RTCDisplay::Handle() implementation
@@ -59,19 +225,27 @@ void CWebRTC::OnStopVideoRenderer()
 
 }
 
+// QuerySurfacePresenter::OnStopVideoRenderer() implementation
+void CWebRTC::QuerySurfacePresenter(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)
+{
+	backBuffWidth = m_nBackBuffWidth;
+	backBuffHeight = m_nbackBuffHeight;
+	spPtr = m_spSurfacePresenter;
+	spText = m_spText;
+}
+
 LRESULT CWebRTC::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	SetWindow(m_hWnd);
+	if (m_bWindowOnly) {
+		SetWindow(m_hWnd);
+	}
 	return S_OK;
 }
 
-void CWebRTC::FinalRelease()
+LRESULT CWebRTC::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	StopVideoRenderer();
-	SetDispatcher(NULL);
-	m_callbacks_onplay.clear();
-	SafeDelete(&m_pTempVideoBuff);
-	ReleaseFakePeerConnectionFactory();
+	
+	return S_OK;
 }
 
 STDMETHODIMP CWebRTC::get_versionName(BSTR* pVal)
@@ -117,6 +291,29 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 	CComPtr<IDispatch>_constraints = Utils::VariantToDispatch(constraints);
 	CComPtr<IDispatch>_successCallback = Utils::VariantToDispatch(successCallback);
 	CComPtr<IDispatch>_errorCallback = Utils::VariantToDispatch(errorCallback);
+
+#if 1
+	bool gumAccepted;
+	CComBSTR protocol;
+	CComBSTR host;
+	if (m_spLocation) {
+		CHECK_HR_RETURN(hr = m_spLocation->get_protocol(&protocol));
+		CHECK_HR_RETURN(hr = m_spLocation->get_host(&host));
+	}
+	CHECK_HR_RETURN(hr = _Utils::MsgBoxGUM(gumAccepted, protocol, host, m_hWnd));
+	if (!gumAccepted) {
+		if (_errorCallback) {
+			BrowserCallback* _cb = new BrowserCallback(WM_GETUSERMEDIA_ERROR, _errorCallback);
+			if (_cb) {
+				CComBSTR err("Permission to access camera/microphone denied");
+				_cb->AddBSTR(err);
+				dynamic_cast<_AsyncEventDispatcher*>(this)->RaiseCallback(_cb);
+				SafeReleaseObject(&_cb);
+			}
+		}
+		return S_OK;
+	}
+#endif
 
 	std::shared_ptr<_MediaStreamConstraints> mediaStreamConstraints;
 
@@ -419,18 +616,19 @@ STDMETHODIMP CWebRTC::get_isWebRtcPlugin(__out VARIANT_BOOL* pVal)
 
 HRESULT CWebRTC::GetDispatch(CComPtr<IDispatch> &spDispatch)
 {
-	HRESULT hr = S_OK;
-	IHTMLDocument2* pDoc = NULL;
+	if (!m_spWindow) {
+		CHECK_HR_RETURN(E_POINTER);
+	}
 
-	CComPtr<IOleContainer> spContainer;
-	CComPtr<IHTMLDocument2> spDoc;
-	CComPtr<IHTMLWindow2> spWindow;
+	CHECK_HR_RETURN(m_spWindow->QueryInterface(IID_PPV_ARGS(&spDispatch)));
+	return S_OK;
+}
 
-	CHECK_HR_BAIL(hr = m_spClientSite->GetContainer(&spContainer));
-	CHECK_HR_BAIL(hr = spContainer->QueryInterface(IID_IHTMLDocument2, (void**)&pDoc));
-	CHECK_HR_BAIL(hr = pDoc->get_parentWindow(&spWindow));
-	CHECK_HR_BAIL(hr = spWindow->QueryInterface(IID_IDispatch, (void**)&spDispatch));
-
-bail:
-	return hr;
+HRESULT CWebRTC::GetHTMLWindow2(CComPtr<IHTMLWindow2> &spWindow2)
+{
+	if (!m_spWindow) {
+		CHECK_HR_RETURN(E_POINTER);
+	}
+	spWindow2 = m_spWindow;
+	return S_OK;
 }

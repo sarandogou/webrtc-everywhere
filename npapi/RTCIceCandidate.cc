@@ -131,7 +131,7 @@ bool RTCIceCandidate::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVa
 	}
 	else if (!strcmp(name, kPropCandidate)) {
 		if (This->m_Candidate) {
-			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Candidate->candidate(), strlen(This->m_Candidate->candidate()));
+			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Candidate->candidate(), we_strlen(This->m_Candidate->candidate()));
 			if (npStr) {
 				STRINGZ_TO_NPVARIANT(npStr, *result);
 				ret_val = true;
@@ -140,7 +140,7 @@ bool RTCIceCandidate::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVa
 	}
 	else if (!strcmp(name, kPropSdpMid)) {
 		if (This->m_Candidate) {
-			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Candidate->sdpMid(), strlen(This->m_Candidate->sdpMid()));
+			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Candidate->sdpMid(), we_strlen(This->m_Candidate->sdpMid()));
 			if (npStr) {
 				STRINGZ_TO_NPVARIANT(npStr, *result);
 				ret_val = true;

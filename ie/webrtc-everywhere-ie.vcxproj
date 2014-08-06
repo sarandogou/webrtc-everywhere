@@ -69,7 +69,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;_DEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -110,7 +110,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;NDEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
@@ -151,7 +151,12 @@
     <ClCompile Include="MediaStream.cc" />
     <ClCompile Include="MediaStreamEvent.cc" />
     <ClCompile Include="MediaStreamTrack.cc" />
+    <ClCompile Include="MessageEvent.cc" />
     <ClCompile Include="PeerConnection.cc" />
+    <ClCompile Include="RTCDataChannel.cc" />
+    <ClCompile Include="RTCDataChannelEvent.cc" />
+    <ClCompile Include="RTCDTMFSender.cc" />
+    <ClCompile Include="RTCDTMFToneChangeEvent.cc" />
     <ClCompile Include="RTCIceCandidate.cc" />
     <ClCompile Include="RTCPeerConnectionIceEvent.cc" />
     <ClCompile Include="RTCStats.cc" />
@@ -180,7 +185,12 @@
     <None Include="MediaStream.rgs" />
     <None Include="MediaStreamEvent.rgs" />
     <None Include="MediaStreamTrack.rgs" />
+    <None Include="MessageEvent.rgs" />
     <None Include="PeerConnection.rgs" />
+    <None Include="RTCDataChannel.rgs" />
+    <None Include="RTCDataChannelEvent.rgs" />
+    <None Include="RTCDTMFSender.rgs" />
+    <None Include="RTCDTMFToneChangeEvent.rgs" />
     <None Include="RTCIceCandidate4.rgs" />
     <None Include="RTCPeerConnectionIceEvent.rgs" />
     <None Include="RTCStats.rgs" />
@@ -202,8 +212,13 @@
     <ClInclude Include="MediaStream.h" />
     <ClInclude Include="MediaStreamEvent.h" />
     <ClInclude Include="MediaStreamTrack.h" />
+    <ClInclude Include="MessageEvent.h" />
     <ClInclude Include="PeerConnection.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="RTCDataChannel.h" />
+    <ClInclude Include="RTCDataChannelEvent.h" />
+    <ClInclude Include="RTCDTMFSender.h" />
+    <ClInclude Include="RTCDTMFToneChangeEvent.h" />
     <ClInclude Include="RTCIceCandidate.h" />
     <ClInclude Include="RTCPeerConnectionIceEvent.h" />
     <ClInclude Include="RTCStats.h" />

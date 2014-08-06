@@ -151,6 +151,40 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 		NPObjectAutoRef successCallback(argCount > 1 ? Utils::VariantToObject((NPVariant*)&args[1]) : NULL);
 		NPObjectAutoRef errorCallback(argCount > 2 ? Utils::VariantToObject((NPVariant*)&args[2]) : NULL);
 
+#if 1
+		bool gumAccepted = false;
+		NPVariant protocol, host;
+		NPError err = Utils::GetLocation(This->m_npp, &protocol, &host);
+		CHECK_NPERR_BAIL(err);
+#if WE_UNDER_WINDOWS
+		std::string _protocol("");
+		std::string _host("");
+		if (NPVARIANT_IS_STRING(protocol)) {
+			_protocol = std::string(protocol.value.stringValue.UTF8Characters, protocol.value.stringValue.UTF8Length);
+		}
+		if (NPVARIANT_IS_STRING(host)) {
+			_host = std::string(host.value.stringValue.UTF8Characters, host.value.stringValue.UTF8Length);
+		}
+		HRESULT hr = _Utils::MsgBoxGUMA(gumAccepted, _protocol.c_str(), _host.c_str(), reinterpret_cast<HWND>(This->GetWindowHandle()));
+		CHECK_HR_BAIL(hr);
+#else
+#error "Not implemented"
+#endif
+		if (!gumAccepted) {
+			if (errorCallback) {
+				BrowserCallback* _cb = new BrowserCallback(This->m_npp, WM_GETUSERMEDIA_ERROR, errorCallback);
+				if (_cb) {
+					static const char __msg[] = "Permission to access camera/microphone denied";
+					static const size_t __msg_len = sizeof(__msg);
+					_cb->AddString(__msg, __msg_len);
+					dynamic_cast<_AsyncEventDispatcher*>(This)->RaiseCallback(_cb);
+					SafeReleaseObject(&_cb);
+				}
+			}
+			goto bail;
+		}
+#endif
+
 		cpp11::shared_ptr<_MediaStreamConstraints> mediaStreamConstraints;
 
 		ret_val = (Utils::BuildMediaStreamConstraints(This->m_npp, constraints, mediaStreamConstraints) == NPERR_NO_ERROR);
@@ -372,10 +406,10 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 					Utils::MemFree(&np_base64_ptr);
 				}
 			}
-			
 		}
 	}
 
+bail:
     BrowserFuncs->memfree(name);
     return ret_val;
 }
@@ -403,7 +437,7 @@ bool WebRTC::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVariant* re
     }
 
     if (!strcmp(name, kPropVersion)) {
-		char* npStr = (char*)Utils::MemDup(kPluginVersionString, strlen(kPluginVersionString));
+		char* npStr = (char*)Utils::MemDup(kPluginVersionString, we_strlen(kPluginVersionString));
         if (npStr) {
             STRINGZ_TO_NPVARIANT(npStr, *result);
             ret_val = true;

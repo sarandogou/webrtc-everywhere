@@ -7,6 +7,7 @@
 class WEBRTC_EVERYWHERE_API _Buffer
 {
 public:
+	_Buffer(const void* ptr, size_t size);
     virtual ~_Buffer();
     WE_INLINE const void* getPtr()const {
         return m_pPtr;
@@ -18,7 +19,6 @@ public:
     static WeError New(const void* ptr, size_t size, _Buffer** ppObj);
 
 private:
-    _Buffer();
     void* m_pPtr;
     size_t m_nSize;
 };

@@ -12,6 +12,9 @@
 #include "RTCIceCandidate.h"
 #include "RTCPeerConnectionIceEvent.h"
 #include "RTCStatsReport.h"
+#include "RTCDTMFSender.h"
+#include "RTCDataChannel.h"
+#include "RTCDataChannelEvent.h"
 #include "WebRTC.h"
 #include "NPCommon.h"
 #include "Utils.h"
@@ -30,6 +33,7 @@ extern const char* kPluginVersion;
 #define kPropOnaddstream							"onaddstream"
 #define kPropOnremovestream							"onremovestream"
 #define kPropOniceconnectionstatechange				"oniceconnectionstatechange"
+#define kPropOndatachannel							"ondatachannel"
 
 #define kFuncCreateOffer							"createOffer"
 #define kFuncCreateAnswer							"createAnswer"
@@ -44,6 +48,8 @@ extern const char* kPluginVersion;
 #define kFuncRemoveStream							"removeStream"
 #define kFuncClose									"close"
 #define kFuncGetStats								"getStats"
+#define kFuncCreateDTMFSender						"createDTMFSender"
+#define kFuncCreateDataChannel						"createDataChannel"
 
 NPClass PeerConnectionClass = {
 	NP_CLASS_STRUCT_VERSION,
@@ -84,6 +90,7 @@ PeerConnection::PeerConnection(NPP instance)
 	, m_callback_onaddstream(NULL)
 	, m_callback_onremovestream(NULL)
 	, m_callback_oniceconnectionstatechange(NULL)
+	, m_callback_ondatachannel(NULL)
 {
 	WE_DEBUG_INFO("PeerConnection::NewInstance()");
 }
@@ -96,6 +103,7 @@ PeerConnection::~PeerConnection()
 	Utils::NPObjectRelease(&m_callback_onaddstream);
 	Utils::NPObjectRelease(&m_callback_onremovestream);
 	Utils::NPObjectRelease(&m_callback_oniceconnectionstatechange);
+	Utils::NPObjectRelease(&m_callback_ondatachannel);
 
 	m_Peer = nullPtr;
 
@@ -125,6 +133,7 @@ NPError PeerConnection::Init(NPObject* RTCConfiguration, NPObject* MediaConstrai
 	m_Peer->SetCallback_onaddstream(cpp11::bind(&PeerConnection::onaddstream, this, cpp11::placeholders::_1));
 	m_Peer->SetCallback_onremovestream(cpp11::bind(&PeerConnection::onremovestream, this, cpp11::placeholders::_1));
 	m_Peer->SetCallback_oniceconnectionstatechange(cpp11::bind(&PeerConnection::oniceconnectionstatechange, this));
+	m_Peer->SetCallback_ondatachannel(cpp11::bind(&PeerConnection::ondatachannel, this, cpp11::placeholders::_1));
 
 	return NPERR_NO_ERROR;
 }
@@ -155,7 +164,9 @@ bool PeerConnection::HasMethod(NPObject* obj, NPIdentifier methodName)
 		!strcmp(name, kFuncAddStream) ||
 		!strcmp(name, kFuncRemoveStream) ||
 		!strcmp(name, kFuncClose) ||
-		!strcmp(name, kFuncGetStats)
+		!strcmp(name, kFuncGetStats) ||
+		!strcmp(name, kFuncCreateDTMFSender) ||
+		!strcmp(name, kFuncCreateDataChannel)
 		;
 
 	BrowserFuncs->memfree(name);
@@ -439,7 +450,7 @@ bool PeerConnection::Invoke(NPObject* obj, NPIdentifier methodName,
 			NPObject* _selector = Utils::VariantToObject((NPVariant*)&args[0]);
 			NPObjectAutoRef _successCallback(argCount > 1 ? Utils::VariantToObject((NPVariant*)&args[1]) : NULL);
 			NPObjectAutoRef _failureCallback(argCount > 2 ? Utils::VariantToObject((NPVariant*)&args[2]) : NULL);
-			
+
 			if (_selector || _successCallback || _failureCallback) {
 				MediaStreamTrack* _mediaStreamTrack = (MediaStreamTrack*)(MediaStreamTrack::IsInstanceOf(_selector) ? _selector : Utils::NPObjectUpCast(_selector));
 				if (!MediaStreamTrack::IsInstanceOf(_selector)) {
@@ -497,6 +508,50 @@ bool PeerConnection::Invoke(NPObject* obj, NPIdentifier methodName,
 			}
 		}
 	}
+	else if (!strcmp(name, kFuncCreateDTMFSender)) {
+		if (This->m_Peer && argCount > 0) {
+			NPObject* _MediaStreamTrack = Utils::VariantToObject((NPVariant*)&args[0]);
+			MediaStreamTrack* _mediaStreamTrack = (MediaStreamTrack*)(MediaStreamTrack::IsInstanceOf(_MediaStreamTrack) ? _MediaStreamTrack : Utils::NPObjectUpCast(_MediaStreamTrack));
+			if (_mediaStreamTrack) {
+				cpp11::shared_ptr<_RTCDTMFSender>sender = This->m_Peer->CreateDtmfSender(_mediaStreamTrack->GetTrack().get());
+				if (sender) {
+					RTCDTMFSender* _sender = NULL;
+					NPError err = RTCDTMFSender::CreateInstanceWithRef(This->m_npp, &_sender);
+					if (err == NPERR_NO_ERROR) {
+						_sender->SetSender(sender);
+						_sender->SetDispatcher(const_cast<_AsyncEventDispatcher*>(This->GetDispatcher()));
+						OBJECT_TO_NPVARIANT(_sender, *result); _sender = NULL;
+						RTCDTMFSender::ReleaseInstance(&_sender);
+						ret_val = true;
+					}
+				}
+			}
+		}
+	}
+	else if (!strcmp(name, kFuncCreateDataChannel)) {
+		if (This->m_Peer) {
+			std::string label = "";
+			if (argCount > 0 && args[0].type == NPVariantType_String) {
+				label = std::string(args[0].value.stringValue.UTF8Characters, args[0].value.stringValue.UTF8Length);
+			}
+			NPObject* dataChannelDict = argCount > 1 ? Utils::VariantToObject((NPVariant*)&args[1]) : NULL;
+
+			cpp11::shared_ptr<_RTCDataChannelInit> _dataChannelDict;
+			NPError err = Utils::BuildRTCDataChannelInit(This->m_npp, dataChannelDict, _dataChannelDict);
+			cpp11::shared_ptr<_RTCDataChannel> dataChannel = This->m_Peer->CreateDataChannel(label.c_str(), _dataChannelDict);
+			if (err == NPERR_NO_ERROR) {
+				RTCDataChannel* _dataChannel = NULL;
+				err = RTCDataChannel::CreateInstanceWithRef(This->m_npp, &_dataChannel);
+				if (err == NPERR_NO_ERROR) {
+					_dataChannel->SetChannel(dataChannel);
+					_dataChannel->SetDispatcher(const_cast<_AsyncEventDispatcher*>(This->GetDispatcher()));
+					OBJECT_TO_NPVARIANT(_dataChannel, *result); _dataChannel = NULL;
+					RTCDataChannel::ReleaseInstance(&_dataChannel);
+					ret_val = true;
+				}
+			}
+		}
+	}
 
 	BrowserFuncs->memfree(name);
 	return ret_val;
@@ -517,7 +572,8 @@ bool PeerConnection::HasProperty(NPObject* obj, NPIdentifier propertyName)
 		!strcmp(name, kPropOnsignalingstatechange) ||
 		!strcmp(name, kPropOnaddstream) ||
 		!strcmp(name, kPropOnremovestream) ||
-		!strcmp(name, kPropOniceconnectionstatechange)
+		!strcmp(name, kPropOniceconnectionstatechange) ||
+		!strcmp(name, kPropOndatachannel)
 		;
 
 	BrowserFuncs->memfree(name);
@@ -573,6 +629,12 @@ bool PeerConnection::SetProperty(NPObject *npobj, NPIdentifier propertyName, con
 		Utils::NPObjectSet(&This->m_callback_oniceconnectionstatechange, Utils::VariantToObject((NPVariant*)value));
 		ret_val = true;
 	}
+	else if (!strcmp(name, kPropOndatachannel)) {
+		Utils::NPObjectSet(&This->m_callback_ondatachannel, Utils::VariantToObject((NPVariant*)value));
+		ret_val = true;
+	}
+
+	
 
 	BrowserFuncs->memfree(name);
 	return ret_val;
@@ -630,7 +692,7 @@ bool PeerConnection::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVar
 	}
 	else if (!strcmp(name, kPropSignalingState)) {
 		if (This->m_Peer) {
-			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Peer->SignalingState(), strlen(This->m_Peer->SignalingState()));
+			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Peer->SignalingState(), we_strlen(This->m_Peer->SignalingState()));
 			if (npStr) {
 				STRINGZ_TO_NPVARIANT(npStr, *result);
 				ret_val = true;
@@ -639,7 +701,7 @@ bool PeerConnection::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVar
 	}
 	else if (!strcmp(name, kPropIceGatheringState)) {
 		if (This->m_Peer) {
-			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Peer->IceGatheringState(), strlen(This->m_Peer->IceGatheringState()));
+			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Peer->IceGatheringState(), we_strlen(This->m_Peer->IceGatheringState()));
 			if (npStr) {
 				STRINGZ_TO_NPVARIANT(npStr, *result);
 				ret_val = true;
@@ -648,7 +710,7 @@ bool PeerConnection::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVar
 	}
 	else if (!strcmp(name, kPropIceConnectionState)) {
 		if (This->m_Peer) {
-			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Peer->IceConnectionState(), strlen(This->m_Peer->IceConnectionState()));
+			NPUTF8* npStr = (NPUTF8*)Utils::MemDup(This->m_Peer->IceConnectionState(), we_strlen(This->m_Peer->IceConnectionState()));
 			if (npStr) {
 				STRINGZ_TO_NPVARIANT(npStr, *result);
 				ret_val = true;
@@ -672,6 +734,9 @@ bool PeerConnection::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVar
 	}
 	else if (!strcmp(name, kPropOniceconnectionstatechange)) {
 		ret_val = (Utils::NPObjectToVariantAndRetain(This->m_callback_oniceconnectionstatechange, result) == NPERR_NO_ERROR);
+	}
+	else if (!strcmp(name, kPropOndatachannel)) {
+		ret_val = (Utils::NPObjectToVariantAndRetain(This->m_callback_ondatachannel, result) == NPERR_NO_ERROR);
 	}
 
 	BrowserFuncs->memfree(name);
@@ -768,6 +833,25 @@ void PeerConnection::oniceconnectionstatechange()
 		if (_cb) {
 			this->RaiseCallback(_cb);
 			SafeReleaseObject(&_cb);
+		}
+	}
+}
+
+void PeerConnection::ondatachannel(cpp11::shared_ptr<_RTCDataChannelEvent> e)
+{
+	if (m_callback_ondatachannel) {
+		RTCDataChannelEvent* _event;
+		NPError err = RTCDataChannelEvent::CreateInstanceWithRef(m_npp, &_event);
+		if (err == NPERR_NO_ERROR) {
+			_event->SetDispatcher(const_cast<_AsyncEventDispatcher*>(GetDispatcher()));
+			_event->SetEvent(e);
+			BrowserCallback* _cb = new BrowserCallback(m_npp, WM_SUCCESS, m_callback_ondatachannel);
+			if (_cb) {
+				_cb->AddObject(_event);
+				this->RaiseCallback(_cb);
+				SafeReleaseObject(&_cb);
+			}
+			RTCDataChannelEvent::ReleaseInstance(&_event);
 		}
 	}
 }

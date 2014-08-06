@@ -23,6 +23,8 @@ HRESULT CRTCStatsReport::FinalConstruct()
 void CRTCStatsReport::FinalRelease()
 {
 	m_Stats = nullptr;
+
+	SetDispatcher(NULL);
 }
 
 STDMETHODIMP CRTCStatsReport::result(__out VARIANT* RTCStatsList)

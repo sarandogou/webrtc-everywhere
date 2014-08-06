@@ -56,7 +56,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WEBRTCEVERYWHERENPAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_DEBUG;_WINDOWS;_USRDLL;WEBRTCEVERYWHERENPAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -79,7 +79,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WEBRTCEVERYWHERENPAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;NDEBUG;_WINDOWS;_USRDLL;WEBRTCEVERYWHERENPAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader />
@@ -106,8 +106,13 @@
     <ClCompile Include="MediaStream.cc" />
     <ClCompile Include="MediaStreamEvent.cc" />
     <ClCompile Include="MediaStreamTrack.cc" />
+    <ClCompile Include="MessageEvent.cc" />
     <ClCompile Include="PeerConnection.cc" />
     <ClCompile Include="Plugin.cc" />
+    <ClCompile Include="RTCDataChannel.cc" />
+    <ClCompile Include="RTCDataChannelEvent.cc" />
+    <ClCompile Include="RTCDTMFSender.cc" />
+    <ClCompile Include="RTCDTMFToneChangeEvent.cc" />
     <ClCompile Include="RTCIceCandidate.cc" />
     <ClCompile Include="RTCPeerConnectionIceEvent.cc" />
     <ClCompile Include="RTCStats.cc" />
@@ -126,10 +131,15 @@
     <ClInclude Include="MediaStream.h" />
     <ClInclude Include="MediaStreamEvent.h" />
     <ClInclude Include="MediaStreamTrack.h" />
+    <ClInclude Include="MessageEvent.h" />
     <ClInclude Include="NPCommon.h" />
     <ClInclude Include="PeerConnection.h" />
     <ClInclude Include="Plugin.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="RTCDataChannel.h" />
+    <ClInclude Include="RTCDataChannelEvent.h" />
+    <ClInclude Include="RTCDTMFSender.h" />
+    <ClInclude Include="RTCDTMFToneChangeEvent.h" />
     <ClInclude Include="RTCIceCandidate.h" />
     <ClInclude Include="RTCPeerConnectionIceEvent.h" />
     <ClInclude Include="RTCStats.h" />

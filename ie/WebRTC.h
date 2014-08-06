@@ -36,6 +36,7 @@ class ATL_NO_VTABLE CWebRTC :
     public IConnectionPointContainerImpl<CWebRTC>,
     public CProxy_IWebRTCEvents<CWebRTC>,
     public IPersistStorageImpl<CWebRTC>,
+	public IPersistPropertyBagImpl<CWebRTC>,
     public ISpecifyPropertyPagesImpl<CWebRTC>,
     public IQuickActivateImpl<CWebRTC>,
 #ifndef _WIN32_WCE
@@ -83,6 +84,7 @@ public:
     COM_INTERFACE_ENTRY(ISpecifyPropertyPages)
     COM_INTERFACE_ENTRY(IQuickActivate)
     COM_INTERFACE_ENTRY(IPersistStorage)
+	COM_INTERFACE_ENTRY(IPersistPropertyBag)
 #ifndef _WIN32_WCE
     COM_INTERFACE_ENTRY(IDataObject)
 #endif
@@ -110,6 +112,7 @@ public:
     CHAIN_MSG_MAP(CComControl<CWebRTC>)
     DEFAULT_REFLECTION_HANDLER()
 	MESSAGE_HANDLER(WM_CREATE, OnCreate)
+	MESSAGE_HANDLER(WM_SIZE, OnSize)
     END_MSG_MAP()
 // Handler prototypes:
 //  LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -182,6 +185,7 @@ public:
 
 	HRESULT FinalConstruct();
 	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	void FinalRelease();
 
 	BrowserObjectImpl_IUnknown();
@@ -204,19 +208,39 @@ public:
 	STDMETHOD(get_videoWidth)(__out LONG* pVal);
 	STDMETHOD(get_videoHeight)(__out LONG* pVal);
 	STDMETHOD(get_isWebRtcPlugin)(__out VARIANT_BOOL* pVal);
+
+	// IOleObjectImpl::SetClientSite()
+	STDMETHOD(SetClientSite)(_Inout_opt_ IOleClientSite *pClientSite);
+
+	// IPersistPropertyBagImpl::Load
+	STDMETHOD(Load)(__RPC__in_opt IPropertyBag *pPropBag, __RPC__in_opt IErrorLog *pErrorLog);
+
+	// IOleInPlaceObject::SetObjectRects
+	STDMETHOD(SetObjectRects)(__RPC__in LPCRECT lprcPosRect, __RPC__in LPCRECT lprcClipRect);
 	
 
 	// _RTCDisplay implementation
 	virtual HWND Handle();
 	virtual void OnStartVideoRenderer();
 	virtual void OnStopVideoRenderer();
+	virtual void QuerySurfacePresenter(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight);
 
 	
 	HRESULT GetDispatch(CComPtr<IDispatch> &spDispatch);
+	HRESULT GetHTMLWindow2(CComPtr<IHTMLWindow2> &spWindow2);
 
 	private:
 		_Buffer *m_pTempVideoBuff;
 		std::vector<CComPtr<IDispatch>>m_callbacks_onplay;
+		CComPtr<IViewObjectPresentSite> m_spPresentSite;
+		CComPtr<ISurfacePresenter> m_spSurfacePresenter;
+		CComPtr<ID3D10Texture2D> m_spText;
+		CComPtr<IHTMLLocation> m_spLocation;
+		CComPtr<IOleContainer> m_spContainer;
+		CComPtr<IHTMLDocument2> m_spDoc;
+		CComPtr<IHTMLWindow2> m_spWindow;
+		int m_nBackBuffWidth;
+		int m_nbackBuffHeight;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WebRTC), CWebRTC)

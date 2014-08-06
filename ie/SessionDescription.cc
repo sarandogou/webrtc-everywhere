@@ -47,9 +47,9 @@ HRESULT CSessionDescription::Init(VARIANT RTCSessionDescriptionInit)
 
 	m_Sdp = std::make_shared<_SessionDescription>(
 		lpszSdp,
-		lpszSdp ? strlen(lpszSdp) : 0,
+		we_strlen(lpszSdp),
 		lpszType,
-		lpszType ? strlen(lpszType) : 0);
+		we_strlen(lpszType));
 	if (lpszType) delete[] lpszType;
 	if (lpszSdp) delete[] lpszSdp;
 
@@ -83,7 +83,7 @@ STDMETHODIMP CSessionDescription::put_type(__in BSTR newVal)
 		_sdp ? _sdp->getPtr() : NULL,
 		_sdp ? _sdp->getSize() : 0,
 		lpszType,
-		lpszType ? strlen(lpszType) : 0);
+		we_strlen(lpszType));
 	delete[] lpszType;
 	m_Sdp = newSdp;
 	return S_OK;
@@ -114,7 +114,7 @@ STDMETHODIMP CSessionDescription::put_sdp(__in BSTR newVal)
 	const _Buffer* _type = m_Sdp ? m_Sdp->getType() : NULL;
 	std::shared_ptr<_SessionDescription> newSdp = std::make_shared<_SessionDescription>(
 		lpszSdp,
-		lpszSdp ? strlen(lpszSdp) : 0,
+		we_strlen(lpszSdp),
 		_type ? _type->getPtr() : NULL,
 		_type ? _type->getSize() : 0);
 	delete[] lpszSdp;

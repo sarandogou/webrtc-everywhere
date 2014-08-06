@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sat Jul 26 08:10:45 2014
+/* at Fri Aug 01 10:06:21 2014
  */
 /* Compiler settings for webrtceverywhere.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -134,6 +134,41 @@ typedef interface IRTCStatsReport IRTCStatsReport;
 typedef interface IRTCStats IRTCStats;
 
 #endif 	/* __IRTCStats_FWD_DEFINED__ */
+
+
+#ifndef __IRTCDTMFSender_FWD_DEFINED__
+#define __IRTCDTMFSender_FWD_DEFINED__
+typedef interface IRTCDTMFSender IRTCDTMFSender;
+
+#endif 	/* __IRTCDTMFSender_FWD_DEFINED__ */
+
+
+#ifndef __IRTCDTMFToneChangeEvent_FWD_DEFINED__
+#define __IRTCDTMFToneChangeEvent_FWD_DEFINED__
+typedef interface IRTCDTMFToneChangeEvent IRTCDTMFToneChangeEvent;
+
+#endif 	/* __IRTCDTMFToneChangeEvent_FWD_DEFINED__ */
+
+
+#ifndef __IRTCDataChannel_FWD_DEFINED__
+#define __IRTCDataChannel_FWD_DEFINED__
+typedef interface IRTCDataChannel IRTCDataChannel;
+
+#endif 	/* __IRTCDataChannel_FWD_DEFINED__ */
+
+
+#ifndef __IMessageEvent_FWD_DEFINED__
+#define __IMessageEvent_FWD_DEFINED__
+typedef interface IMessageEvent IMessageEvent;
+
+#endif 	/* __IMessageEvent_FWD_DEFINED__ */
+
+
+#ifndef __IRTCDataChannelEvent_FWD_DEFINED__
+#define __IRTCDataChannelEvent_FWD_DEFINED__
+typedef interface IRTCDataChannelEvent IRTCDataChannelEvent;
+
+#endif 	/* __IRTCDataChannelEvent_FWD_DEFINED__ */
 
 
 #ifndef ___IWebRTCEvents_FWD_DEFINED__
@@ -297,6 +332,66 @@ typedef struct RTCStats RTCStats;
 #endif /* __cplusplus */
 
 #endif 	/* __RTCStats_FWD_DEFINED__ */
+
+
+#ifndef __RTCDTMFSender_FWD_DEFINED__
+#define __RTCDTMFSender_FWD_DEFINED__
+
+#ifdef __cplusplus
+typedef class RTCDTMFSender RTCDTMFSender;
+#else
+typedef struct RTCDTMFSender RTCDTMFSender;
+#endif /* __cplusplus */
+
+#endif 	/* __RTCDTMFSender_FWD_DEFINED__ */
+
+
+#ifndef __RTCDTMFToneChangeEvent_FWD_DEFINED__
+#define __RTCDTMFToneChangeEvent_FWD_DEFINED__
+
+#ifdef __cplusplus
+typedef class RTCDTMFToneChangeEvent RTCDTMFToneChangeEvent;
+#else
+typedef struct RTCDTMFToneChangeEvent RTCDTMFToneChangeEvent;
+#endif /* __cplusplus */
+
+#endif 	/* __RTCDTMFToneChangeEvent_FWD_DEFINED__ */
+
+
+#ifndef __RTCDataChannel_FWD_DEFINED__
+#define __RTCDataChannel_FWD_DEFINED__
+
+#ifdef __cplusplus
+typedef class RTCDataChannel RTCDataChannel;
+#else
+typedef struct RTCDataChannel RTCDataChannel;
+#endif /* __cplusplus */
+
+#endif 	/* __RTCDataChannel_FWD_DEFINED__ */
+
+
+#ifndef __MessageEvent_FWD_DEFINED__
+#define __MessageEvent_FWD_DEFINED__
+
+#ifdef __cplusplus
+typedef class MessageEvent MessageEvent;
+#else
+typedef struct MessageEvent MessageEvent;
+#endif /* __cplusplus */
+
+#endif 	/* __MessageEvent_FWD_DEFINED__ */
+
+
+#ifndef __RTCDataChannelEvent_FWD_DEFINED__
+#define __RTCDataChannelEvent_FWD_DEFINED__
+
+#ifdef __cplusplus
+typedef class RTCDataChannelEvent RTCDataChannelEvent;
+#else
+typedef struct RTCDataChannelEvent RTCDataChannelEvent;
+#endif /* __cplusplus */
+
+#endif 	/* __RTCDataChannelEvent_FWD_DEFINED__ */
 
 
 /* header files for imported files */
@@ -967,6 +1062,15 @@ EXTERN_C const IID IID_IPeerConnection;
             /* [optional][in] */ VARIANT successCallback,
             /* [optional][in] */ VARIANT failureCallback) = 0;
         
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE createDTMFSender( 
+            /* [in] */ VARIANT MediaStreamTrack,
+            /* [retval][out] */ VARIANT *RTCDTMFSender) = 0;
+        
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE createDataChannel( 
+            /* [in] */ BSTR label,
+            /* [optional][in] */ VARIANT dataChannelDict,
+            /* [retval][out] */ VARIANT *DataChannel) = 0;
+        
         virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_onnegotiationneeded( 
             /* [retval][out] */ VARIANT *pVal) = 0;
         
@@ -1001,6 +1105,12 @@ EXTERN_C const IID IID_IPeerConnection;
             /* [retval][out] */ VARIANT *pVal) = 0;
         
         virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_oniceconnectionstatechange( 
+            /* [in] */ VARIANT newVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_ondatachannel( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_ondatachannel( 
             /* [in] */ VARIANT newVal) = 0;
         
     };
@@ -1147,6 +1257,17 @@ EXTERN_C const IID IID_IPeerConnection;
             /* [optional][in] */ VARIANT successCallback,
             /* [optional][in] */ VARIANT failureCallback);
         
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *createDTMFSender )( 
+            IPeerConnection * This,
+            /* [in] */ VARIANT MediaStreamTrack,
+            /* [retval][out] */ VARIANT *RTCDTMFSender);
+        
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *createDataChannel )( 
+            IPeerConnection * This,
+            /* [in] */ BSTR label,
+            /* [optional][in] */ VARIANT dataChannelDict,
+            /* [retval][out] */ VARIANT *DataChannel);
+        
         /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_onnegotiationneeded )( 
             IPeerConnection * This,
             /* [retval][out] */ VARIANT *pVal);
@@ -1192,6 +1313,14 @@ EXTERN_C const IID IID_IPeerConnection;
             /* [retval][out] */ VARIANT *pVal);
         
         /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_oniceconnectionstatechange )( 
+            IPeerConnection * This,
+            /* [in] */ VARIANT newVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_ondatachannel )( 
+            IPeerConnection * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_ondatachannel )( 
             IPeerConnection * This,
             /* [in] */ VARIANT newVal);
         
@@ -1285,6 +1414,12 @@ EXTERN_C const IID IID_IPeerConnection;
 #define IPeerConnection_getStats(This,selector,successCallback,failureCallback)	\
     ( (This)->lpVtbl -> getStats(This,selector,successCallback,failureCallback) ) 
 
+#define IPeerConnection_createDTMFSender(This,MediaStreamTrack,RTCDTMFSender)	\
+    ( (This)->lpVtbl -> createDTMFSender(This,MediaStreamTrack,RTCDTMFSender) ) 
+
+#define IPeerConnection_createDataChannel(This,label,dataChannelDict,DataChannel)	\
+    ( (This)->lpVtbl -> createDataChannel(This,label,dataChannelDict,DataChannel) ) 
+
 #define IPeerConnection_get_onnegotiationneeded(This,pVal)	\
     ( (This)->lpVtbl -> get_onnegotiationneeded(This,pVal) ) 
 
@@ -1320,6 +1455,12 @@ EXTERN_C const IID IID_IPeerConnection;
 
 #define IPeerConnection_put_oniceconnectionstatechange(This,newVal)	\
     ( (This)->lpVtbl -> put_oniceconnectionstatechange(This,newVal) ) 
+
+#define IPeerConnection_get_ondatachannel(This,pVal)	\
+    ( (This)->lpVtbl -> get_ondatachannel(This,pVal) ) 
+
+#define IPeerConnection_put_ondatachannel(This,newVal)	\
+    ( (This)->lpVtbl -> put_ondatachannel(This,newVal) ) 
 
 #endif /* COBJMACROS */
 
@@ -3062,6 +3203,928 @@ EXTERN_C const IID IID_IRTCStats;
 #endif 	/* __IRTCStats_INTERFACE_DEFINED__ */
 
 
+#ifndef __IRTCDTMFSender_INTERFACE_DEFINED__
+#define __IRTCDTMFSender_INTERFACE_DEFINED__
+
+/* interface IRTCDTMFSender */
+/* [unique][nonextensible][dual][uuid][object] */ 
+
+
+EXTERN_C const IID IID_IRTCDTMFSender;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("3FA7AEBF-DD1D-4F4A-B7AE-8BD878AF7809")
+    IRTCDTMFSender : public IDispatch
+    {
+    public:
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_canInsertDTMF( 
+            /* [retval][out] */ VARIANT_BOOL *pVal) = 0;
+        
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE insertDTMF( 
+            BSTR tones,
+            /* [optional][in] */ VARIANT duration,
+            /* [optional][in] */ VARIANT interToneGap) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_track( 
+            /* [retval][out] */ VARIANT *pMediaStreamTrack) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_ontonechange( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_ontonechange( 
+            /* [in] */ VARIANT newVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_toneBuffer( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_duration( 
+            /* [retval][out] */ LONG *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_interToneGap( 
+            /* [retval][out] */ LONG *pVal) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct IRTCDTMFSenderVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IRTCDTMFSender * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IRTCDTMFSender * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IRTCDTMFSender * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfoCount )( 
+            IRTCDTMFSender * This,
+            /* [out] */ UINT *pctinfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfo )( 
+            IRTCDTMFSender * This,
+            /* [in] */ UINT iTInfo,
+            /* [in] */ LCID lcid,
+            /* [out] */ ITypeInfo **ppTInfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetIDsOfNames )( 
+            IRTCDTMFSender * This,
+            /* [in] */ REFIID riid,
+            /* [size_is][in] */ LPOLESTR *rgszNames,
+            /* [range][in] */ UINT cNames,
+            /* [in] */ LCID lcid,
+            /* [size_is][out] */ DISPID *rgDispId);
+        
+        /* [local] */ HRESULT ( STDMETHODCALLTYPE *Invoke )( 
+            IRTCDTMFSender * This,
+            /* [annotation][in] */ 
+            _In_  DISPID dispIdMember,
+            /* [annotation][in] */ 
+            _In_  REFIID riid,
+            /* [annotation][in] */ 
+            _In_  LCID lcid,
+            /* [annotation][in] */ 
+            _In_  WORD wFlags,
+            /* [annotation][out][in] */ 
+            _In_  DISPPARAMS *pDispParams,
+            /* [annotation][out] */ 
+            _Out_opt_  VARIANT *pVarResult,
+            /* [annotation][out] */ 
+            _Out_opt_  EXCEPINFO *pExcepInfo,
+            /* [annotation][out] */ 
+            _Out_opt_  UINT *puArgErr);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_canInsertDTMF )( 
+            IRTCDTMFSender * This,
+            /* [retval][out] */ VARIANT_BOOL *pVal);
+        
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *insertDTMF )( 
+            IRTCDTMFSender * This,
+            BSTR tones,
+            /* [optional][in] */ VARIANT duration,
+            /* [optional][in] */ VARIANT interToneGap);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_track )( 
+            IRTCDTMFSender * This,
+            /* [retval][out] */ VARIANT *pMediaStreamTrack);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_ontonechange )( 
+            IRTCDTMFSender * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_ontonechange )( 
+            IRTCDTMFSender * This,
+            /* [in] */ VARIANT newVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_toneBuffer )( 
+            IRTCDTMFSender * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_duration )( 
+            IRTCDTMFSender * This,
+            /* [retval][out] */ LONG *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_interToneGap )( 
+            IRTCDTMFSender * This,
+            /* [retval][out] */ LONG *pVal);
+        
+        END_INTERFACE
+    } IRTCDTMFSenderVtbl;
+
+    interface IRTCDTMFSender
+    {
+        CONST_VTBL struct IRTCDTMFSenderVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define IRTCDTMFSender_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define IRTCDTMFSender_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define IRTCDTMFSender_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define IRTCDTMFSender_GetTypeInfoCount(This,pctinfo)	\
+    ( (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo) ) 
+
+#define IRTCDTMFSender_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+    ( (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo) ) 
+
+#define IRTCDTMFSender_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
+    ( (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId) ) 
+
+#define IRTCDTMFSender_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
+    ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
+
+
+#define IRTCDTMFSender_get_canInsertDTMF(This,pVal)	\
+    ( (This)->lpVtbl -> get_canInsertDTMF(This,pVal) ) 
+
+#define IRTCDTMFSender_insertDTMF(This,tones,duration,interToneGap)	\
+    ( (This)->lpVtbl -> insertDTMF(This,tones,duration,interToneGap) ) 
+
+#define IRTCDTMFSender_get_track(This,pMediaStreamTrack)	\
+    ( (This)->lpVtbl -> get_track(This,pMediaStreamTrack) ) 
+
+#define IRTCDTMFSender_get_ontonechange(This,pVal)	\
+    ( (This)->lpVtbl -> get_ontonechange(This,pVal) ) 
+
+#define IRTCDTMFSender_put_ontonechange(This,newVal)	\
+    ( (This)->lpVtbl -> put_ontonechange(This,newVal) ) 
+
+#define IRTCDTMFSender_get_toneBuffer(This,pVal)	\
+    ( (This)->lpVtbl -> get_toneBuffer(This,pVal) ) 
+
+#define IRTCDTMFSender_get_duration(This,pVal)	\
+    ( (This)->lpVtbl -> get_duration(This,pVal) ) 
+
+#define IRTCDTMFSender_get_interToneGap(This,pVal)	\
+    ( (This)->lpVtbl -> get_interToneGap(This,pVal) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __IRTCDTMFSender_INTERFACE_DEFINED__ */
+
+
+#ifndef __IRTCDTMFToneChangeEvent_INTERFACE_DEFINED__
+#define __IRTCDTMFToneChangeEvent_INTERFACE_DEFINED__
+
+/* interface IRTCDTMFToneChangeEvent */
+/* [unique][nonextensible][dual][uuid][object] */ 
+
+
+EXTERN_C const IID IID_IRTCDTMFToneChangeEvent;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("E01CBEE1-8442-40FF-81CC-20714A49CC39")
+    IRTCDTMFToneChangeEvent : public IDispatch
+    {
+    public:
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_tone( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct IRTCDTMFToneChangeEventVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IRTCDTMFToneChangeEvent * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IRTCDTMFToneChangeEvent * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IRTCDTMFToneChangeEvent * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfoCount )( 
+            IRTCDTMFToneChangeEvent * This,
+            /* [out] */ UINT *pctinfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfo )( 
+            IRTCDTMFToneChangeEvent * This,
+            /* [in] */ UINT iTInfo,
+            /* [in] */ LCID lcid,
+            /* [out] */ ITypeInfo **ppTInfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetIDsOfNames )( 
+            IRTCDTMFToneChangeEvent * This,
+            /* [in] */ REFIID riid,
+            /* [size_is][in] */ LPOLESTR *rgszNames,
+            /* [range][in] */ UINT cNames,
+            /* [in] */ LCID lcid,
+            /* [size_is][out] */ DISPID *rgDispId);
+        
+        /* [local] */ HRESULT ( STDMETHODCALLTYPE *Invoke )( 
+            IRTCDTMFToneChangeEvent * This,
+            /* [annotation][in] */ 
+            _In_  DISPID dispIdMember,
+            /* [annotation][in] */ 
+            _In_  REFIID riid,
+            /* [annotation][in] */ 
+            _In_  LCID lcid,
+            /* [annotation][in] */ 
+            _In_  WORD wFlags,
+            /* [annotation][out][in] */ 
+            _In_  DISPPARAMS *pDispParams,
+            /* [annotation][out] */ 
+            _Out_opt_  VARIANT *pVarResult,
+            /* [annotation][out] */ 
+            _Out_opt_  EXCEPINFO *pExcepInfo,
+            /* [annotation][out] */ 
+            _Out_opt_  UINT *puArgErr);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_tone )( 
+            IRTCDTMFToneChangeEvent * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        END_INTERFACE
+    } IRTCDTMFToneChangeEventVtbl;
+
+    interface IRTCDTMFToneChangeEvent
+    {
+        CONST_VTBL struct IRTCDTMFToneChangeEventVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define IRTCDTMFToneChangeEvent_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define IRTCDTMFToneChangeEvent_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define IRTCDTMFToneChangeEvent_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define IRTCDTMFToneChangeEvent_GetTypeInfoCount(This,pctinfo)	\
+    ( (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo) ) 
+
+#define IRTCDTMFToneChangeEvent_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+    ( (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo) ) 
+
+#define IRTCDTMFToneChangeEvent_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
+    ( (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId) ) 
+
+#define IRTCDTMFToneChangeEvent_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
+    ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
+
+
+#define IRTCDTMFToneChangeEvent_get_tone(This,pVal)	\
+    ( (This)->lpVtbl -> get_tone(This,pVal) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __IRTCDTMFToneChangeEvent_INTERFACE_DEFINED__ */
+
+
+#ifndef __IRTCDataChannel_INTERFACE_DEFINED__
+#define __IRTCDataChannel_INTERFACE_DEFINED__
+
+/* interface IRTCDataChannel */
+/* [unique][nonextensible][dual][uuid][object] */ 
+
+
+EXTERN_C const IID IID_IRTCDataChannel;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("453AFDA0-2936-48C3-BE41-D059302217C2")
+    IRTCDataChannel : public IDispatch
+    {
+    public:
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_label( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_ordered( 
+            /* [retval][out] */ VARIANT_BOOL *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_maxRetransmitTime( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_maxRetransmits( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_protocol( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_negotiated( 
+            /* [retval][out] */ VARIANT_BOOL *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_id( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_readyState( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_bufferedAmount( 
+            /* [retval][out] */ ULONG *pVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_binaryType( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_binaryType( 
+            /* [in] */ BSTR newVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_onopen( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_onopen( 
+            /* [in] */ VARIANT newVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_onerror( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_onerror( 
+            /* [in] */ VARIANT newVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_onclose( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_onclose( 
+            /* [in] */ VARIANT newVal) = 0;
+        
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_onmessage( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_onmessage( 
+            /* [in] */ VARIANT newVal) = 0;
+        
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE close( void) = 0;
+        
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE send( 
+            /* [in] */ VARIANT data) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct IRTCDataChannelVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IRTCDataChannel * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IRTCDataChannel * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IRTCDataChannel * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfoCount )( 
+            IRTCDataChannel * This,
+            /* [out] */ UINT *pctinfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfo )( 
+            IRTCDataChannel * This,
+            /* [in] */ UINT iTInfo,
+            /* [in] */ LCID lcid,
+            /* [out] */ ITypeInfo **ppTInfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetIDsOfNames )( 
+            IRTCDataChannel * This,
+            /* [in] */ REFIID riid,
+            /* [size_is][in] */ LPOLESTR *rgszNames,
+            /* [range][in] */ UINT cNames,
+            /* [in] */ LCID lcid,
+            /* [size_is][out] */ DISPID *rgDispId);
+        
+        /* [local] */ HRESULT ( STDMETHODCALLTYPE *Invoke )( 
+            IRTCDataChannel * This,
+            /* [annotation][in] */ 
+            _In_  DISPID dispIdMember,
+            /* [annotation][in] */ 
+            _In_  REFIID riid,
+            /* [annotation][in] */ 
+            _In_  LCID lcid,
+            /* [annotation][in] */ 
+            _In_  WORD wFlags,
+            /* [annotation][out][in] */ 
+            _In_  DISPPARAMS *pDispParams,
+            /* [annotation][out] */ 
+            _Out_opt_  VARIANT *pVarResult,
+            /* [annotation][out] */ 
+            _Out_opt_  EXCEPINFO *pExcepInfo,
+            /* [annotation][out] */ 
+            _Out_opt_  UINT *puArgErr);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_label )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_ordered )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT_BOOL *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_maxRetransmitTime )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_maxRetransmits )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_protocol )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_negotiated )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT_BOOL *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_id )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_readyState )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_bufferedAmount )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ ULONG *pVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_binaryType )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_binaryType )( 
+            IRTCDataChannel * This,
+            /* [in] */ BSTR newVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_onopen )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_onopen )( 
+            IRTCDataChannel * This,
+            /* [in] */ VARIANT newVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_onerror )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_onerror )( 
+            IRTCDataChannel * This,
+            /* [in] */ VARIANT newVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_onclose )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_onclose )( 
+            IRTCDataChannel * This,
+            /* [in] */ VARIANT newVal);
+        
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_onmessage )( 
+            IRTCDataChannel * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_onmessage )( 
+            IRTCDataChannel * This,
+            /* [in] */ VARIANT newVal);
+        
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *close )( 
+            IRTCDataChannel * This);
+        
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *send )( 
+            IRTCDataChannel * This,
+            /* [in] */ VARIANT data);
+        
+        END_INTERFACE
+    } IRTCDataChannelVtbl;
+
+    interface IRTCDataChannel
+    {
+        CONST_VTBL struct IRTCDataChannelVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define IRTCDataChannel_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define IRTCDataChannel_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define IRTCDataChannel_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define IRTCDataChannel_GetTypeInfoCount(This,pctinfo)	\
+    ( (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo) ) 
+
+#define IRTCDataChannel_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+    ( (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo) ) 
+
+#define IRTCDataChannel_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
+    ( (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId) ) 
+
+#define IRTCDataChannel_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
+    ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
+
+
+#define IRTCDataChannel_get_label(This,pVal)	\
+    ( (This)->lpVtbl -> get_label(This,pVal) ) 
+
+#define IRTCDataChannel_get_ordered(This,pVal)	\
+    ( (This)->lpVtbl -> get_ordered(This,pVal) ) 
+
+#define IRTCDataChannel_get_maxRetransmitTime(This,pVal)	\
+    ( (This)->lpVtbl -> get_maxRetransmitTime(This,pVal) ) 
+
+#define IRTCDataChannel_get_maxRetransmits(This,pVal)	\
+    ( (This)->lpVtbl -> get_maxRetransmits(This,pVal) ) 
+
+#define IRTCDataChannel_get_protocol(This,pVal)	\
+    ( (This)->lpVtbl -> get_protocol(This,pVal) ) 
+
+#define IRTCDataChannel_get_negotiated(This,pVal)	\
+    ( (This)->lpVtbl -> get_negotiated(This,pVal) ) 
+
+#define IRTCDataChannel_get_id(This,pVal)	\
+    ( (This)->lpVtbl -> get_id(This,pVal) ) 
+
+#define IRTCDataChannel_get_readyState(This,pVal)	\
+    ( (This)->lpVtbl -> get_readyState(This,pVal) ) 
+
+#define IRTCDataChannel_get_bufferedAmount(This,pVal)	\
+    ( (This)->lpVtbl -> get_bufferedAmount(This,pVal) ) 
+
+#define IRTCDataChannel_get_binaryType(This,pVal)	\
+    ( (This)->lpVtbl -> get_binaryType(This,pVal) ) 
+
+#define IRTCDataChannel_put_binaryType(This,newVal)	\
+    ( (This)->lpVtbl -> put_binaryType(This,newVal) ) 
+
+#define IRTCDataChannel_get_onopen(This,pVal)	\
+    ( (This)->lpVtbl -> get_onopen(This,pVal) ) 
+
+#define IRTCDataChannel_put_onopen(This,newVal)	\
+    ( (This)->lpVtbl -> put_onopen(This,newVal) ) 
+
+#define IRTCDataChannel_get_onerror(This,pVal)	\
+    ( (This)->lpVtbl -> get_onerror(This,pVal) ) 
+
+#define IRTCDataChannel_put_onerror(This,newVal)	\
+    ( (This)->lpVtbl -> put_onerror(This,newVal) ) 
+
+#define IRTCDataChannel_get_onclose(This,pVal)	\
+    ( (This)->lpVtbl -> get_onclose(This,pVal) ) 
+
+#define IRTCDataChannel_put_onclose(This,newVal)	\
+    ( (This)->lpVtbl -> put_onclose(This,newVal) ) 
+
+#define IRTCDataChannel_get_onmessage(This,pVal)	\
+    ( (This)->lpVtbl -> get_onmessage(This,pVal) ) 
+
+#define IRTCDataChannel_put_onmessage(This,newVal)	\
+    ( (This)->lpVtbl -> put_onmessage(This,newVal) ) 
+
+#define IRTCDataChannel_close(This)	\
+    ( (This)->lpVtbl -> close(This) ) 
+
+#define IRTCDataChannel_send(This,data)	\
+    ( (This)->lpVtbl -> send(This,data) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __IRTCDataChannel_INTERFACE_DEFINED__ */
+
+
+#ifndef __IMessageEvent_INTERFACE_DEFINED__
+#define __IMessageEvent_INTERFACE_DEFINED__
+
+/* interface IMessageEvent */
+/* [unique][nonextensible][dual][uuid][object] */ 
+
+
+EXTERN_C const IID IID_IMessageEvent;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("2C5FD5A1-29F3-4CFF-94B6-711A77F0CB61")
+    IMessageEvent : public IDispatch
+    {
+    public:
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_data( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct IMessageEventVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IMessageEvent * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IMessageEvent * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IMessageEvent * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfoCount )( 
+            IMessageEvent * This,
+            /* [out] */ UINT *pctinfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfo )( 
+            IMessageEvent * This,
+            /* [in] */ UINT iTInfo,
+            /* [in] */ LCID lcid,
+            /* [out] */ ITypeInfo **ppTInfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetIDsOfNames )( 
+            IMessageEvent * This,
+            /* [in] */ REFIID riid,
+            /* [size_is][in] */ LPOLESTR *rgszNames,
+            /* [range][in] */ UINT cNames,
+            /* [in] */ LCID lcid,
+            /* [size_is][out] */ DISPID *rgDispId);
+        
+        /* [local] */ HRESULT ( STDMETHODCALLTYPE *Invoke )( 
+            IMessageEvent * This,
+            /* [annotation][in] */ 
+            _In_  DISPID dispIdMember,
+            /* [annotation][in] */ 
+            _In_  REFIID riid,
+            /* [annotation][in] */ 
+            _In_  LCID lcid,
+            /* [annotation][in] */ 
+            _In_  WORD wFlags,
+            /* [annotation][out][in] */ 
+            _In_  DISPPARAMS *pDispParams,
+            /* [annotation][out] */ 
+            _Out_opt_  VARIANT *pVarResult,
+            /* [annotation][out] */ 
+            _Out_opt_  EXCEPINFO *pExcepInfo,
+            /* [annotation][out] */ 
+            _Out_opt_  UINT *puArgErr);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_data )( 
+            IMessageEvent * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        END_INTERFACE
+    } IMessageEventVtbl;
+
+    interface IMessageEvent
+    {
+        CONST_VTBL struct IMessageEventVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define IMessageEvent_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define IMessageEvent_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define IMessageEvent_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define IMessageEvent_GetTypeInfoCount(This,pctinfo)	\
+    ( (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo) ) 
+
+#define IMessageEvent_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+    ( (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo) ) 
+
+#define IMessageEvent_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
+    ( (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId) ) 
+
+#define IMessageEvent_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
+    ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
+
+
+#define IMessageEvent_get_data(This,pVal)	\
+    ( (This)->lpVtbl -> get_data(This,pVal) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __IMessageEvent_INTERFACE_DEFINED__ */
+
+
+#ifndef __IRTCDataChannelEvent_INTERFACE_DEFINED__
+#define __IRTCDataChannelEvent_INTERFACE_DEFINED__
+
+/* interface IRTCDataChannelEvent */
+/* [unique][nonextensible][dual][uuid][object] */ 
+
+
+EXTERN_C const IID IID_IRTCDataChannelEvent;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("51E8910B-881C-43DE-B211-28C43107C6A1")
+    IRTCDataChannelEvent : public IDispatch
+    {
+    public:
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_channel( 
+            /* [retval][out] */ VARIANT *pVal) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct IRTCDataChannelEventVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IRTCDataChannelEvent * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IRTCDataChannelEvent * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IRTCDataChannelEvent * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfoCount )( 
+            IRTCDataChannelEvent * This,
+            /* [out] */ UINT *pctinfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetTypeInfo )( 
+            IRTCDataChannelEvent * This,
+            /* [in] */ UINT iTInfo,
+            /* [in] */ LCID lcid,
+            /* [out] */ ITypeInfo **ppTInfo);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetIDsOfNames )( 
+            IRTCDataChannelEvent * This,
+            /* [in] */ REFIID riid,
+            /* [size_is][in] */ LPOLESTR *rgszNames,
+            /* [range][in] */ UINT cNames,
+            /* [in] */ LCID lcid,
+            /* [size_is][out] */ DISPID *rgDispId);
+        
+        /* [local] */ HRESULT ( STDMETHODCALLTYPE *Invoke )( 
+            IRTCDataChannelEvent * This,
+            /* [annotation][in] */ 
+            _In_  DISPID dispIdMember,
+            /* [annotation][in] */ 
+            _In_  REFIID riid,
+            /* [annotation][in] */ 
+            _In_  LCID lcid,
+            /* [annotation][in] */ 
+            _In_  WORD wFlags,
+            /* [annotation][out][in] */ 
+            _In_  DISPPARAMS *pDispParams,
+            /* [annotation][out] */ 
+            _Out_opt_  VARIANT *pVarResult,
+            /* [annotation][out] */ 
+            _Out_opt_  EXCEPINFO *pExcepInfo,
+            /* [annotation][out] */ 
+            _Out_opt_  UINT *puArgErr);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_channel )( 
+            IRTCDataChannelEvent * This,
+            /* [retval][out] */ VARIANT *pVal);
+        
+        END_INTERFACE
+    } IRTCDataChannelEventVtbl;
+
+    interface IRTCDataChannelEvent
+    {
+        CONST_VTBL struct IRTCDataChannelEventVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define IRTCDataChannelEvent_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define IRTCDataChannelEvent_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define IRTCDataChannelEvent_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define IRTCDataChannelEvent_GetTypeInfoCount(This,pctinfo)	\
+    ( (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo) ) 
+
+#define IRTCDataChannelEvent_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+    ( (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo) ) 
+
+#define IRTCDataChannelEvent_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
+    ( (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId) ) 
+
+#define IRTCDataChannelEvent_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
+    ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
+
+
+#define IRTCDataChannelEvent_get_channel(This,pVal)	\
+    ( (This)->lpVtbl -> get_channel(This,pVal) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __IRTCDataChannelEvent_INTERFACE_DEFINED__ */
+
+
 
 #ifndef __webrtceverywhereLib_LIBRARY_DEFINED__
 #define __webrtceverywhereLib_LIBRARY_DEFINED__
@@ -3289,6 +4352,46 @@ EXTERN_C const CLSID CLSID_RTCStats;
 
 class DECLSPEC_UUID("F752E29B-45CB-4753-AA0C-51D1A021143C")
 RTCStats;
+#endif
+
+EXTERN_C const CLSID CLSID_RTCDTMFSender;
+
+#ifdef __cplusplus
+
+class DECLSPEC_UUID("FDFDCAED-5FE4-4B75-A492-5E1837CDC84C")
+RTCDTMFSender;
+#endif
+
+EXTERN_C const CLSID CLSID_RTCDTMFToneChangeEvent;
+
+#ifdef __cplusplus
+
+class DECLSPEC_UUID("C01163AE-3E5E-4224-B708-74933D83E81E")
+RTCDTMFToneChangeEvent;
+#endif
+
+EXTERN_C const CLSID CLSID_RTCDataChannel;
+
+#ifdef __cplusplus
+
+class DECLSPEC_UUID("815D3DD5-8BFD-40DC-ABCC-382C94A57445")
+RTCDataChannel;
+#endif
+
+EXTERN_C const CLSID CLSID_MessageEvent;
+
+#ifdef __cplusplus
+
+class DECLSPEC_UUID("F62F0206-F6F8-4FD8-8F63-0C6BCE7C904F")
+MessageEvent;
+#endif
+
+EXTERN_C const CLSID CLSID_RTCDataChannelEvent;
+
+#ifdef __cplusplus
+
+class DECLSPEC_UUID("C40ED871-D195-4EFD-9E60-F0911449A404")
+RTCDataChannelEvent;
 #endif
 #endif /* __webrtceverywhereLib_LIBRARY_DEFINED__ */
 

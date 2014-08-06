@@ -63,6 +63,21 @@
     <ClCompile Include="SourceInfo.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RTCDTMFSender.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCDTMFToneChangeEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCDataChannel.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCDataChannelEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="webrtc-everywhere-npapi.def">
@@ -119,6 +134,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NPCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDTMFSender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDTMFToneChangeEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDataChannel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDataChannelEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

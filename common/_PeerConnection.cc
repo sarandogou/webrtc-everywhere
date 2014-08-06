@@ -7,6 +7,8 @@
 #include "_MediaTrackConstraints.h"
 #include "_MediaStreamConstraints.h"
 #include "_RTCIceCandidate.h"
+#include "_RTCDTMFSender.h"
+#include "_RTCDataChannel.h"
 #include "_utils.h"
 #include "_Common.h"
 #include "_Debug.h"
@@ -361,6 +363,30 @@ bool _RTCPeerConnection::getStats(webrtc::MediaStreamTrackInterface* selector /*
 	return false;
 }
 
+cpp11::shared_ptr<_RTCDTMFSender> _RTCPeerConnection::createDTMFSender(webrtc::AudioTrackInterface *track)
+{
+	if (IsValid() && track) {
+		talk_base::scoped_refptr<webrtc::DtmfSenderInterface> sender = m_peer_connection->CreateDtmfSender(track);
+		if (sender) {
+			cpp11::shared_ptr<_RTCDTMFSender>_sender(new _RTCDTMFSender(sender));
+			return _sender;
+		}
+	}
+	return nullPtr;
+}
+
+cpp11::shared_ptr<_RTCDataChannel> _RTCPeerConnection::CreateDataChannel(const std::string& label, const webrtc::DataChannelInit* config)
+{
+	if (IsValid() && config) {
+		talk_base::scoped_refptr<webrtc::DataChannelInterface> dataChannel = m_peer_connection->CreateDataChannel(label, config);
+		if (dataChannel) {
+			cpp11::shared_ptr<_RTCDataChannel>_dataChannel(new _RTCDataChannel(dataChannel));
+			return _dataChannel;
+		}
+	}
+	return nullPtr;
+}
+
 _RTCPeerConnection::~_RTCPeerConnection()
 {
 	m_peer_connection = NULL;
@@ -446,6 +472,18 @@ void _RTCPeerConnection::OnIceComplete()
 {
 	WE_DEBUG_INFO("_RTCPeerConnection::OnIceComplete");
 	OnIceCandidate(NULL); // null candidate used as a hack to signal end of ICe gathering
+}
+
+void _RTCPeerConnection::OnDataChannel(webrtc::DataChannelInterface* data_channel)
+{
+	WE_DEBUG_INFO("_RTCPeerConnection::OnDataChannel");
+	if (m_pcBase && m_pcBase->ondatachannel) {
+		cpp11::shared_ptr<_RTCDataChannel>dataChannel(new _RTCDataChannel(data_channel));
+		if (dataChannel) {
+			cpp11::shared_ptr<_RTCDataChannelEvent> e(new _RTCDataChannelEvent(dataChannel));
+			m_pcBase->ondatachannel(e);
+		}
+	}
 }
 
 
@@ -792,14 +830,45 @@ bool _PeerConnection::Close()
 	return m_peer_connection->close();
 }
 
+// http://www.w3.org/TR/webrtc/#widl-RTCPeerConnection-getStats-void-MediaStreamTrack-selector-RTCStatsCallback-successCallback-RTCPeerConnectionErrorCallback-failureCallback
+// void getStats (MediaStreamTrack? selector, RTCStatsCallback successCallback, RTCPeerConnectionErrorCallback failureCallback);
+
 bool _PeerConnection::GetStats(_MediaStreamTrackBase* selector /*= NULL*/, _RTCStatsCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
 	CHECK_INITIALIZED();
 	return m_peer_connection->getStats(selector ? selector->_track() : NULL, successCallback, failureCallback);
 }
 
-// http://www.w3.org/TR/webrtc/#widl-RTCPeerConnection-getStats-void-MediaStreamTrack-selector-RTCStatsCallback-successCallback-RTCPeerConnectionErrorCallback-failureCallback
-// void getStats (MediaStreamTrack? selector, RTCStatsCallback successCallback, RTCPeerConnectionErrorCallback failureCallback);
+// http://www.w3.org/TR/webrtc/#rtcpeerconnection-interface-extensions-1
+// RTCDTMFSender createDTMFSender (MediaStreamTrack track);
+cpp11::shared_ptr<_RTCDTMFSender> _PeerConnection::CreateDtmfSender(_MediaStreamTrack *track)
+{
+	if (IsInitialized() && track && track->type() == _MediaStreamTrackTypeAudio) {
+		return m_peer_connection->createDTMFSender(dynamic_cast<_MediaStreamTrackAudio*>(track)->track());
+	}
+	return nullPtr;
+}
+
+// http://www.w3.org/TR/webrtc/#widl-RTCPeerConnection-createDataChannel-RTCDataChannel-DOMString-label-RTCDataChannelInit-dataChannelDict
+// RTCDataChannel createDataChannel ([TreatNullAs=EmptyString] DOMString label, optional RTCDataChannelInit dataChannelDict);
+cpp11::shared_ptr<_RTCDataChannel> _PeerConnection::CreateDataChannel(const char* _label/*[TreatNullAs=EmptyString]*/, cpp11::shared_ptr<_RTCDataChannelInit> dataChannelDict /*= nullPtr*/)
+{
+	if (IsInitialized()) {
+		std::string label(_label ? _label : "");
+		webrtc::DataChannelInit config;
+		if (dataChannelDict) {
+			config.ordered = dataChannelDict->ordered;
+			config.maxRetransmitTime = dataChannelDict->maxRetransmitTime;
+			config.maxRetransmits = dataChannelDict->maxRetransmits;
+			config.protocol = dataChannelDict->protocol;
+			config.negotiated = dataChannelDict->negotiated;
+			config.id = dataChannelDict->id;
+		}
+		cpp11::shared_ptr<_RTCDataChannel> dataChannel = m_peer_connection->CreateDataChannel(label, &config);
+		return dataChannel;
+	}
+	return nullPtr;
+}
 
 bool _PeerConnection::DeInit()
 {

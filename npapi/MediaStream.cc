@@ -268,7 +268,7 @@ bool MediaStream::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVarian
 	}
 	else if (!strcmp(name, kPropId)) {
 		if (This->m_Stream) {
-			NPUTF8* npStrId = (NPUTF8*)Utils::MemDup(This->m_Stream->id(), strlen(This->m_Stream->id()));
+			NPUTF8* npStrId = (NPUTF8*)Utils::MemDup(This->m_Stream->id(), we_strlen(This->m_Stream->id()));
 			if (npStrId) {
 				STRINGZ_TO_NPVARIANT(npStrId, *result);
 				ret_val = true;

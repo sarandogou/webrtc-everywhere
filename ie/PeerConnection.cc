@@ -2,6 +2,7 @@
 
 
 // http://www.w3.org/TR/webrtc/#interface-definition
+// http://www.w3.org/TR/webrtc/#rtcpeerconnection-interface-extensions-1
 // http://www.w3.org/TR/webrtc/#rtcpeerconnection-interface-extensions-2
 #include "stdafx.h"
 #include "PeerConnection.h"
@@ -13,6 +14,9 @@
 #include "RTCIceCandidate.h"
 #include "RTCPeerConnectionIceEvent.h"
 #include "RTCStatsReport.h"
+#include "RTCDTMFSender.h"
+#include "RTCDataChannel.h"
+#include "RTCDataChannelEvent.h"
 #include "WebRTC.h"
 #include "Utils.h"
 
@@ -73,6 +77,7 @@ HRESULT CPeerConnection::Init(VARIANT RTCConfiguration, VARIANT MediaConstraints
 	m_Peer->SetCallback_onaddstream(std::bind(&CPeerConnection::onaddstream, this, std::placeholders::_1));
 	m_Peer->SetCallback_onremovestream(std::bind(&CPeerConnection::onremovestream, this, std::placeholders::_1));
 	m_Peer->SetCallback_oniceconnectionstatechange(std::bind(&CPeerConnection::oniceconnectionstatechange, this));
+	m_Peer->SetCallback_ondatachannel(std::bind(&CPeerConnection::ondatachannel, this, std::placeholders::_1));
 
 	return S_OK;
 }
@@ -141,7 +146,7 @@ STDMETHODIMP CPeerConnection::createOffer(__in_opt VARIANT successCallback, __in
 STDMETHODIMP CPeerConnection::createAnswer(__in_opt VARIANT successCallback, __in_opt VARIANT failureCallback, __in_opt VARIANT mediaConstraints)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 
 	HRESULT hr = S_OK;
@@ -202,7 +207,7 @@ STDMETHODIMP CPeerConnection::createAnswer(__in_opt VARIANT successCallback, __i
 STDMETHODIMP CPeerConnection::setLocalDescription(__in VARIANT RTCSessionDescription, __in_opt VARIANT successCallback, __in_opt VARIANT failureCallback)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 	
 	HRESULT hr = S_OK;
@@ -267,7 +272,7 @@ STDMETHODIMP CPeerConnection::setLocalDescription(__in VARIANT RTCSessionDescrip
 STDMETHODIMP CPeerConnection::get_localDescription(__out VARIANT* pVal)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 	
 	std::shared_ptr<_SessionDescription>sdp = m_Peer->LocalDescription();
@@ -290,7 +295,7 @@ STDMETHODIMP CPeerConnection::get_localDescription(__out VARIANT* pVal)
 STDMETHODIMP CPeerConnection::setRemoteDescription(__in VARIANT RTCSessionDescription, __in_opt VARIANT successCallback, __in_opt VARIANT failureCallback)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 
 	HRESULT hr = S_OK;
@@ -355,7 +360,7 @@ STDMETHODIMP CPeerConnection::setRemoteDescription(__in VARIANT RTCSessionDescri
 STDMETHODIMP CPeerConnection::get_remoteDescription(__out VARIANT* pVal)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 
 	std::shared_ptr<_SessionDescription>sdp = m_Peer->RemoteDescription();
@@ -378,7 +383,7 @@ STDMETHODIMP CPeerConnection::get_remoteDescription(__out VARIANT* pVal)
 STDMETHODIMP CPeerConnection::get_signalingState(__out BSTR* pVal)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 	return Utils::CopyAnsiStr(m_Peer->SignalingState(), pVal);
 }
@@ -403,7 +408,7 @@ STDMETHODIMP CPeerConnection::updateIce(__in VARIANT RTCConfiguration, __in_opt 
 STDMETHODIMP CPeerConnection::addIceCandidate(__in VARIANT RTCIceCandidate, __in VARIANT successCallback, __in VARIANT failureCallback)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 
 	HRESULT hr = S_OK;
@@ -460,7 +465,7 @@ STDMETHODIMP CPeerConnection::addIceCandidate(__in VARIANT RTCIceCandidate, __in
 STDMETHODIMP CPeerConnection::get_iceGatheringState(__out BSTR* pVal)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 	return Utils::CopyAnsiStr(m_Peer->IceGatheringState(), pVal);
 }
@@ -468,7 +473,7 @@ STDMETHODIMP CPeerConnection::get_iceGatheringState(__out BSTR* pVal)
 STDMETHODIMP CPeerConnection::get_iceConnectionState(__out BSTR* pVal)
 {
 	if (!m_Peer) {
-		return E_POINTER;
+		CHECK_HR_RETURN(E_POINTER);
 	}
 	return Utils::CopyAnsiStr(m_Peer->IceConnectionState(), pVal);
 }
@@ -485,7 +490,7 @@ STDMETHODIMP CPeerConnection::getRemoteStreams(__out VARIANT* MediaStreams)
 
 STDMETHODIMP CPeerConnection::getStreamById(__in BSTR streamId, __out VARIANT* MediaStream)
 {
-	if (!m_Peer) {
+	if (!m_Peer || !streamId) {
 		CHECK_HR_RETURN(E_POINTER);
 	}
 
@@ -502,13 +507,12 @@ STDMETHODIMP CPeerConnection::getStreamById(__in BSTR streamId, __out VARIANT* M
 		if (SUCCEEDED(hr)) {
 			_stream->SetDispatcher(const_cast<_AsyncEventDispatcher*>(GetDispatcher()));
 			_stream->SetStream(stream);
-			*MediaStream = CComVariant(_stream);
+			hr = CComVariant(_stream).Detach(MediaStream);
 		}
 		return hr;
 	}
 	else {
-		*MediaStream = CComVariant(NULL);
-		return S_OK;
+		return CComVariant(NULL).Detach(MediaStream);
 	}
 }
 
@@ -657,6 +661,59 @@ STDMETHODIMP CPeerConnection::getStats(__in VARIANT selector, __in_opt VARIANT s
 	return S_OK;
 }
 
+STDMETHODIMP CPeerConnection::createDTMFSender(__in VARIANT MediaStreamTrack, __out VARIANT* RTCDTMFSender)
+{
+	if (!m_Peer) {
+		CHECK_HR_RETURN(E_POINTER);
+	}
+	CComPtr<IDispatch>_MediaStreamTrack = Utils::VariantToDispatch(MediaStreamTrack);
+	if (!_MediaStreamTrack) {
+		CHECK_HR_RETURN(E_POINTER);
+	}
+	
+	HRESULT hr;
+	CComPtr<IMediaStreamTrack> _mediaStreamTrack = NULL;
+	CHECK_HR_RETURN(hr = _MediaStreamTrack->QueryInterface(&_mediaStreamTrack));
+	CMediaStreamTrack* pMediaStreamTrack = dynamic_cast<CMediaStreamTrack*>(_mediaStreamTrack.p);
+	if (!pMediaStreamTrack) {
+		CHECK_HR_RETURN(E_INVALIDARG);
+	}
+	cpp11::shared_ptr<_RTCDTMFSender>sender =  m_Peer->CreateDtmfSender(pMediaStreamTrack->GetTrack().get());
+	if (!sender) {
+		CHECK_HR_RETURN(E_POINTER);
+	}
+	CComObject<CRTCDTMFSender>* _sender;
+	CHECK_HR_RETURN(hr = Utils::CreateInstanceWithRef(&_sender));
+	_sender->SetSender(sender);
+	_sender->SetDispatcher(const_cast<_AsyncEventDispatcher*>(GetDispatcher()));
+	*RTCDTMFSender = CComVariant(_sender);
+	return S_OK;
+}
+
+STDMETHODIMP CPeerConnection::createDataChannel(__in BSTR label/*[TreatNullAs=EmptyString]*/, __in_opt VARIANT dataChannelDict, __out VARIANT* DataChannel)
+{
+	if (!m_Peer) {
+		CHECK_HR_RETURN(E_POINTER);
+	}
+	HRESULT hr;
+	cpp11::shared_ptr<_RTCDataChannelInit> _dataChannelDict;
+	CHECK_HR_RETURN(hr = Utils::BuildRTCDataChannelInit(dataChannelDict, _dataChannelDict));
+
+	char *_label = _com_util::ConvertBSTRToString(label ? label : _T(""));
+	if (!_label) {
+		CHECK_HR_RETURN(E_OUTOFMEMORY);
+	}
+
+	cpp11::shared_ptr<_RTCDataChannel> dataChannel = m_Peer->CreateDataChannel(_label, _dataChannelDict);
+	delete[] _label;
+	CComObject<CRTCDataChannel>* _dataChannel;
+	CHECK_HR_RETURN(hr = Utils::CreateInstanceWithRef(&_dataChannel));
+	_dataChannel->SetChannel(dataChannel);
+	_dataChannel->SetDispatcher(const_cast<_AsyncEventDispatcher*>(GetDispatcher()));
+	*DataChannel = CComVariant(_dataChannel);
+	return S_OK;
+}
+
 STDMETHODIMP CPeerConnection::put_onnegotiationneeded(VARIANT newVal)
 {
 	m_callback_onnegotiationneeded = Utils::VariantToDispatch(newVal);
@@ -726,6 +783,18 @@ STDMETHODIMP CPeerConnection::put_oniceconnectionstatechange(VARIANT newVal)
 STDMETHODIMP CPeerConnection::get_oniceconnectionstatechange(VARIANT* pVal)
 {
 	*pVal = CComVariant(m_callback_oniceconnectionstatechange);
+	return S_OK;
+}
+
+STDMETHODIMP CPeerConnection::put_ondatachannel(__in VARIANT newVal)
+{
+	m_callback_ondatachannel = Utils::VariantToDispatch(newVal);
+	return S_OK;
+}
+
+STDMETHODIMP CPeerConnection::get_ondatachannel(__out VARIANT* pVal)
+{
+	*pVal = CComVariant(m_callback_ondatachannel);
 	return S_OK;
 }
 
@@ -815,6 +884,25 @@ void CPeerConnection::oniceconnectionstatechange()
 		if (_cb) {
 			this->RaiseCallback(_cb);
 			SafeReleaseObject(&_cb);
+		}
+	}
+}
+
+void CPeerConnection::ondatachannel(cpp11::shared_ptr<_RTCDataChannelEvent> e)
+{
+	if (m_callback_ondatachannel) {
+		CComObject<CRTCDataChannelEvent>* _event;
+		HRESULT _hr = Utils::CreateInstanceWithRef(&_event);
+		if (SUCCEEDED(_hr)) {
+			_event->SetDispatcher(const_cast<_AsyncEventDispatcher*>(GetDispatcher()));
+			_event->SetEvent(e);
+			BrowserCallback* _cb = new BrowserCallback(WM_SUCCESS, m_callback_ondatachannel);
+			if (_cb) {
+				_cb->AddDispatch(_event);
+				this->RaiseCallback(_cb);
+				SafeReleaseObject(&_cb);
+			}
+			SafeRelease(&_event);
 		}
 	}
 }

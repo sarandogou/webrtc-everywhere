@@ -51,8 +51,9 @@ RTCStatsReport::RTCStatsReport(NPP instance)
 
 RTCStatsReport::~RTCStatsReport()
 {
-	SetDispatcher(NULL);
 	m_Stats = nullPtr;
+
+	SetDispatcher(NULL);
 }
 
 NPObject* RTCStatsReport::Allocate(NPP instance, NPClass* npclass)

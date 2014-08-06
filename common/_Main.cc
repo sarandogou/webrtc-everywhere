@@ -14,7 +14,9 @@
 #include "_MediaStreamTrack.h"
 #include "_MediaTrackConstraints.h"
 #include "_MediaStreamConstraints.h"
+#include "_EncryptCtx.h"
 #include "_Utils.h"
+#include "_Buffer.h"
 #include "_Debug.h"
 
 #ifdef WIN32
@@ -95,6 +97,42 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	_Utils::Initialize();
 	TakeFakePeerConnectionFactory();
+
+	WeError err;
+
+	/*
+#if 1
+	err = _Utils::FileConfigTrustedWebsiteAdd("https", "yahoo.fr");
+	err = _Utils::FileConfigTrustedWebsiteAdd("https", "google.fr");
+
+	cpp11::shared_ptr<_Buffer>in, out;
+	cpp11::shared_ptr<_EncryptCtx>encryptCtx(new _EncryptCtx());
+	cpp11::shared_ptr<_File> file =_Utils::FileConfigGet(true);
+
+	file->LockInterProcess(false);
+	in = file->Read();
+	err = encryptCtx->Encrypt(in, out);
+	err = encryptCtx->Decrypt(out, in);
+	file->UnlockInterProcess();
+	WE_DEBUG_INFO("Data:%s", (const char*)in->getPtr());
+
+	encryptCtx = nullPtr;
+
+#else
+
+	cpp11::shared_ptr<_File> file =_Utils::FileConfigGet(true);
+	file->LockInterProcess(true);
+
+	cpp11::shared_ptr<_Buffer>data(new _Buffer((const void*)"abc", 3));
+	file->Write(data);
+	data = file->Read();
+
+	_FTIME time;
+	file->GetModificationTime(&time);
+
+	file->UnlockInterProcess();
+	file = nullPtr;
+#endif*/
 
 	peerConnection = std::make_shared<_PeerConnection>();
 	static _RTCIceServer iceServers[] = {

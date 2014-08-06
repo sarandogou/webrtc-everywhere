@@ -9,6 +9,8 @@
 
 #if WE_UNDER_WINDOWS
 #include <Windows.h>
+#include <D3D9.h>
+
 #endif
 
 
@@ -71,7 +73,9 @@ _VideoRenderer::~_VideoRenderer()
 		m_rendered_track = NULL;
 
 #if WE_UNDER_WINDOWS
-
+		if (m_Hwnd) {
+			InvalidateRect(m_Hwnd, NULL, TRUE);
+		}
 #elif WE_UNDER_APPLE
 		if (m_layer) {
 			m_layer.contents = NULL;
@@ -131,6 +135,7 @@ CALayer *_VideoRenderer::GetLayer()
 #endif
 
 // On Windows, must be called inside OnPaint()
+// Requires valid m_Hwnd
 bool _VideoRenderer::PaintFrame()
 {
     _AutoLock<_VideoRenderer> lock(this);
@@ -235,6 +240,13 @@ size_t _VideoRenderer::CopyFromFrame(void* bufferPtr, size_t bufferSize)
 	return  0;
 }
 
+void _VideoRenderer::SetFnQuerySurfacePresentere(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter)
+{
+	_AutoLock<_VideoRenderer> lock(this);
+
+	m_fnQuerySurfacePresenter = fnQuerySurfacePresenter;
+}
+
 // VideoRendererInterface implementation
 void _VideoRenderer::SetSize(int width, int height)
 {
@@ -249,6 +261,8 @@ void _VideoRenderer::SetSize(int width, int height)
 	m_bmi.bmiHeader.biSizeImage = width * height *
 		(m_bmi.bmiHeader.biBitCount >> 3);
 	m_image.reset(new uint8[m_bmi.bmiHeader.biSizeImage]);
+	if (m_Hwnd) {
+	}
 #elif WE_UNDER_APPLE
     if (m_context) {
         CGContextRelease(m_context);
@@ -303,8 +317,24 @@ void _VideoRenderer::RenderFrame(const cricket::VideoFrame* frame)
 		m_bmi.bmiHeader.biBitCount / 8);
 	
 	if (m_Hwnd) {
-		InvalidateRect(m_Hwnd, NULL, FALSE);
+		InvalidateRect(m_Hwnd, NULL, TRUE);
 	}
+#if 0
+	else if (m_fnQuerySurfacePresenter){
+		CComPtr<ISurfacePresenter> spSurfacePresenter = NULL;
+		CComPtr<ID3D10Texture2D> spText = NULL;
+		int backBuffWidth = 0, backBuffHeight = 0;
+		m_fnQuerySurfacePresenter(spSurfacePresenter, spText, backBuffWidth, backBuffHeight);
+		if (spSurfacePresenter && spText && backBuffWidth && backBuffHeight) {
+			D3D10_MAPPED_TEXTURE2D pMappedTex2D = { 0 };
+			HRESULT hr = spText->Map(D3D10CalcSubresource(0, 0, 1), D3D10_MAP_WRITE_DISCARD, 0/* D3D10_MAP_FLAG_DO_NOT_WAIT*/, &pMappedTex2D);
+			if (SUCCEEDED(hr)) {
+				memcpy(pMappedTex2D.pData, m_image.get(), (m_width * 10 * 4));
+				spText->Unmap(D3D10CalcSubresource(0, 0, 1));
+			}
+		}
+	}
+#endif
 #elif WE_UNDER_APPLE
     if (m_context_buff && m_context && m_layer) {
         frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, m_image.get(), m_context_buff_size, m_width * 4);
@@ -357,6 +387,7 @@ void _RTCDisplay::StartVideoRenderer(VideoTrackInterfacePtr video)
 	if (_v) {
 		_VideoRenderer* _video = new _VideoRenderer(1, 1, cpp11::bind(&_RTCDisplay::OnStartVideoRenderer, this), _v);
 		if (_video) {
+			_video->SetFnQuerySurfacePresentere(cpp11::bind(&_RTCDisplay::QuerySurfacePresenter, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 #if WE_UNDER_WINDOWS
 			_video->SetHwnd(Handle());
 			SetWindowLongPtr(_video->GetHwnd(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));

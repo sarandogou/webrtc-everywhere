@@ -57,8 +57,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,0
- PRODUCTVERSION 1,1,0,0
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -73,14 +73,14 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Sarandogou"
-            VALUE "FileDescription", "WebRTC plugin for Safari, IE, Chrome, Opera and Firefox"
-            VALUE "FileVersion", "1.1.0.0"
-            VALUE "LegalCopyright", "(c) 2014 Sarandogou.  All rights reserved."
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
             VALUE "InternalName", "webrtc-everywhere.dll"
             VALUE "OriginalFilename", "webrtc-everywhere.dll"
-            VALUE "ProductName", "WebRTC Everywhere Plugin"
-            VALUE "ProductVersion", "1.1.0.0"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -140,9 +140,14 @@ IDR_MEDIASTREAMTRACK    REGISTRY                "MediaStreamTrack.rgs"
 IDR_SOURCEINFO          REGISTRY                "SourceInfo.rgs"
 IDR_MEDIASOURCESTATES   REGISTRY                "MediaSourceStates.rgs"
 IDR_MEDIASTREAMEVENT    REGISTRY                "MediaStreamEvent.rgs"
-IDR_RTCPEERCONNECTIONICEEVENT REGISTRY          "RTCPeerConnectionIceEvent.rgs"
+IDR_RTCPEERCONNECTIONICEEVENT REGISTRY                "RTCPeerConnectionIceEvent.rgs"
 IDR_RTCSTATSREPORT      REGISTRY                "RTCStatsReport.rgs"
 IDR_RTCSTATS            REGISTRY                "RTCStats.rgs"
+IDR_RTCDTMFSENDER       REGISTRY                "RTCDTMFSender.rgs"
+IDR_RTCDTMFTONECHANGEEVENT REGISTRY                "RTCDTMFToneChangeEvent.rgs"
+IDR_RTCDATACHANNEL      REGISTRY                "RTCDataChannel.rgs"
+IDR_MESSAGEEVENT        REGISTRY                "MessageEvent.rgs"
+IDR_RTCDATACHANNELEVENT REGISTRY                "RTCDataChannelEvent.rgs"
 #endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
 

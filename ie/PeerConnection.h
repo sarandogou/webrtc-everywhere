@@ -1,5 +1,6 @@
 /* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/webrtc/#interface-definition
+// http://www.w3.org/TR/webrtc/#rtcpeerconnection-interface-extensions-1
 // http://www.w3.org/TR/webrtc/#rtcpeerconnection-interface-extensions-2
 
 #pragma once
@@ -69,6 +70,8 @@ public:
 	STDMETHOD(removeStream)(__in VARIANT stream);
 	STDMETHOD(close)();
 	STDMETHOD(getStats)(__in VARIANT selector, __in_opt VARIANT successCallback, __in_opt VARIANT failureCallback);
+	STDMETHOD(createDTMFSender)(__in VARIANT MediaStreamTrack, __out VARIANT* RTCDTMFSender);
+	STDMETHOD(createDataChannel)(__in BSTR label, __in_opt VARIANT dataChannelDict, __out VARIANT* DataChannel);
 
 	STDMETHOD(put_onnegotiationneeded)(__in VARIANT newVal);
 	STDMETHOD(get_onnegotiationneeded)(__out VARIANT* pVal);
@@ -82,6 +85,8 @@ public:
 	STDMETHOD(get_onremovestream)(__out VARIANT* pVal);
 	STDMETHOD(put_oniceconnectionstatechange)(__in VARIANT newVal);
 	STDMETHOD(get_oniceconnectionstatechange)(__out VARIANT* pVal);
+	STDMETHOD(put_ondatachannel)(__in VARIANT newVal);
+	STDMETHOD(get_ondatachannel)(__out VARIANT* pVal);
 
 private:
 	// callbacks
@@ -91,6 +96,7 @@ private:
 	void onaddstream(std::shared_ptr<_MediaStreamEvent> stream);
 	void onremovestream(std::shared_ptr<_MediaStreamEvent> stream);
 	void oniceconnectionstatechange();
+	void ondatachannel(cpp11::shared_ptr<_RTCDataChannelEvent> e);
 
 	HRESULT getStreams(__in BOOL remote, __out VARIANT* MediaStreams);
 
@@ -104,6 +110,7 @@ private:
 	CComPtr<IDispatch>m_callback_onaddstream;
 	CComPtr<IDispatch>m_callback_onremovestream;
 	CComPtr<IDispatch>m_callback_oniceconnectionstatechange;
+	CComPtr<IDispatch>m_callback_ondatachannel;
 public:
 
 	

@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {FDFDCAED-5FE4-4B75-A492-5E1837CDC84C} = s 'RTCDTMFSender Class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{12E5324E-D53E-4C89-BFA4-E3020902DD62}'
+			Version = s '1.0'
+		}
+	}
+}

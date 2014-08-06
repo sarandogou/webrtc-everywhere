@@ -19,6 +19,11 @@
 #define IDR_RTCPEERCONNECTIONICEEVENT   114
 #define IDR_RTCSTATSREPORT              115
 #define IDR_RTCSTATS                    116
+#define IDR_RTCDTMFSENDER               117
+#define IDR_RTCDTMFTONECHANGEEVENT      118
+#define IDR_RTCDATACHANNEL              119
+#define IDR_MESSAGEEVENT                120
+#define IDR_RTCDATACHANNELEVENT         121
 
 // Next default values for new objects
 // 
@@ -27,6 +32,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        201
 #define _APS_NEXT_COMMAND_VALUE         32768
 #define _APS_NEXT_CONTROL_VALUE         201
-#define _APS_NEXT_SYMED_VALUE           117
+#define _APS_NEXT_SYMED_VALUE           122
 #endif
 #endif

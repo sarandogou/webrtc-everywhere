@@ -55,7 +55,7 @@ NPError BrowserCallback::AddObject(NPObject* obj)
 	return NPERR_NO_ERROR;
 }
 
-NPError BrowserCallback::AddString(void* ptr, size_t size)
+NPError BrowserCallback::AddString(const void* ptr, size_t size)
 {
 	if ((m_params_count + 1) >= kMaxParamArgs) {
 		WE_DEBUG_ERROR("Too much params");

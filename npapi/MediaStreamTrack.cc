@@ -310,7 +310,7 @@ bool MediaStreamTrack::GetProperty(NPObject* obj, NPIdentifier propertyName, NPV
 	}
 	else if (!strcmp(name, kPropKind)) {
 		if (This->m_Track) {
-			NPUTF8* npStrKind = (NPUTF8*)Utils::MemDup(This->m_Track->kind(), strlen(This->m_Track->kind()));
+			NPUTF8* npStrKind = (NPUTF8*)Utils::MemDup(This->m_Track->kind(), we_strlen(This->m_Track->kind()));
 			if (npStrKind) {
 				STRINGZ_TO_NPVARIANT(npStrKind, *result);
 				ret_val = true;
@@ -319,7 +319,7 @@ bool MediaStreamTrack::GetProperty(NPObject* obj, NPIdentifier propertyName, NPV
 	}
 	else if (!strcmp(name, kPropId)) {
 		if (This->m_Track) {
-			NPUTF8* npStrId = (NPUTF8*)Utils::MemDup(This->m_Track->id(), strlen(This->m_Track->id()));
+			NPUTF8* npStrId = (NPUTF8*)Utils::MemDup(This->m_Track->id(), we_strlen(This->m_Track->id()));
 			if (npStrId) {
 				STRINGZ_TO_NPVARIANT(npStrId, *result);
 				ret_val = true;
@@ -328,7 +328,7 @@ bool MediaStreamTrack::GetProperty(NPObject* obj, NPIdentifier propertyName, NPV
 	}
 	else if (!strcmp(name, kPropLabel)) {
 		if (This->m_Track) {
-			NPUTF8* npStrLabel = (NPUTF8*)Utils::MemDup(This->m_Track->label(), strlen(This->m_Track->label()));
+			NPUTF8* npStrLabel = (NPUTF8*)Utils::MemDup(This->m_Track->label(), we_strlen(This->m_Track->label()));
 			if (npStrLabel) {
 				STRINGZ_TO_NPVARIANT(npStrLabel, *result);
 				ret_val = true;
@@ -367,7 +367,7 @@ bool MediaStreamTrack::GetProperty(NPObject* obj, NPIdentifier propertyName, NPV
 	}
 	else if (!strcmp(name, kPropReadyState)) {
 		if (This->m_Track) {
-			NPUTF8* npStrState = (NPUTF8*)Utils::MemDup(This->m_Track->readyState(), strlen(This->m_Track->readyState()));
+			NPUTF8* npStrState = (NPUTF8*)Utils::MemDup(This->m_Track->readyState(), we_strlen(This->m_Track->readyState()));
 			if (npStrState) {
 				STRINGZ_TO_NPVARIANT(npStrState, *result);
 				ret_val = true;

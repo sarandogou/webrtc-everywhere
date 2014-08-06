@@ -9,6 +9,8 @@
 
 #include <map>
 
+class _EncryptCtx;
+
 class WEBRTC_EVERYWHERE_API _Utils
 {
 public:
@@ -31,9 +33,22 @@ public:
     static void UniqueObjAdd(const _UniqueObject* obj);
     static void UniqueObjRemove(long id);
 
+	static int ArrayBytesCount(_ArrayType arrayType);
+	static bool ArrayIsFloatingPoint(_ArrayType arrayType);
+
+	static cpp11::shared_ptr<_File> FileConfigGet(bool write = false);
+	static WeError FileConfigGetKeyAndIV(const unsigned char* &key_ptr, size_t &key_size, const unsigned char* &iv_ptr, size_t &iv_size);
+	static WeError FileConfigChanged(cpp11::shared_ptr<_File> file, bool &changed);
+	static WeError FileConfigTrustedWebsiteAdd(const char* protocol, const char* host);
+	static WeError FileConfigTrustedWebsiteExist(const char* protocol, const char* host, bool &exists);
+
 	static WeError ConvertToBase64(const void* in_ptr, size_t in_size, void **out_pptr, size_t *out_size_ptr, void* (*MemAllocFn)(size_t n) = NULL);
 	static WeError ConvertToBMP(const void* rgb32_ptr, size_t width, size_t height, void** bmp_pptr, size_t *bmp_size_ptr);
-    
+#if WE_UNDER_WINDOWS
+	static HRESULT MsgBoxGUMA(bool &accepted, const char* protocol, const char* host, HWND hwndParent /*= NULL*/);
+	static HRESULT MsgBoxGUM(bool &accepted, const TCHAR* protocol, const TCHAR* host, HWND hwndParent = NULL);
+#endif
+
 private:
 #if _MSC_VER
 #pragma warning(push)
@@ -41,6 +56,8 @@ private:
 #endif
     static webrtc::CriticalSectionWrapper* s_unique_objs_cs;
     static std::map<long, const _UniqueObject*> s_unique_objs;
+	static _FTIME s_time_config_modif;
+	static cpp11::shared_ptr<_EncryptCtx> s_encrypt_ctx;
 #if _MSC_VER
 #pragma warning(pop)
 #endif

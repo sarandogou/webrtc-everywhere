@@ -2,10 +2,20 @@
 #include "_Buffer.h"
 #include "_Debug.h"
 
-_Buffer::_Buffer()
-    : m_pPtr(NULL)
-    , m_nSize(0)
+_Buffer::_Buffer(const void* ptr, size_t size)
+	: m_pPtr(NULL)
+	, m_nSize(0)
 {
+	m_pPtr = malloc(size + 1);
+	if (!m_pPtr) {
+		WE_DEBUG_ERROR("Failed to allocate buffer with size=%lu", size);
+		return;
+	}
+	((char*)m_pPtr)[size] = '\0';
+	if (size && ptr) {
+		memcpy(m_pPtr, ptr, size);
+	}
+	m_nSize = size;
 }
 
 _Buffer::~_Buffer()
@@ -19,21 +29,11 @@ WeError _Buffer::New(const void* ptr, size_t size, _Buffer** ppObj)
         WE_DEBUG_ERROR("Invalid argument");
         return WeError_InvalidArgument;
     }
-    (*ppObj) = new _Buffer();
-    if (!(*ppObj)) {
+	(*ppObj) = new _Buffer(ptr, size);
+	if (!(*ppObj) || (*ppObj)->getSize() != size) {
+		SafeFree(ppObj);
         WE_DEBUG_ERROR("Failed to create new buffer");
         return WeError_OutOfMemory;
     }
-    (*ppObj)->m_pPtr = malloc(size + 1);
-    if (!(*ppObj)) {
-        WE_DEBUG_ERROR("Failed to allocate buffer with size=%lu", size);
-        SafeFree(ppObj);
-        return WeError_OutOfMemory;
-    }
-    ((char*)(*ppObj)->m_pPtr)[size] = '\0';
-	if (ptr) {
-		memcpy((*ppObj)->m_pPtr, ptr, size);
-	}
-    (*ppObj)->m_nSize = size;
     return WeError_Success;
 }

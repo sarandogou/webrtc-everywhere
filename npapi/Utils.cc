@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "NPCommon.h"
 
+#include "../common/_Buffer.h"
 #include "../common/_Debug.h"
 
 extern NPNetscapeFuncs* BrowserFuncs;
@@ -29,6 +30,22 @@ NPError Utils::NPObjectRelease(NPObject** obj)
 	return NPERR_NO_ERROR;
 }
 
+NPError Utils::NPVariantRelease(NPVariant** var)
+{
+	if (var && *var) {
+		NPError err = NPERR_NO_ERROR;
+		if ((*var)->type == NPVariantType_Object) {
+			err = Utils::NPObjectRelease(&(*var)->value.objectValue);
+		}
+		else {
+			BrowserFuncs->releasevariantvalue(*var);
+		}
+		*var = NULL;
+		return err;
+	}
+	return NPERR_NO_ERROR;
+}
+
 NPError Utils::CreateInstanceWithRef(NPP npp, NPClass *aClass, NPObject** obj)
 {
 	if (!obj || !aClass) {
@@ -40,31 +57,51 @@ NPError Utils::CreateInstanceWithRef(NPP npp, NPClass *aClass, NPObject** obj)
 	return NPERR_NO_ERROR;
 }
 
-NPError Utils::CreateJsArray(NPP npp, std::vector<NPVariant> &vecValues, NPObject** arrayObj)
+NPError Utils::CreateJsArrayEx(NPP npp, std::vector<NPVariant> &vecValues, const NPUTF8* arrayClassName, NPObject** arrayObj)
 {
-	if (!arrayObj || *arrayObj) {
+	if (!arrayObj || *arrayObj || !arrayClassName) {
 		CHECK_NPERR_RETURN(NPERR_INVALID_PARAM);
 	}
 	NPObject* npWindow = NULL;
 	NPError err;
-	
+
 	CHECK_NPERR_RETURN(err = BrowserFuncs->getvalue(npp, NPNVWindowNPObject, &npWindow));
 
 	NPVariant var;
-	bool bRet = BrowserFuncs->invoke(npp, npWindow, BrowserFuncs->getstringidentifier("Array"), NULL, 0, &var);
+	bool bRet;
+
+#if 1
+	NPUTF8 createArrayEvalString[1024];
+	NPString npCreateArrayEvalString = { 0 };
+	sprintf(createArrayEvalString, "new %s(%u)", arrayClassName, vecValues.size());
+	npCreateArrayEvalString.UTF8Characters = createArrayEvalString;
+	npCreateArrayEvalString.UTF8Length = strlen(createArrayEvalString);
+	bRet = BrowserFuncs->evaluate(npp, npWindow, &npCreateArrayEvalString, &var);
+#else
+
+	NPVariant args[1];
+	INT32_TO_NPVARIANT(vecValues.size(), args[0]);
+	NPIdentifier classId = BrowserFuncs->getstringidentifier(arrayClassName);
+	bRet = BrowserFuncs->invoke(npp, npWindow, classId, args, sizeof(args) / sizeof(args[0]), &var);
+#endif
+
 	BrowserFuncs->releaseobject(npWindow);
 	if (!bRet || var.type != NPVariantType_Object || !var.value.objectValue) {
 		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
 	}
 	*arrayObj = var.value.objectValue;
 
-	NPIdentifier idPush = BrowserFuncs->getstringidentifier("push");
-	VOID_TO_NPVARIANT(var);
+	NPUTF8 index[25];
 	for (size_t i = 0; i < vecValues.size(); ++i) {
-		BrowserFuncs->invoke(npp, *arrayObj, idPush, &vecValues[i], 1, &var);
-		BrowserFuncs->releasevariantvalue(&var);
+		sprintf(index, "%ld\0", i);
+		/*bRet =*/ BrowserFuncs->setproperty(npp, *arrayObj, BrowserFuncs->getstringidentifier(index), &vecValues[i]);
 	}
 	return NPERR_NO_ERROR;
+}
+
+NPError Utils::CreateJsArray(NPP npp, std::vector<NPVariant> &vecValues, NPObject** arrayObj)
+{
+	return Utils::CreateJsArrayEx(npp, vecValues, "Array", arrayObj);
 }
 
 NPError Utils::CreateDocumentElementObject(NPP npp, NPObject** jsObj)
@@ -77,7 +114,6 @@ NPError Utils::CreateDocumentElementObject(NPP npp, NPObject** jsObj)
     NPVariant var;
 	
 	CHECK_NPERR_RETURN(err = BrowserFuncs->getvalue(npp, NPNVWindowNPObject, &npWindow));
-    
     
     if (!BrowserFuncs->getproperty(npp,npWindow, BrowserFuncs->getstringidentifier("document"), &var) || !NPVARIANT_IS_OBJECT(var)) {
         Utils::NPObjectRelease(&npWindow);
@@ -212,10 +248,10 @@ NPError Utils::NPObjectGetPropNumber(NPP npp, NPObject* obj, const NPUTF8* name,
 	NPVariant var;
 	CHECK_NPERR_RETURN(Utils::NPObjectGetProp(npp, obj, name, &var));
 
-	if (var.type == NPVariantType_Double) {
+	if (NPVARIANT_IS_DOUBLE(var)) {
 		number = var.value.doubleValue;
 	}
-	else if (var.type == NPVariantType_Int32) {
+	else if (NPVARIANT_IS_INT32(var)) {
 		number = var.value.intValue;
 	}
 	else {
@@ -223,6 +259,35 @@ NPError Utils::NPObjectGetPropNumber(NPP npp, NPObject* obj, const NPUTF8* name,
 		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
 	}
 	BrowserFuncs->releasevariantvalue(&var);
+	return NPERR_NO_ERROR;
+}
+
+NPError Utils::NPObjectGetPropBool(NPP npp, NPObject* obj, const NPUTF8* name, bool& _bool)
+{
+	NPVariant var;
+	CHECK_NPERR_RETURN(Utils::NPObjectGetProp(npp, obj, name, &var));
+
+	if (NPVARIANT_IS_BOOLEAN(var)) {
+		_bool = var.value.boolValue;
+	}
+	else {
+		BrowserFuncs->releasevariantvalue(&var);
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
+	BrowserFuncs->releasevariantvalue(&var);
+	return NPERR_NO_ERROR;
+}
+
+NPError Utils::NPObjectCallJsFunction(NPP npp, NPObject* obj, const NPUTF8* name, NPVariant* var)
+{
+	if (!npp || !name || !var) {
+		CHECK_NPERR_RETURN(NPERR_INVALID_PARAM);
+	}
+	VOID_TO_NPVARIANT(*var);
+	NPIdentifier indentifier = BrowserFuncs->getstringidentifier(name);
+	if (!BrowserFuncs->invoke(npp, obj, indentifier, NULL, 0, var)) {
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
 	return NPERR_NO_ERROR;
 }
 
@@ -433,6 +498,157 @@ NPError Utils::BuildRTCConfiguration(NPP npp, NPObject* varConfiguration, cpp11:
 	return NPERR_NO_ERROR;
 }
 
+NPError Utils::BuildRTCDataChannelInit(NPP npp, NPObject* varRTCDataChannelInit, cpp11::shared_ptr<_RTCDataChannelInit> &configuration)
+{
+	if (!varRTCDataChannelInit) {
+		return NPERR_NO_ERROR;
+	}
+
+	configuration = cpp11::shared_ptr<_RTCDataChannelInit>(new _RTCDataChannelInit());
+	NPError err;
+	std::string string;
+	bool _bool;
+	double _double;
+
+
+	// http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannel
+	if ((err = Utils::NPObjectGetPropString(npp, varRTCDataChannelInit, "protocol", string)) == NPERR_NO_ERROR) {
+		configuration->protocol = string;
+	}
+	if ((err = Utils::NPObjectGetPropBool(npp, varRTCDataChannelInit, "protocol", _bool)) == NPERR_NO_ERROR) {
+		configuration->ordered = _bool;
+	}	
+	if ((err = Utils::NPObjectGetPropNumber(npp, varRTCDataChannelInit, "maxRetransmitTime", _double)) == NPERR_NO_ERROR) {
+		configuration->maxRetransmitTime = (nullable_ushort)_double;
+	}
+	if ((err = Utils::NPObjectGetPropNumber(npp, varRTCDataChannelInit, "maxRetransmits", _double)) == NPERR_NO_ERROR) {
+		configuration->maxRetransmits = (nullable_ushort)_double;
+	}
+	if ((err = Utils::NPObjectGetPropBool(npp, varRTCDataChannelInit, "negotiated", _bool)) == NPERR_NO_ERROR) {
+		configuration->negotiated = _bool;
+	}
+	if ((err = Utils::NPObjectGetPropNumber(npp, varRTCDataChannelInit, "id", _double)) == NPERR_NO_ERROR) {
+		configuration->id = (nullable_ushort)_double;
+	}
+	return NPERR_NO_ERROR;
+}
+
+NPError Utils::BuildData(NPP npp, const NPVariant* varData, cpp11::shared_ptr<_Buffer> &data)
+{
+	if (!varData) {
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
+	if (NPVARIANT_IS_STRING(*varData)) {
+		data = cpp11::shared_ptr<_Buffer>(new _Buffer((const void*)varData->value.stringValue.UTF8Characters, (size_t)varData->value.stringValue.UTF8Length));
+		return NPERR_NO_ERROR;
+	}
+	else if (NPVARIANT_IS_OBJECT(*varData)) {
+		NPObject* _data = Utils::VariantToObject((NPVariant*)varData);
+		if (!_data) {
+			CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+		}
+
+		_ArrayType arrayType = _ArrayType_None;
+		NPError err;
+
+		NPVariant var;
+		CHECK_NPERR_RETURN(err = Utils::NPObjectCallJsFunction(npp, _data, "toString", &var));
+		if (!NPVARIANT_IS_STRING(var)) {
+			CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+		}
+
+		if (strncmp(var.value.stringValue.UTF8Characters, "[object Int8Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Int8Array;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Uint8Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Uint8Array;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Uint8ClampedArray]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Uint8ClampedArray;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Int16Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Int16Array;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Uint16Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Uint16Array;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Int32Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Int32Array;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Uint32Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Uint32Array;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Float32Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Float32Array;
+		}
+		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Float64Array]", var.value.stringValue.UTF8Length) == 0) {
+			arrayType = _ArrayType_Float64Array;
+		}
+
+		if (arrayType != _ArrayType_None) {
+			return Utils::BuildDataArray(npp, _data, arrayType, data);
+		}
+	}
+
+	CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+
+	return NPERR_GENERIC_ERROR;
+}
+
+NPError Utils::BuildDataArray(NPP npp, NPObject* varData, _ArrayType arrayType, cpp11::shared_ptr<_Buffer> &data)
+{
+	if (!varData || arrayType == _ArrayType_None) {
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
+
+	int byteCount = _Utils::ArrayBytesCount(arrayType);
+	if (byteCount <= 0) {
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
+
+	double length;
+	NPError err;
+
+	CHECK_NPERR_RETURN(err = Utils::NPObjectGetPropNumber(npp, varData, "length", length));
+
+	data = std::make_shared<_Buffer>((const void*)NULL, (size_t)(length * byteCount));
+	if (!data.get() || !data->getPtr()) {
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
+	uint8_t* ptr = reinterpret_cast<uint8_t*>(const_cast<void*>(data->getPtr()));
+
+	bool isFloatingPoint = _Utils::ArrayIsFloatingPoint(arrayType);
+
+	char s[25];
+	double _double;
+	for (long i = 0; i < length; ++i) {
+		sprintf(s, "%ld", i);
+		CHECK_NPERR_RETURN(err = Utils::NPObjectGetPropNumber(npp, varData, s, _double));
+		if (isFloatingPoint) {
+			switch (arrayType) {
+			case _ArrayType_Float32Array: *((float*)ptr) = (float)_double; break;
+			case _ArrayType_Float64Array: *((double*)ptr) = _double; break;
+			default: CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+			}
+		}
+		else {
+			switch (arrayType) {
+			case _ArrayType_Int8Array: *((int8_t*)ptr) = (int8_t)_double; break;
+			case _ArrayType_Uint8Array: *((uint8_t*)ptr) = (uint8_t)_double; break;
+			case _ArrayType_Uint8ClampedArray: *((uint8_t*)ptr) = (uint8_t)(_double < 0 ? 0 : (_double > 255 ? 255 : _double)); break;
+			case _ArrayType_Int16Array: *((int16_t*)ptr) = ((int16_t)_double); break;
+			case _ArrayType_Uint16Array: *((uint16_t*)ptr) = ((uint16_t)_double); break;
+			case _ArrayType_Int32Array: *((int32_t*)ptr) = (int32_t)_double; break;
+			case _ArrayType_Uint32Array: *((uint32_t*)ptr) = (uint32_t)_double; break;
+			default: CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+			}
+		}
+		ptr += byteCount;
+	}
+
+	return NPERR_NO_ERROR;
+}
+
 NPObject* Utils::NPObjectUpCast(NPObject* pObj)
 {
     if (pObj) {
@@ -450,6 +666,41 @@ NPObject* Utils::NPObjectUpCast(NPObject* pObj)
         }
     }
     return NULL;
+}
+
+NPError Utils::GetLocation(NPP npp, NPVariant* protocol, NPVariant *host)
+{
+	if (!protocol || !host) {
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
+
+	VOID_TO_NPVARIANT(*protocol);
+	VOID_TO_NPVARIANT(*host);
+
+	NPObject* npWindow = NULL;
+	NPError err;
+	NPVariant var;
+
+	CHECK_NPERR_RETURN(err = BrowserFuncs->getvalue(npp, NPNVWindowNPObject, &npWindow));
+
+	if (!BrowserFuncs->getproperty(npp, npWindow, BrowserFuncs->getstringidentifier("location"), &var) || !NPVARIANT_IS_OBJECT(var)) {
+		Utils::NPObjectRelease(&npWindow);
+		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+	}
+	Utils::NPObjectRelease(&npWindow);
+
+	err = Utils::NPObjectGetProp(npp, var.value.objectValue, "protocol", protocol);
+	if (err == NPERR_NO_ERROR) {
+		err = Utils::NPObjectGetProp(npp, var.value.objectValue, "host", host);
+	}
+	BrowserFuncs->releasevariantvalue(&var);
+
+	if (err != NPERR_NO_ERROR) {
+		BrowserFuncs->releasevariantvalue(protocol);
+		BrowserFuncs->releasevariantvalue(host);
+	}
+
+	return err;
 }
 
 void* Utils::MemAlloc(size_t n)

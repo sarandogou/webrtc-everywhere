@@ -56,7 +56,7 @@ STDMETHODIMP CMediaSourceStates::get_width(__out VARIANT* pVal)
 	}
 	// nullable
 	if (m_States->width <= 0) {
-		*pVal = CComVariant(NULL);
+		CComVariant(NULL).Detach(pVal);
 	}
 	else {
 		*pVal = CComVariant(m_States->width);
@@ -71,7 +71,7 @@ STDMETHODIMP CMediaSourceStates::get_height(__out VARIANT* pVal)
 	}
 	// nullable
 	if (m_States->height <= 0) {
-		*pVal = CComVariant(NULL);
+		CComVariant(NULL).Detach(pVal);
 	}
 	else {
 		*pVal = CComVariant(m_States->height);
@@ -86,7 +86,7 @@ STDMETHODIMP CMediaSourceStates::get_frameRate(__out VARIANT* pVal)
 	}
 	// nullable
 	if (m_States->frameRate <= 0) {
-		*pVal = CComVariant(NULL);
+		CComVariant(NULL).Detach(pVal);
 	}
 	else {
 		*pVal = CComVariant(m_States->frameRate);
@@ -101,7 +101,7 @@ STDMETHODIMP CMediaSourceStates::get_aspectRatio(__out VARIANT* pVal)
 	}
 	// nullable
 	if (m_States->aspectRatio <= 0) {
-		*pVal = CComVariant(NULL);
+		CComVariant(NULL).Detach(pVal);
 	}
 	else {
 		*pVal = CComVariant(m_States->aspectRatio);

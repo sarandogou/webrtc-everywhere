@@ -2,19 +2,30 @@
 #include "_Utils.h"
 #include "_RTCDisplay.h"
 #include "_AsyncEvent.h"
+#include "_Buffer.h"
 #include "_Debug.h"
+#include "_EncryptCtx.h"
 #include "_Common.h"
 
 #if WE_UNDER_WINDOWS
-#	include "windows.h"
+#	include <windows.h>
 #	include <comutil.h>
+#	include <shlwapi.h>
+#	include <shlobj.h>
+#	include <AtlConv.h>
 #	include "talk/base/win32socketinit.h"
+#	include "resource.h"
 # elif WE_UNDER_MAC
 #	include "talk/base/maccocoasocketserver.h"
 #endif
 
+#ifdef _MSC_VER
+#pragma comment(lib,"shlwapi.lib")
+#endif
+
 #include "talk/base/ssladapter.h"
 #include "talk/base/thread.h"
+#include "talk/base/json.h"
 
 static bool g_bInitialized = false;
 #if WE_UNDER_WINDOWS
@@ -23,6 +34,9 @@ static bool g_winCoInitialize = false;
 
 webrtc::CriticalSectionWrapper* _Utils::s_unique_objs_cs = webrtc::CriticalSectionWrapper::CreateCriticalSection();
 std::map<long, const _UniqueObject*> _Utils::s_unique_objs;
+_FTIME _Utils::s_time_config_modif = { 0 };
+cpp11::shared_ptr<_EncryptCtx> _Utils::s_encrypt_ctx = cpp11::shared_ptr<_EncryptCtx>(new _EncryptCtx());
+
 
 _Utils::_Utils()
 {
@@ -60,6 +74,7 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
         
 		talk_base::InitializeSSL();
 		talk_base::InitializeSSLThread();
+
         g_bInitialized = true;
     }
 	if (InitializeAdditionals) {
@@ -307,6 +322,256 @@ void _Utils::UniqueObjRemove(long id)
     _Utils::s_unique_objs_cs->Leave();
 }
 
+int _Utils::ArrayBytesCount(_ArrayType arrayType)
+{
+	switch (arrayType) {
+	case _ArrayType_Int8Array:
+	case _ArrayType_Uint8Array:
+	case _ArrayType_Uint8ClampedArray:
+		return 1;
+	case _ArrayType_Int16Array:
+	case _ArrayType_Uint16Array:
+		return 2;
+	case _ArrayType_Int32Array:
+	case _ArrayType_Uint32Array:
+	case _ArrayType_Float32Array:
+		return 4;
+	case _ArrayType_Float64Array:
+		return 8;
+	default:
+		return -1;
+	}
+}
+
+bool _Utils::ArrayIsFloatingPoint(_ArrayType arrayType)
+{
+	switch (arrayType) {
+	case _ArrayType_Int8Array:
+	case _ArrayType_Uint8Array:
+	case _ArrayType_Uint8ClampedArray:
+	case _ArrayType_Int16Array:
+	case _ArrayType_Uint16Array:
+	case _ArrayType_Int32Array:
+	case _ArrayType_Uint32Array:
+	default:
+		return false;
+	case _ArrayType_Float32Array:
+	case _ArrayType_Float64Array:
+		return true;
+	}
+}
+
+cpp11::shared_ptr<_File> _Utils::FileConfigGet(bool write /*= false*/)
+{
+	cpp11::shared_ptr<_File> file_config;
+#if WE_UNDER_WINDOWS
+	// http ://support.microsoft.com/kb/310294
+	TCHAR szPath[MAX_PATH];
+	// Get path for each computer, non-user specific and non-roaming data.
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath))) {
+		// Append product-specific path - this path needs to already exist
+		// for GetTempFileName to succeed.
+		PathAppend(szPath, _T("\\Doubango Telecom\\webrtc-everywhere\\"));
+		if (SUCCEEDED(SHCreateDirectoryEx(NULL, szPath, NULL))) {
+			PathAppend(szPath, _T("\\config.json"));
+			file_config = cpp11::shared_ptr<_File>(new _File(szPath, write));
+		}
+	}
+#else
+#error "Not implemented"
+#endif
+
+	return file_config;
+}
+
+WeError _Utils::FileConfigGetKeyAndIV(const unsigned char* &key_ptr, size_t &key_size, const unsigned char* &iv_ptr, size_t &iv_size)
+{
+	static const unsigned char g_Key[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	static const unsigned char g_IV[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+#if defined(WE_CONFIG_CRYPT_KEY) && defined(WE_CONFIG_CRYPT_IV)
+	static unsigned char *__key = NULL;
+	static size_t __key_size = 0;
+	static unsigned char *__iv = NULL;
+	static size_t __iv_size = 0;
+	if (!__key || !__iv) {
+		size_t key_len = we_strlen((const char*)WE_CONFIG_CRYPT_KEY);
+		size_t iv_len = we_strlen((const char*)WE_CONFIG_CRYPT_IV);
+		if (!key_len || (key_len & 1) || !iv_len || (iv_len & 1)) {
+			WE_DEBUG_ERROR("Crypto:key:iv not length (%u:%u)", key_len, iv_len);
+			return WeError_System;
+		}
+		if (!__key) {
+			__key_size = key_len >> 1;
+			__key = (unsigned char *)malloc(__key_size);
+			if (!__key) {
+				WE_DEBUG_ERROR("failed to alloc memory with size = %u", __key_size);
+				return WeError_OutOfMemory;
+			}
+			const char* ptr = (const char*)WE_CONFIG_CRYPT_KEY;
+			for (size_t i = 0; i < key_len; i+=2) {
+				sscanf(&ptr[i], "%2x", &__key[i >> 1]);
+			}
+		}
+		if (!__iv) {
+			__iv_size = iv_len >> 1;
+			__iv = (unsigned char *)malloc(__iv_size);
+			if (!__iv) {
+				WE_DEBUG_ERROR("failed to alloc memory with size = %u", __iv_size);
+				return WeError_OutOfMemory;
+			}
+			const char* ptr = (const char*)WE_CONFIG_CRYPT_KEY;
+			for (size_t i = 0; i < iv_len; i += 2) {
+				sscanf(&ptr[i], "%2x", &__iv[i >> 1]);
+			}
+		}
+	}
+	key_ptr = __key;
+	key_size = __key_size;
+	iv_ptr = __iv;
+	iv_size = __iv_size;
+	return WeError_Success;
+#else
+	key_ptr = g_Key;
+	key_size = sizeof(g_Key);
+	iv_ptr = g_IV;
+	iv_size = sizeof(g_IV);
+	return WeError_Success;
+#endif
+}
+
+WeError _Utils::FileConfigChanged(cpp11::shared_ptr<_File> file, bool &changed)
+{
+	changed = true;
+	if (file) {
+		_FTIME time;
+		if (file->GetModificationTime(&time)) {
+			changed = (time.dwHighDateTime != s_time_config_modif.dwHighDateTime || time.dwLowDateTime != s_time_config_modif.dwLowDateTime);
+			return WeError_Success;
+		}
+	}
+	return WeError_System;
+} 
+
+WeError _Utils::FileConfigTrustedWebsiteAdd(const char* protocol, const char* host)
+{
+	WeError err;
+	if (!protocol || !host || (we_stricmp(protocol, "https:") && we_stricmp(protocol, "https"))) {
+		WE_DEBUG_ERROR("Invalid parameter");
+		return WeError_InvalidArgument;
+	}
+
+	cpp11::shared_ptr<_File> file = _Utils::FileConfigGet(true);
+	if (!file) {
+		WE_DEBUG_ERROR("Failed to get configuration file");
+		return  WeError_System;
+	}
+
+	// inter-process lock file for writing
+	_FileInterProcessLock interProcessLock(file, true);
+
+	cpp11::shared_ptr<_Buffer> enc_data = file->Read();
+	cpp11::shared_ptr<_Buffer> dec_data;
+	Json::Reader reader;
+	Json::Value configuration;
+
+	if (enc_data && enc_data->getPtr() && enc_data->getSize()) {
+		err = s_encrypt_ctx->Decrypt(enc_data, dec_data);
+		if (err == WeError_Success) {
+			if (!(reader.parse((const char*)dec_data->getPtr(), ((const char*)dec_data->getPtr() + dec_data->getSize()), configuration))) {
+				WE_DEBUG_ERROR("Invalid JSON content:%.*s", dec_data->getSize(), (const char*)dec_data->getPtr());
+				// return WeError_InvalidJsonContent; /* do not exit -> override the content */
+			}
+		}
+		else; // probably trying to use wrong key -> overwrite the existing content
+	}
+
+	Json::Value trustedWebsites = configuration["trusted_websites"];
+	if (!trustedWebsites.isNull() && !trustedWebsites.isArray()) {
+		WE_DEBUG_ERROR("Unexpected JSON content");
+		assert(0);
+		return WeError_InvalidJsonContent; // must never happen
+	}
+	Json::Value entry;
+
+	Json::ArrayIndex size = trustedWebsites.size();
+	for (Json::ArrayIndex i = 0; i < size; ++i) {
+		entry = trustedWebsites[i];
+		if (entry.isObject() && entry["protocol"].isString() && entry["host"].isString()) {
+			if (!we_stricmp(entry["protocol"].asString().c_str(), protocol) && !we_stricmp(entry["host"].asString().c_str(), host)) {
+				return WeError_Success;
+			}
+		}
+	}
+	
+	entry["protocol"] = std::string(protocol);
+	entry["host"] = std::string(host);
+	trustedWebsites.append(entry);
+	configuration["trusted_websites"] = trustedWebsites;
+
+	Json::StyledWriter writer;
+	std::string output = writer.write(configuration);
+	if (!output.empty()) {
+		dec_data = cpp11::shared_ptr<_Buffer>(new _Buffer(output.c_str(), output.length()));
+		err = s_encrypt_ctx->Encrypt(dec_data, enc_data);
+		if (err) {
+			return err;
+		}
+		if (!file->Write(enc_data, false/*overwrite existing content*/)) {
+			return  WeError_System;
+		}
+	}
+	file->GetModificationTime(&s_time_config_modif);
+
+	return WeError_Success;
+}
+
+WeError _Utils::FileConfigTrustedWebsiteExist(const char* protocol, const char* host, bool &exists)
+{
+	exists = false;
+	if (!protocol || !host) {
+		WE_DEBUG_ERROR("Invalid parameter");
+		return WeError_InvalidArgument;
+	}
+
+	cpp11::shared_ptr<_File> file = _Utils::FileConfigGet(false);
+	if (!file) {
+		WE_DEBUG_ERROR("Failed to get configuration file");
+		return  WeError_System;
+	}
+
+	// inter-process lock file for reading
+	_FileInterProcessLock interProcessLock(file, false);
+
+	cpp11::shared_ptr<_Buffer> enc_data = file->Read();
+	Json::Reader reader;
+	Json::Value configuration;
+
+	if (enc_data && enc_data->getPtr() && enc_data->getSize()) {
+		cpp11::shared_ptr<_Buffer> dec_data;
+		WeError err = s_encrypt_ctx->Decrypt(enc_data, dec_data);
+		if (err) {
+			return err;
+		}
+		if ((reader.parse((const char*)dec_data->getPtr(), ((const char*)dec_data->getPtr() + dec_data->getSize()), configuration))) {
+			Json::Value trustedWebsites = configuration["trusted_websites"];
+			if (trustedWebsites.isArray()) {
+				Json::Value entry;
+				Json::ArrayIndex size = trustedWebsites.size();
+				for (Json::ArrayIndex i = 0; i < size && !exists; ++i) {
+					entry = trustedWebsites[i];
+					if (entry.isObject() && entry["protocol"].isString() && entry["host"].isString()) {
+						if (!we_stricmp(entry["protocol"].asString().c_str(), protocol) && !we_stricmp(entry["host"].asString().c_str(), host)) {
+							exists = true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return WeError_Success;
+}
+
 //!\ Up to the caller to free the returned buffer ("out_pptr")
 WeError _Utils::ConvertToBase64(const void* _in_ptr, size_t in_size, void **out_pptr, size_t *out_size_ptr, void* (*MemAllocFn)(size_t n) /*= NULL*/)
 {
@@ -512,21 +777,15 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 	memcpy(bmp_ptr, &hdr_file, sizeof(BMPFILEHEADER)), bmp_ptr += sizeof(BMPFILEHEADER);
 	memcpy(bmp_ptr, &hdr_info, sizeof(BMPINFOHEADER)), bmp_ptr += sizeof(BMPINFOHEADER);
 
-	for (size_t y = 0; y < height; ++y) {
-		for (size_t x = 0; x < width; ++x, rgb32_ptr+=4, bmp_ptr+=4) {
-#if 0
-			((uint32_t*)bmp_ptr)[0] = ((uint32_t*)rgb32_ptr)[0];
-#else
-			bmp_ptr[0] = rgb32_ptr[0], bmp_ptr[1] = rgb32_ptr[1], bmp_ptr[2] = rgb32_ptr[2], bmp_ptr[3] = rgb32_ptr[3];
-#endif
+	if (align == 0) {
+		memcpy(bmp_ptr, rgb32_ptr, (width << 2) * height);
+	}
+	else {
+		for (size_t y = 0; y < height; ++y) {
+			memcpy(bmp_ptr, rgb32_ptr, (width << 2));
+			bmp_ptr += (width << 2) + align;
+			rgb32_ptr += (width << 2);
 		}
-#if 0
-		for (size_t a = 0; a < align; ++a) {
-			*bmp_ptr++ = 0;
-		}
-#else
-		bmp_ptr += align;
-#endif
 	}
 
 #if 0
@@ -539,3 +798,104 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 
 	return WeError_Success;
 }
+
+#if WE_UNDER_WINDOWS
+static INT_PTR CALLBACK GUMDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	switch (Message)
+	{
+		case WM_INITDIALOG:
+		{
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wParam))
+			{
+				case IDOK:
+				{
+					EndDialog(hwnd, IDOK);
+					break;
+				}
+				case IDCANCEL:
+				{
+					EndDialog(hwnd, IDCANCEL);
+					break;
+				}
+			}
+			break;
+		default:
+			return FALSE;
+	}
+	return TRUE;
+}
+
+HRESULT _Utils::MsgBoxGUMA(bool &accepted, const char* protocol, const char* host, HWND hwndParent /*= NULL*/)
+{
+	USES_CONVERSION;
+	return _Utils::MsgBoxGUM(accepted, A2T(protocol), A2T(host), hwndParent);
+}
+
+HRESULT _Utils::MsgBoxGUM(bool &accepted, const TCHAR* protocol, const TCHAR* host, HWND hwndParent /*= NULL*/)
+{
+	static const TCHAR __title_ptr[] = _T("Media permission");
+	static const TCHAR __msg_ptr[] = _T(" would like to access your microphone and/or camera.");
+	static const size_t __msg_size = sizeof(__msg_ptr) + 1;
+	static const TCHAR __location_ptr[] = _T("This website");
+	static const size_t __location_size = sizeof(__location_ptr) + 1;
+	static const size_t __TCHAR_size = sizeof(TCHAR);
+	static const TCHAR __protocol_ptr[] = _T("http:");
+	static const TCHAR __host_ptr[] = _T("local");
+
+	if (!host || !wcslen(host)) { // local file -> host = null
+		host = __host_ptr;
+	}
+	if (!protocol || !wcslen(protocol)) { // local file -> protocol = null
+		protocol = __protocol_ptr;
+	}
+
+
+	if (!protocol || !host || !wcslen(protocol) || !wcslen(host)) {
+		CHECK_HR_RETURN(E_INVALIDARG);
+	}
+
+#if 0
+	if (!location || !wcslen(location)) {
+		location = __location_ptr;
+	}
+#endif
+
+	char *_protocol = _com_util::ConvertBSTRToString(CComBSTR(protocol));
+	char *_host = _com_util::ConvertBSTRToString(CComBSTR(host));
+
+	accepted = false;
+	_Utils::FileConfigTrustedWebsiteExist(_protocol, _host, accepted);
+
+	if (!accepted) {
+		size_t msg_len = __msg_size + (wcslen(host) * __TCHAR_size) + 1;
+		TCHAR* msg = new TCHAR[msg_len];
+		if (!msg) {
+			CHECK_HR_RETURN(E_OUTOFMEMORY);
+		}
+		memset(msg, 0, msg_len);
+		wcscpy(msg, host);
+		wcscpy(&msg[wcslen(host)], __msg_ptr);
+		int msgboxID = MessageBox(
+			hwndParent,
+			msg,
+			__title_ptr,
+			MB_ICONEXCLAMATION | MB_YESNO
+			);
+		accepted = (msgboxID == IDYES);
+		delete[]msg;
+
+		if (accepted && !wcscmp(protocol, _T("https:"))) {
+			_Utils::FileConfigTrustedWebsiteAdd(_protocol, _host);
+		}
+	}
+
+	if (_protocol) delete[]_protocol;
+	if (_host) delete[]_host;
+
+	return S_OK;
+}
+#endif

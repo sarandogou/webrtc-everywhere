@@ -51,6 +51,7 @@ private:
 	void onaddstream(cpp11::shared_ptr<_MediaStreamEvent> stream);
 	void onremovestream(cpp11::shared_ptr<_MediaStreamEvent> stream);
 	void oniceconnectionstatechange();
+	void ondatachannel(cpp11::shared_ptr<_RTCDataChannelEvent> e);
 
 	NPError getStreams(bool remote, NPVariant* MediaStreams);
 
@@ -65,6 +66,7 @@ private:
 	NPObject* m_callback_onaddstream;
 	NPObject* m_callback_onremovestream;
 	NPObject* m_callback_oniceconnectionstatechange;
+	NPObject* m_callback_ondatachannel;
 };
 
 #endif /* _WEBRTC_EVERYWHERE_NPAPI_PEERCONNECTION_H_ */

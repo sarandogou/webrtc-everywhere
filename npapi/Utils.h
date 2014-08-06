@@ -13,8 +13,10 @@ class Utils : public _Utils
 public:
 	static void NPObjectSet(NPObject** dst, NPObject* src);
 	static NPError NPObjectRelease(NPObject** obj);
+	static NPError NPVariantRelease(NPVariant** var);
 
 	static NPError CreateInstanceWithRef(NPP npp, NPClass *aClass, NPObject** obj);
+	static NPError CreateJsArrayEx(NPP npp, std::vector<NPVariant> &vecValues, const NPUTF8* arrayClassName, NPObject** arrayObj);
 	static NPError CreateJsArray(NPP npp, std::vector<NPVariant> &vecValues, NPObject** arrayObj);
     static NPError CreateDocumentElementObject(NPP npp, NPObject** jsObj);
 	static void NPVecClear(std::vector<NPVariant>& vecVars);
@@ -28,13 +30,20 @@ public:
 	static NPError NPObjectGetProp(NPP npp, NPObject* obj, const NPUTF8* name, NPVariant* var);
 	static NPError NPObjectGetPropString(NPP npp, NPObject* obj, const NPUTF8* name, std::string& str);
 	static NPError NPObjectGetPropNumber(NPP npp, NPObject* obj, const NPUTF8* name, double& number);
+	static NPError NPObjectGetPropBool(NPP npp, NPObject* obj, const NPUTF8* name, bool& _bool);
+	static NPError NPObjectCallJsFunction(NPP npp, NPObject* obj, const NPUTF8* name, NPVariant* var);
 
 	static NPError BuildMediaConstraints(NPP npp, NPObject* varConstraints, cpp11::shared_ptr<_MediaConstraints>& constraints);
 	static NPError BuildMediaStreamConstraints(NPP npp, NPObject* varConstraints, cpp11::shared_ptr<_MediaStreamConstraints> &constraints);
 	static NPError BuildMediaConstraintsObjs(NPP npp, NPObject* varConstraints, cpp11::shared_ptr<_MediaConstraintsObj> &constraints);
 	static NPError BuildRTCConfiguration(NPP npp, NPObject* varConfiguration, cpp11::shared_ptr<_RTCConfiguration> &configuration);
+	static NPError BuildRTCDataChannelInit(NPP npp, NPObject* varRTCDataChannelInit, cpp11::shared_ptr<_RTCDataChannelInit> &configuration);
+	static NPError BuildData(NPP npp, const NPVariant* varData, cpp11::shared_ptr<_Buffer> &data);
+	static NPError BuildDataArray(NPP npp, NPObject* varData, _ArrayType type, cpp11::shared_ptr<_Buffer> &data);
     
     static NPObject* NPObjectUpCast(NPObject* pObj);
+
+	static NPError GetLocation(NPP, NPVariant* protocol, NPVariant *host);
     
 	static void* MemAlloc(size_t n);
 	static void* MemDup(const void* mem, size_t n);

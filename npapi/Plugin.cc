@@ -110,10 +110,21 @@ NPP_New(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t argc, char* 
     if (!browserSupportsWindowless) {
         printf("Windowless mode not supported by the browser\n");
     }
+	
+#if WE_UNDER_WINDOWS
+	NPBool supportsAsyncBitmapSurface = FALSE;
+	if (BrowserFuncs->getvalue(instance, NPNVsupportsAsyncBitmapSurfaceBool, &supportsAsyncBitmapSurface) != NPERR_NO_ERROR) {
+		supportsAsyncBitmapSurface = FALSE;
+	}
+	NPBool supportsAsyncWindowsDXGISurfaceBool = FALSE;
+	if (BrowserFuncs->getvalue(instance, NPNVsupportsAsyncWindowsDXGISurfaceBool, &supportsAsyncWindowsDXGISurfaceBool) != NPERR_NO_ERROR) {
+		supportsAsyncWindowsDXGISurfaceBool = FALSE;
+	}
+#endif
 
 #if WE_UNDER_APPLE
     // Ask the browser if it supports the Core Animation drawing model
-    NPBool supportsCoreAnimation;
+	NPBool supportsCoreAnimation = FALSE;
     if (BrowserFuncs->getvalue(instance, NPNVsupportsCoreAnimationBool, &supportsCoreAnimation) != NPERR_NO_ERROR) {
         supportsCoreAnimation = FALSE;
     }
@@ -266,7 +277,7 @@ NPP_GetValue(NPP instance, NPPVariable variable, void *value)
         if (!pluginInstance->object) {
             if (!(pluginInstance->object = BrowserFuncs->createobject(pluginInstance->npp, &WebRTCClass))) {
                 return NPERR_OUT_OF_MEMORY_ERROR;
-            }
+			}
         }
 		WebRTC* webrtc = reinterpret_cast<WebRTC*>((WebRTC*)pluginInstance->object);
 #if WE_UNDER_WINDOWS

@@ -89,6 +89,9 @@ interface IPeerConnection : IDispatch{
 	[id(16), helpstring("method removeStream")] HRESULT removeStream([in] VARIANT stream);
 	[id(17), helpstring("method close")] HRESULT close();
 	[id(18), helpstring("method getStats")] HRESULT getStats([in] VARIANT selector, [in, optional] VARIANT successCallback, [in, optional] VARIANT failureCallback);
+	[id(19), helpstring("method createDTMFSender")] HRESULT createDTMFSender([in] VARIANT MediaStreamTrack, [out, retval] VARIANT* RTCDTMFSender);
+	[id(20), helpstring("method createDataChannel")] HRESULT createDataChannel([in] BSTR label, [in, optional] VARIANT dataChannelDict, [out, retval] VARIANT* DataChannel);
+	
 
 	[propget, id(50), helpstring("property onnegotiationneeded")] HRESULT onnegotiationneeded([out, retval] VARIANT* pVal);
 	[propput, id(50), helpstring("property onnegotiationneeded")] HRESULT onnegotiationneeded([in] VARIANT newVal);
@@ -102,6 +105,8 @@ interface IPeerConnection : IDispatch{
 	[propput, id(54), helpstring("property onremovestream")] HRESULT onremovestream([in] VARIANT newVal);
 	[propget, id(55), helpstring("property oniceconnectionstatechange")] HRESULT oniceconnectionstatechange([out, retval] VARIANT* pVal);
 	[propput, id(55), helpstring("property oniceconnectionstatechange")] HRESULT oniceconnectionstatechange([in] VARIANT newVal);
+	[propget, id(56), helpstring("property ondatachannel")] HRESULT ondatachannel([out, retval] VARIANT* pVal);
+	[propput, id(56), helpstring("property ondatachannel")] HRESULT ondatachannel([in] VARIANT newVal);
 };
 [
 	object,
@@ -250,6 +255,83 @@ interface IRTCStats : IDispatch{
 	[id(5), helpstring("method stat")] HRESULT stat([in]BSTR name, [out, retval] BSTR* pVal);
 };
 [
+	object,
+	uuid(3FA7AEBF-DD1D-4F4A-B7AE-8BD878AF7809),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IRTCDTMFSender : IDispatch{
+	[propget, id(1), helpstring("property canInsertDTMF")] HRESULT canInsertDTMF([out, retval] VARIANT_BOOL* pVal);
+	[id(2), helpstring("method insertDTMF")] HRESULT insertDTMF(BSTR tones, [in, optional] VARIANT duration, [in, optional] VARIANT interToneGap);
+	[propget, id(3), helpstring("property track")] HRESULT track([out, retval] VARIANT* pMediaStreamTrack);
+	[propget, id(4), helpstring("property ontonechange")] HRESULT ontonechange([out, retval] VARIANT* pVal);
+	[propput, id(4), helpstring("property ontonechange")] HRESULT ontonechange([in] VARIANT newVal);
+	[propget, id(5), helpstring("property toneBuffer")] HRESULT toneBuffer([out, retval] BSTR* pVal);
+	[propget, id(6), helpstring("property duration")] HRESULT duration([out, retval] LONG* pVal);
+	[propget, id(7), helpstring("property interToneGap")] HRESULT interToneGap([out, retval] LONG* pVal);
+};
+[
+	object,
+	uuid(E01CBEE1-8442-40FF-81CC-20714A49CC39),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IRTCDTMFToneChangeEvent : IDispatch{
+	[propget, id(1)] HRESULT tone([out, retval] BSTR* pVal);
+};
+[
+	object,
+	uuid(453AFDA0-2936-48C3-BE41-D059302217C2),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IRTCDataChannel : IDispatch{
+	[propget, id(1), helpstring("property label")] HRESULT label([out, retval] BSTR* pVal);
+	[propget, id(2), helpstring("property ordered")] HRESULT ordered([out, retval] VARIANT_BOOL* pVal);
+	[propget, id(3), helpstring("property maxRetransmitTime")] HRESULT maxRetransmitTime([out, retval] VARIANT* pVal);
+	[propget, id(4), helpstring("property maxRetransmits")] HRESULT maxRetransmits([out, retval] VARIANT* pVal);
+	[propget, id(5), helpstring("property protocol")] HRESULT protocol([out, retval] BSTR* pVal);
+	[propget, id(6), helpstring("property negotiated")] HRESULT negotiated([out, retval] VARIANT_BOOL* pVal);
+	[propget, id(7), helpstring("property id")] HRESULT id([out, retval] VARIANT* pVal);
+	[propget, id(8), helpstring("property readyState")] HRESULT readyState([out, retval] BSTR* pVal);
+	[propget, id(9), helpstring("property bufferedAmount")] HRESULT bufferedAmount([out, retval] ULONG* pVal);
+	[propget, id(10), helpstring("property binaryType")] HRESULT binaryType([out, retval] BSTR* pVal);
+	[propput, id(10), helpstring("property binaryType")] HRESULT binaryType([in] BSTR newVal);	
+	[propget, id(11), helpstring("property onopen")] HRESULT onopen([out, retval] VARIANT* pVal);
+	[propput, id(11), helpstring("property onopen")] HRESULT onopen([in] VARIANT newVal);
+	[propget, id(12), helpstring("property onerror")] HRESULT onerror([out, retval] VARIANT* pVal);
+	[propput, id(12), helpstring("property onerror")] HRESULT onerror([in] VARIANT newVal);
+	[propget, id(13), helpstring("property onclose")] HRESULT onclose([out, retval] VARIANT* pVal);
+	[propput, id(13), helpstring("property onclose")] HRESULT onclose([in] VARIANT newVal);
+	[propget, id(14), helpstring("property onmessage")] HRESULT onmessage([out, retval] VARIANT* pVal);
+	[propput, id(14), helpstring("property onmessage")] HRESULT onmessage([in] VARIANT newVal);
+	[id(15), helpstring("method close")] HRESULT close();
+	[id(16), helpstring("method send")] HRESULT send([in] VARIANT data);
+};
+[
+	object,
+	uuid(2C5FD5A1-29F3-4CFF-94B6-711A77F0CB61),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IMessageEvent : IDispatch{
+	[propget, id(1)] HRESULT data([out, retval] VARIANT* pVal);
+};
+[
+	object,
+	uuid(51E8910B-881C-43DE-B211-28C43107C6A1),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IRTCDataChannelEvent : IDispatch{
+	[propget, id(1)] HRESULT channel([out, retval] VARIANT* pVal);
+};
+[
 	uuid(12E5324E-D53E-4C89-BFA4-E3020902DD62),
 	version(1.0),
 	helpstring("webrtceverywhere 1.0 Type Library")
@@ -362,5 +444,40 @@ library webrtceverywhereLib
 	coclass RTCStats
 	{
 		[default] interface IRTCStats;
+	};
+	[
+		uuid(FDFDCAED-5FE4-4B75-A492-5E1837CDC84C)		
+	]
+	coclass RTCDTMFSender
+	{
+		[default] interface IRTCDTMFSender;
+	};
+	[
+		uuid(C01163AE-3E5E-4224-B708-74933D83E81E)		
+	]
+	coclass RTCDTMFToneChangeEvent
+	{
+		[default] interface IRTCDTMFToneChangeEvent;
+	};
+	[
+		uuid(815D3DD5-8BFD-40DC-ABCC-382C94A57445)		
+	]
+	coclass RTCDataChannel
+	{
+		[default] interface IRTCDataChannel;
+	};
+	[
+		uuid(F62F0206-F6F8-4FD8-8F63-0C6BCE7C904F)		
+	]
+	coclass MessageEvent
+	{
+		[default] interface IMessageEvent;
+	};
+	[
+		uuid(C40ED871-D195-4EFD-9E60-F0911449A404)		
+	]
+	coclass RTCDataChannelEvent
+	{
+		[default] interface IRTCDataChannelEvent;
 	};
 };

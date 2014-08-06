@@ -34,7 +34,7 @@ public:
 	BrowserObjectImpl_Inline();
 
 	NPError AddObject(NPObject* obj);
-	NPError AddString(void* ptr, size_t size);
+	NPError AddString(const void* ptr, size_t size);
 
 	// _BrowserCallback implementation
 	virtual bool Invoke();

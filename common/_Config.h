@@ -80,7 +80,8 @@ typedef enum WeError {
     WeError_InvalidArgument,
     WeError_InvalidJsonContent,
     WeError_OutOfMemory,
-    WeError_System
+    WeError_System,
+	WeError_NotInitialized
 }
 WeError;
 

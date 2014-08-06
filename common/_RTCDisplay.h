@@ -7,6 +7,13 @@
 
 #include "talk/media/base/videorenderer.h"
 #include "webrtc/system_wrappers/interface/critical_section_wrapper.h"
+#if WE_UNDER_WINDOWS
+#	include <atlbase.h>
+#	include <atlcom.h>
+#	include <atlctl.h>
+#	include <D3D10_1.h> // Requires Windows Vista or later
+#	include <DXGI.h> // Requires Windows 7 or later
+#endif
 #if WE_UNDER_APPLE
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/CoreVideo.h>
@@ -33,6 +40,7 @@ public:
 	int GetVideoWidth();
 	int GetVideoHeight();
 	size_t CopyFromFrame(void* bufferPtr, size_t bufferSize);
+	void SetFnQuerySurfacePresentere(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter);
 
 	// VideoRendererInterface implementation
 	virtual void SetSize(int width, int height);
@@ -47,6 +55,7 @@ private:
 #if WE_UNDER_WINDOWS
 	HWND m_Hwnd;
 	BITMAPINFO m_bmi;
+	cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> m_fnQuerySurfacePresenter;
 #elif WE_UNDER_APPLE
     CALayer *m_layer;
     CGContextRef m_context;
@@ -74,6 +83,7 @@ public:
 
 	virtual void OnStartVideoRenderer() {};
 	virtual void OnStopVideoRenderer() {};
+	virtual void OnNewFrame(const void* rgb32_ptr, int width, int height) {}
 	
 	void StartVideoRenderer(VideoTrackInterfacePtr video);
 	void StopVideoRenderer();
@@ -85,6 +95,10 @@ public:
 
 #if WE_UNDER_WINDOWS
 	virtual HWND Handle() = 0;
+	virtual void QuerySurfacePresenter(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)
+	{
+		spPtr = NULL, spText = NULL, backBuffWidth = 0, backBuffHeight = 0;
+	}
 #elif WE_UNDER_APPLE
     virtual CALayer *Layer() = 0;
 #endif

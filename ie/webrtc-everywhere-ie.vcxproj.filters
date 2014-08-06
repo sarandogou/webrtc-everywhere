@@ -76,6 +76,21 @@
     <ClCompile Include="RTCStats.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RTCDTMFToneChangeEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCDTMFSender.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCDataChannel.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTCDataChannelEvent.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="webrtc-everywhere.def">
@@ -121,6 +136,21 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RTCStats.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCDTMFSender.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCDTMFToneChangeEvent.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCDataChannel.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="MessageEvent.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="RTCDataChannelEvent.rgs">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -191,6 +221,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RTCStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDTMFSender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDTMFToneChangeEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDataChannel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTCDataChannelEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

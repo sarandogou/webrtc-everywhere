@@ -15,11 +15,28 @@
 class _SessionDescription;
 class _MediaStream;
 class _RTCIceCandidate;
+class _RTCDataChannel;
+class _Buffer;
 
-typedef void* VideoTrackInterfacePtr;
-typedef void* MediaStreamInterfacePtr;
-typedef void* MediaStreamTrackInterfacePtr;
-typedef void* VideoRendererPtr;
+typedef void* VoidPtr;
+typedef VoidPtr DtmfSenderInterfacePtr,
+VideoTrackInterfacePtr,
+MediaStreamInterfacePtr,
+MediaStreamTrackInterfacePtr,
+VideoRendererPtr,
+DataChannelInterfacePtr;
+
+#define nullable_ushort_null -1
+typedef int nullable_ushort;
+
+#if WE_UNDER_WINDOWS
+typedef FILETIME _FTIME;
+#else
+typedef struct __FTIME {
+	unsigned long dwLowDateTime;
+	unsigned long dwHighDateTime;
+} _FTIME;
+#endif
 
 static const char kAudioLabel[] = "audio_label";
 static const char kVideoLabel[] = "video_label";
@@ -68,7 +85,35 @@ static const char kVideoFacingModeEnumRight[] = "right";
 static const char kRTCStatsTypeInboundRtp[] = "inbound-rtp";
 static const char kRTCStatsTypeOutboundRtp[] = "outbound-rtp";
 
+// http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannelState
+static const char kRTCDataChannelStateConnecting[] = "connecting";
+static const char kRTCDataChannelStateOpen[] = "open";
+static const char kRTCDataChannelStateClosing[] = "closing";
+static const char kRTCDataChannelStateClosed[] = "closed";
+
 #define kMaxParamArgs 10
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays
+typedef enum _ArrayType
+{
+	_ArrayType_None,
+	_ArrayType_Int8Array,//	1	8 - bit twos complement signed integer	signed char
+	_ArrayType_Uint8Array,//	1	8 - bit unsigned integer	unsigned char
+	_ArrayType_Uint8ClampedArray,//	1	8 - bit unsigned integer	unsigned char
+	_ArrayType_Int16Array,//	2	16 - bit twos complement signed integer	short
+	_ArrayType_Uint16Array,//	2	16 - bit unsigned integer	unsigned short
+	_ArrayType_Int32Array,//	4	32 - bit twos complement signed integer	int
+	_ArrayType_Uint32Array,//	4	32 - bit unsigned integer	unsigned int
+	_ArrayType_Float32Array,//	4	32 - bit IEEE floating point number	float
+	_ArrayType_Float64Array,//	8	64 - bit IEEE floating point number	double
+}
+_ArrayType;
+
+typedef struct __TrustedWebsite {
+	std::string scheme;
+	std::string host;
+}
+_TrustedWebsite;
 
 typedef struct __BrowserObject {
 	virtual struct __BrowserObject* RetainObject() = 0;
@@ -102,6 +147,34 @@ typedef struct __RTCConfiguration {
 	}
 }
 _RTCConfiguration;
+
+// http://www.w3.org/TR/webrtc/#idl-def-RTCDTMFToneChangeEvent
+typedef struct __RTCDTMFToneChangeEvent {
+	std::string tone; // readonly attribute DOMString tone;
+	__RTCDTMFToneChangeEvent(std::string _tone = "") {
+		tone = _tone;
+	}
+}
+_RTCDTMFToneChangeEvent;
+
+// http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannelEvent
+typedef struct __RTCDataChannelEvent {
+	cpp11::shared_ptr<_RTCDataChannel> channel; // readonly    attribute RTCDataChannel channel;
+	__RTCDataChannelEvent(cpp11::shared_ptr<_RTCDataChannel>& _channel) {
+		channel = _channel;
+	}
+}
+_RTCDataChannelEvent;
+
+// http://www.w3.org/TR/webrtc/#event-datachannel-message
+typedef struct __MessageEvent {
+	cpp11::shared_ptr<_Buffer>data;
+	bool binary = false;
+	__MessageEvent() {
+	}
+}
+_MessageEvent;
+
 
 // http://www.w3.org/TR/webrtc/#idl-def-RTCPeerConnectionIceEvent
 typedef struct __RTCPeerConnectionIceEvent {
@@ -218,6 +291,17 @@ typedef struct  __RTCStatsReport {
 }
 _RTCStatsReport;
 
+// http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannelInit
+typedef struct  __RTCDataChannelInit {
+	// "nullable_ushort" is used instead of "unsigned short" to emulate nulable values: "-1 == null" (same rule is used in WebRTC internals)
+	bool ordered = true; //  boolean ordered = true;
+	nullable_ushort maxRetransmitTime = nullable_ushort_null; // unsigned short ? maxRetransmitTime = null;
+	nullable_ushort maxRetransmits = nullable_ushort_null; // unsigned short ? maxRetransmits = null;
+	std::string protocol = ""; // DOMString protocol = "";
+	bool negotiated = false; // boolean negotiated = false;
+	nullable_ushort id = nullable_ushort_null; // unsigned short ? id = null;
+}
+_RTCDataChannelInit;
 
 // http://www.w3.org/TR/mediacapture-streams/#idl-def-CapabilityRange
 typedef struct __CapabilityRange {
@@ -328,8 +412,40 @@ private:
     long m_id;
 };
 
+class _File {
+public:
+#if WE_UNDER_WINDOWS
+	_File(const TCHAR* path, bool write = false);
+#else
+#error "Not implemented"
+#endif
+	virtual ~_File();
+	virtual bool IsValid()const;
+	virtual bool LockInterProcess(bool exclusive = false);
+	virtual bool UnlockInterProcess();
+	virtual cpp11::shared_ptr<_Buffer> Read();
+	virtual bool Write(cpp11::shared_ptr<_Buffer>& buffer, bool append = false);
+	virtual bool GetModificationTime(_FTIME *time);
+private:
+#if WE_UNDER_WINDOWS
+	HANDLE m_file;
+#else
+#error "Not implemented"
+#endif
+	bool m_write;
+};
+
+class _FileInterProcessLock {
+public:
+	explicit _FileInterProcessLock(cpp11::shared_ptr<_File> file, bool exclusive = false) : file_(file) { file_->LockInterProcess(exclusive); }
+	virtual ~_FileInterProcessLock() { file_->UnlockInterProcess(); }
+protected:
+	cpp11::shared_ptr<_File> file_;
+};
+
 
 typedef cpp11::function<void()> _VoidFunctionCallback;
+typedef cpp11::function<void(cpp11::shared_ptr<std::string> string)> _StringFunctionCallback;
 
 // http://www.w3.org/TR/webrtc/#idl-def-RTCSessionDescriptionCallback
 typedef cpp11::function<void(cpp11::shared_ptr<_SessionDescription> sdp)> _RTCSessionDescriptionCallback;
@@ -357,6 +473,13 @@ typedef cpp11::function<void(cpp11::shared_ptr<_MediaStreamEvent> stream)> _onre
 typedef cpp11::function<void()> _oniceconnectionstatechangeCallback;
 // http://www.w3.org/TR/webrtc/#idl-def-RTCStatsCallback
 typedef cpp11::function<void(cpp11::shared_ptr<_RTCStatsReport> report)> _RTCStatsCallback;
+// http://www.w3.org/TR/webrtc/#idl-def-RTCDTMFToneChangeEvent
+typedef cpp11::function<void(cpp11::shared_ptr<_RTCDTMFToneChangeEvent> e)> _ontonechangeCallback;
+// http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannelEvent
+typedef cpp11::function<void(cpp11::shared_ptr<_RTCDataChannelEvent> e)> _ondatachannelCallback;
+// http://www.w3.org/TR/webrtc/#event-datachannel-message
+typedef cpp11::function<void(cpp11::shared_ptr<_MessageEvent> e)> _onmessageCallback;
+
 
 typedef _MediaStream*(*_MediaStreamAllocateFn)();
 
@@ -373,6 +496,8 @@ typedef _MediaStream*(*_MediaStreamAllocateFn)();
 #endif
 
 #define SafeDelete(pptr) if(pptr && *pptr) delete *pptr, *pptr = NULL;
+
+#define we_strlen(pStr) ((pStr) ? strlen((pStr)) : 0)
 
 #define BrowserObjectImpl_IUnknown() \
 	virtual struct __BrowserObject* RetainObject() { \
@@ -446,6 +571,7 @@ struct __BrowserObject* ReleaseObject() { \
 // In CHECK_HR(x) When (x) is a function it will be executed twice when used in "WE_DEBUG_ERROR(x)" and "If(x)"
 #define CHECK_HR_BAIL(x) { HRESULT __hr__ = (x); if (FAILED(__hr__)) { WE_DEBUG_ERROR("Operation Failed (%08x)", __hr__); goto bail; } }
 #define CHECK_HR_RETURN(x) { HRESULT __hr__ = (x); if (FAILED(__hr__)) { WE_DEBUG_ERROR("Operation Failed (%08x)", __hr__); return __hr__; } }
+#define CHECK_NPERR_BAIL(x) { NPError __err__ = (x); if (__err__ != NPERR_NO_ERROR) { WE_DEBUG_ERROR("Operation Failed (%08x)", __err__); goto bail; } }
 #define CHECK_NPERR_RETURN(x) { NPError __err__ = (x); if (__err__ != NPERR_NO_ERROR) { WE_DEBUG_ERROR("Operation Failed (%08x)", __err__); return __err__; } }
 
 extern WEBRTC_EVERYWHERE_API talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> GetPeerConnectionFactory();
@@ -455,3 +581,4 @@ extern talk_base::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _Me
 extern webrtc::MediaStreamInterface* BuildMediaStream(const _MediaStream* stream);
 
 #endif /* _WEBRTC_EVERYWHERE_COMMON_COMMON_H_ */
+
