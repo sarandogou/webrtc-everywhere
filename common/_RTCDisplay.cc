@@ -240,12 +240,14 @@ size_t _VideoRenderer::CopyFromFrame(void* bufferPtr, size_t bufferSize)
 	return  0;
 }
 
+#if WE_UNDER_WINDOWS
 void _VideoRenderer::SetFnQuerySurfacePresentere(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter)
 {
 	_AutoLock<_VideoRenderer> lock(this);
 
 	m_fnQuerySurfacePresenter = fnQuerySurfacePresenter;
 }
+#endif /* WE_UNDER_WINDOWS */
 
 // VideoRendererInterface implementation
 void _VideoRenderer::SetSize(int width, int height)
@@ -387,8 +389,8 @@ void _RTCDisplay::StartVideoRenderer(VideoTrackInterfacePtr video)
 	if (_v) {
 		_VideoRenderer* _video = new _VideoRenderer(1, 1, cpp11::bind(&_RTCDisplay::OnStartVideoRenderer, this), _v);
 		if (_video) {
-			_video->SetFnQuerySurfacePresentere(cpp11::bind(&_RTCDisplay::QuerySurfacePresenter, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 #if WE_UNDER_WINDOWS
+            _video->SetFnQuerySurfacePresentere(cpp11::bind(&_RTCDisplay::QuerySurfacePresenter, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 			_video->SetHwnd(Handle());
 			SetWindowLongPtr(_video->GetHwnd(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 #elif WE_UNDER_APPLE

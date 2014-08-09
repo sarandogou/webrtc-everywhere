@@ -7,6 +7,9 @@
 
 extern NPNetscapeFuncs* BrowserFuncs;
 
+NPIdentifier Utils::s_funcID_WE00_dataChannelSendBlob = 0;
+NPIdentifier Utils::s_funcID_WE01_wrapArrayBufferIntoUint8Array = 0;
+
 void Utils::NPObjectSet(NPObject** dst, NPObject* src)
 {
 	Utils::NPObjectRelease(dst);
@@ -73,7 +76,7 @@ NPError Utils::CreateJsArrayEx(NPP npp, std::vector<NPVariant> &vecValues, const
 #if 1
 	NPUTF8 createArrayEvalString[1024];
 	NPString npCreateArrayEvalString = { 0 };
-	sprintf(createArrayEvalString, "new %s(%u)", arrayClassName, vecValues.size());
+	sprintf(createArrayEvalString, "new %s(%zu)", arrayClassName, vecValues.size());
 	npCreateArrayEvalString.UTF8Characters = createArrayEvalString;
 	npCreateArrayEvalString.UTF8Length = strlen(createArrayEvalString);
 	bRet = BrowserFuncs->evaluate(npp, npWindow, &npCreateArrayEvalString, &var);
@@ -93,7 +96,7 @@ NPError Utils::CreateJsArrayEx(NPP npp, std::vector<NPVariant> &vecValues, const
 
 	NPUTF8 index[25];
 	for (size_t i = 0; i < vecValues.size(); ++i) {
-		sprintf(index, "%ld\0", i);
+		sprintf(index, "%ld", i);
 		/*bRet =*/ BrowserFuncs->setproperty(npp, *arrayObj, BrowserFuncs->getstringidentifier(index), &vecValues[i]);
 	}
 	return NPERR_NO_ERROR;
@@ -144,6 +147,18 @@ void Utils::NPVecClear(std::vector<NPVariant>& vecVars)
 		BrowserFuncs->releasevariantvalue(&vecVars[i]);
 	}
 	vecVars.clear();
+}
+
+bool Utils::NPObjectIsJsBLOB(NPP npp, NPObject* obj)
+{
+    if (obj) {
+        NPVariant var;
+        NPError err = NPObjectCallJsFunction(npp, obj, "toString", &var);
+        if (err == NPERR_NO_ERROR && NPVARIANT_IS_STRING(var)) {
+            return strncmp(var.value.stringValue.UTF8Characters, "[object Blob]", var.value.stringValue.UTF8Length) == 0;
+        }
+    }
+    return false;
 }
 
 // No retain()
@@ -584,6 +599,14 @@ NPError Utils::BuildData(NPP npp, const NPVariant* varData, cpp11::shared_ptr<_B
 		else if (strncmp(var.value.stringValue.UTF8Characters, "[object Float64Array]", var.value.stringValue.UTF8Length) == 0) {
 			arrayType = _ArrayType_Float64Array;
 		}
+        else if (strncmp(var.value.stringValue.UTF8Characters, "[object ArrayBuffer]", var.value.stringValue.UTF8Length) == 0) {
+            NPObject *uint8Array = NULL;
+            CHECK_NPERR_RETURN(Utils::WrapArrayBufferIntoUint8Array(npp, _data, &uint8Array));
+            OBJECT_TO_NPVARIANT(uint8Array, var);
+            NPError err = Utils::BuildData(npp, &var, data);
+            BrowserFuncs->releasevariantvalue(&var);
+            return err;
+		}
 
 		if (arrayType != _ArrayType_None) {
 			return Utils::BuildDataArray(npp, _data, arrayType, data);
@@ -611,7 +634,7 @@ NPError Utils::BuildDataArray(NPP npp, NPObject* varData, _ArrayType arrayType, 
 
 	CHECK_NPERR_RETURN(err = Utils::NPObjectGetPropNumber(npp, varData, "length", length));
 
-	data = std::make_shared<_Buffer>((const void*)NULL, (size_t)(length * byteCount));
+	data = cpp11::shared_ptr<_Buffer>(new _Buffer((const void*)NULL, (size_t)(length * byteCount)));
 	if (!data.get() || !data->getPtr()) {
 		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
 	}
@@ -700,6 +723,115 @@ NPError Utils::GetLocation(NPP npp, NPVariant* protocol, NPVariant *host)
 		BrowserFuncs->releasevariantvalue(host);
 	}
 
+	return err;
+}
+
+NPError Utils::InstallScripts(NPP npp)
+{
+    static bool g_installed = false;
+    
+	if (g_installed) {
+		return NPERR_NO_ERROR;
+	}
+    
+	typedef struct script {
+		const NPUTF8* funcName = NULL;
+		NPIdentifier* funcID = NULL;
+		const NPUTF8* code = NULL;
+		script(const NPUTF8* _funcName, NPIdentifier* _funcID, const NPUTF8* _code) : funcName(_funcName), funcID(_funcID), code(_code) {}
+	} script;
+    
+	static const NPUTF8 __script00[] = "window.WE00_dataChannelSendBlob = function(dataChannel, blob) {"
+    "var reader = new FileReader();"
+    "attachEventListener(reader, 'loadend', function() {"
+    "dataChannel.send(reader.result);"
+    "});"
+    "reader.readAsArrayBuffer(blob);"
+    "}";
+	static const NPUTF8 __script001[] = "window.WE01_wrapArrayBufferIntoUint8Array = function(arrayBuffer) { return new Uint8Array(arrayBuffer) }";
+	static script __scripts[] = { { "WE00_dataChannelSendBlob", &Utils::s_funcID_WE00_dataChannelSendBlob, __script00 }, { "WE01_wrapArrayBufferIntoUint8Array", &Utils::s_funcID_WE01_wrapArrayBufferIntoUint8Array, __script001 } };
+    
+    NPVariant var;
+	NPError err = NPERR_NO_ERROR;
+    NPObject* npWindow = NULL;
+    NPString npScript = { 0 };
+    
+    CHECK_NPERR_BAIL(err = BrowserFuncs->getvalue(npp, NPNVWindowNPObject, &npWindow));
+    
+	for (size_t i = 0; i < sizeof(__scripts) / sizeof(__scripts[0]); ++i) {
+        npScript.UTF8Characters = __scripts[i].code;
+        npScript.UTF8Length = we_strlen(npScript.UTF8Characters);
+        if (!BrowserFuncs->evaluate(npp, npWindow, &npScript, &var)) {
+            CHECK_NPERR_BAIL(err = NPERR_GENERIC_ERROR);
+        }
+        *__scripts[i].funcID = BrowserFuncs->getstringidentifier(__scripts[i].funcName);
+        BrowserFuncs->releasevariantvalue(&var);
+	}
+	g_installed = true;
+    
+bail:
+    if (npWindow) {
+        BrowserFuncs->releaseobject(npWindow);
+    }
+	return err;
+}
+
+NPError Utils::WrapArrayBufferIntoUint8Array(NPP npp, NPObject* arrayBuffer, NPObject ** uint8Array)
+{
+    if (!arrayBuffer || !uint8Array || *uint8Array) {
+        CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+    }
+    NPVariant var;
+	NPError err = NPERR_NO_ERROR;
+    NPObject* npWindow = NULL;
+    NPVariant args[1];
+    bool ret;
+    
+    CHECK_NPERR_BAIL(err = Utils::InstallScripts(npp));
+    
+    CHECK_NPERR_BAIL(err = BrowserFuncs->getvalue(npp, NPNVWindowNPObject, &npWindow));
+    
+    OBJECT_TO_NPVARIANT(arrayBuffer, args[0]);
+    VOID_TO_NPVARIANT(var);
+    ret = BrowserFuncs->invoke(npp, npWindow, Utils::s_funcID_WE01_wrapArrayBufferIntoUint8Array, args, sizeof(args)/sizeof(args[0]), &var);
+    if (!ret || !NPVARIANT_IS_OBJECT(var) || !var.value.objectValue) {
+        CHECK_NPERR_BAIL(err = NPERR_GENERIC_ERROR);
+    }
+    *uint8Array = var.value.objectValue;
+                                    
+bail:
+    if (npWindow) {
+        BrowserFuncs->releaseobject(npWindow);
+    }
+	return err;
+}
+
+NPError Utils::DataChannelSendBlob(NPP npp, NPObject * dataChannel, NPObject* blob)
+{
+    if (!dataChannel || !blob) {
+        CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
+    }
+    NPVariant var;
+	NPError err = NPERR_NO_ERROR;
+    NPObject* npWindow = NULL;
+    NPVariant args[2];
+    
+    CHECK_NPERR_BAIL(err = Utils::InstallScripts(npp));
+    
+    CHECK_NPERR_BAIL(err = BrowserFuncs->getvalue(npp, NPNVWindowNPObject, &npWindow));
+    
+    OBJECT_TO_NPVARIANT(dataChannel, args[0]);
+    OBJECT_TO_NPVARIANT(blob, args[1]);
+    VOID_TO_NPVARIANT(var);
+    
+    if (!BrowserFuncs->invoke(npp, npWindow, Utils::s_funcID_WE00_dataChannelSendBlob, args, sizeof(args)/sizeof(args[0]), &var)) {
+        CHECK_NPERR_BAIL(err = NPERR_GENERIC_ERROR);
+    }
+    
+bail:
+    if (npWindow) {
+        BrowserFuncs->releaseobject(npWindow);
+    }
 	return err;
 }
 

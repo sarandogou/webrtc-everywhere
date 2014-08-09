@@ -99,7 +99,7 @@ bool MessageEvent::Invoke(NPObject* obj, NPIdentifier methodName,
 	const NPVariant* args, uint32_t argCount,
 	NPVariant* result)
 {
-	MessageEvent *This = static_cast<MessageEvent*>(obj);
+	// MessageEvent *This = static_cast<MessageEvent*>(obj);
 	char* name = BrowserFuncs->utf8fromidentifier(methodName);
 	bool ret_val = false;
 	if (!name) {

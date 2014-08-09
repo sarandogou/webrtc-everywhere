@@ -82,7 +82,7 @@ bool RTCDTMFToneChangeEvent::Invoke(NPObject* obj, NPIdentifier methodName,
 	const NPVariant* args, uint32_t argCount,
 	NPVariant* result)
 {
-	RTCDTMFToneChangeEvent *This = static_cast<RTCDTMFToneChangeEvent*>(obj);
+	// RTCDTMFToneChangeEvent *This = static_cast<RTCDTMFToneChangeEvent*>(obj);
 	char* name = BrowserFuncs->utf8fromidentifier(methodName);
 	bool ret_val = false;
 	if (!name) {

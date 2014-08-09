@@ -32,7 +32,7 @@ _RTCDTMFSender::_RTCDTMFSender(DtmfSenderInterfacePtr sender)
 {
 	assert(sender);
 	m_sender = static_cast<webrtc::DtmfSenderInterface*>(sender);
-	m_sender->RegisterObserver(DummyDtmfSenderObserver::Create(std::bind(&_RTCDTMFSender::OnToneChange, this, std::placeholders::_1)));
+	m_sender->RegisterObserver(DummyDtmfSenderObserver::Create(cpp11::bind(&_RTCDTMFSender::OnToneChange, this, cpp11::placeholders::_1)));
 }
 
 _RTCDTMFSender::~_RTCDTMFSender()

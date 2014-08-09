@@ -44,7 +44,7 @@ public:
 
 private:
 	NPP m_npp;
-	std::shared_ptr<_MessageEvent> m_Event;
+	cpp11::shared_ptr<_MessageEvent> m_Event;
 	NPVariant m_data;
 };
 

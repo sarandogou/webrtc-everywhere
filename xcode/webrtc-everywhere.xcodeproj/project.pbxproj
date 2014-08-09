@@ -73,6 +73,22 @@
 		EC2AEC251973588900360EC6 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC2AEC241973588900360EC6 /* AppKit.framework */; };
 		EC2AEC27197358B200360EC6 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC2AEC26197358B200360EC6 /* QTKit.framework */; };
 		EC2AEC29197358BB00360EC6 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC2AEC28197358BB00360EC6 /* AVFoundation.framework */; };
+		ECE4C3A819927D4E00FFD159 /* _EncryptCtx.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3A219927D4D00FFD159 /* _EncryptCtx.cc */; };
+		ECE4C3A919927D4F00FFD159 /* _EncryptCtx.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3A319927D4D00FFD159 /* _EncryptCtx.h */; };
+		ECE4C3AA19927D4F00FFD159 /* _RTCDataChannel.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3A419927D4D00FFD159 /* _RTCDataChannel.cc */; };
+		ECE4C3AB19927D4F00FFD159 /* _RTCDataChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3A519927D4D00FFD159 /* _RTCDataChannel.h */; };
+		ECE4C3AC19927D4F00FFD159 /* _RTCDTMFSender.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3A619927D4D00FFD159 /* _RTCDTMFSender.cc */; };
+		ECE4C3AD19927D4F00FFD159 /* _RTCDTMFSender.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3A719927D4D00FFD159 /* _RTCDTMFSender.h */; };
+		ECE4C3B819927D8000FFD159 /* MessageEvent.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3AE19927D8000FFD159 /* MessageEvent.cc */; };
+		ECE4C3B919927D8000FFD159 /* MessageEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3AF19927D8000FFD159 /* MessageEvent.h */; };
+		ECE4C3BA19927D8000FFD159 /* RTCDataChannel.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3B019927D8000FFD159 /* RTCDataChannel.cc */; };
+		ECE4C3BB19927D8000FFD159 /* RTCDataChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3B119927D8000FFD159 /* RTCDataChannel.h */; };
+		ECE4C3BC19927D8000FFD159 /* RTCDataChannelEvent.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3B219927D8000FFD159 /* RTCDataChannelEvent.cc */; };
+		ECE4C3BD19927D8000FFD159 /* RTCDataChannelEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3B319927D8000FFD159 /* RTCDataChannelEvent.h */; };
+		ECE4C3BE19927D8000FFD159 /* RTCDTMFSender.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3B419927D8000FFD159 /* RTCDTMFSender.cc */; };
+		ECE4C3BF19927D8000FFD159 /* RTCDTMFSender.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3B519927D8000FFD159 /* RTCDTMFSender.h */; };
+		ECE4C3C019927D8000FFD159 /* RTCDTMFToneChangeEvent.cc in Sources */ = {isa = PBXBuildFile; fileRef = ECE4C3B619927D8000FFD159 /* RTCDTMFToneChangeEvent.cc */; };
+		ECE4C3C119927D8000FFD159 /* RTCDTMFToneChangeEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3B719927D8000FFD159 /* RTCDTMFToneChangeEvent.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -173,6 +189,22 @@
 		EC2AEC28197358BB00360EC6 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		EC2AEC2A19735B5400360EC6 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		EC2AEC2C19735D2400360EC6 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		ECE4C3A219927D4D00FFD159 /* _EncryptCtx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _EncryptCtx.cc; sourceTree = "<group>"; };
+		ECE4C3A319927D4D00FFD159 /* _EncryptCtx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _EncryptCtx.h; sourceTree = "<group>"; };
+		ECE4C3A419927D4D00FFD159 /* _RTCDataChannel.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _RTCDataChannel.cc; sourceTree = "<group>"; };
+		ECE4C3A519927D4D00FFD159 /* _RTCDataChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _RTCDataChannel.h; sourceTree = "<group>"; };
+		ECE4C3A619927D4D00FFD159 /* _RTCDTMFSender.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _RTCDTMFSender.cc; sourceTree = "<group>"; };
+		ECE4C3A719927D4D00FFD159 /* _RTCDTMFSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _RTCDTMFSender.h; sourceTree = "<group>"; };
+		ECE4C3AE19927D8000FFD159 /* MessageEvent.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageEvent.cc; sourceTree = "<group>"; };
+		ECE4C3AF19927D8000FFD159 /* MessageEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageEvent.h; sourceTree = "<group>"; };
+		ECE4C3B019927D8000FFD159 /* RTCDataChannel.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTCDataChannel.cc; sourceTree = "<group>"; };
+		ECE4C3B119927D8000FFD159 /* RTCDataChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCDataChannel.h; sourceTree = "<group>"; };
+		ECE4C3B219927D8000FFD159 /* RTCDataChannelEvent.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTCDataChannelEvent.cc; sourceTree = "<group>"; };
+		ECE4C3B319927D8000FFD159 /* RTCDataChannelEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCDataChannelEvent.h; sourceTree = "<group>"; };
+		ECE4C3B419927D8000FFD159 /* RTCDTMFSender.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTCDTMFSender.cc; sourceTree = "<group>"; };
+		ECE4C3B519927D8000FFD159 /* RTCDTMFSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCDTMFSender.h; sourceTree = "<group>"; };
+		ECE4C3B619927D8000FFD159 /* RTCDTMFToneChangeEvent.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RTCDTMFToneChangeEvent.cc; sourceTree = "<group>"; };
+		ECE4C3B719927D8000FFD159 /* RTCDTMFToneChangeEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCDTMFToneChangeEvent.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -205,6 +237,16 @@
 		EC23B3BB1974E0E2000DFA4B /* npapi */ = {
 			isa = PBXGroup;
 			children = (
+				ECE4C3AE19927D8000FFD159 /* MessageEvent.cc */,
+				ECE4C3AF19927D8000FFD159 /* MessageEvent.h */,
+				ECE4C3B019927D8000FFD159 /* RTCDataChannel.cc */,
+				ECE4C3B119927D8000FFD159 /* RTCDataChannel.h */,
+				ECE4C3B219927D8000FFD159 /* RTCDataChannelEvent.cc */,
+				ECE4C3B319927D8000FFD159 /* RTCDataChannelEvent.h */,
+				ECE4C3B419927D8000FFD159 /* RTCDTMFSender.cc */,
+				ECE4C3B519927D8000FFD159 /* RTCDTMFSender.h */,
+				ECE4C3B619927D8000FFD159 /* RTCDTMFToneChangeEvent.cc */,
+				ECE4C3B719927D8000FFD159 /* RTCDTMFToneChangeEvent.h */,
 				EC23B40A1974F8D1000DFA4B /* npapi-includes.h */,
 				EC23B3BC1974E0E2000DFA4B /* BrowserCallback.cc */,
 				EC23B3BD1974E0E2000DFA4B /* BrowserCallback.h */,
@@ -334,6 +376,12 @@
 				EC2AEB8F1973457600360EC6 /* _Common.cc */,
 				EC2AEB901973457600360EC6 /* _Common.h */,
 				EC2AEB911973457600360EC6 /* _Config.h */,
+				ECE4C3A219927D4D00FFD159 /* _EncryptCtx.cc */,
+				ECE4C3A319927D4D00FFD159 /* _EncryptCtx.h */,
+				ECE4C3A419927D4D00FFD159 /* _RTCDataChannel.cc */,
+				ECE4C3A519927D4D00FFD159 /* _RTCDataChannel.h */,
+				ECE4C3A619927D4D00FFD159 /* _RTCDTMFSender.cc */,
+				ECE4C3A719927D4D00FFD159 /* _RTCDTMFSender.h */,
 				EC2AEB921973457600360EC6 /* _Debug.h */,
 				EC2AEB941973457600360EC6 /* _MediaStream.cc */,
 				EC2AEB951973457600360EC6 /* _MediaStream.h */,
@@ -372,14 +420,22 @@
 			files = (
 				EC23B40B1974F8D1000DFA4B /* npapi-includes.h in Headers */,
 				EC23B3FD1974E0E2000DFA4B /* RTCStats.h in Headers */,
+				ECE4C3AB19927D4F00FFD159 /* _RTCDataChannel.h in Headers */,
 				EC23B4031974E0E2000DFA4B /* SourceInfo.h in Headers */,
 				EC23B4071974E0E2000DFA4B /* WebRTC.h in Headers */,
+				ECE4C3BF19927D8000FFD159 /* RTCDTMFSender.h in Headers */,
+				ECE4C3B919927D8000FFD159 /* MessageEvent.h in Headers */,
 				EC23B3FB1974E0E2000DFA4B /* RTCPeerConnectionIceEvent.h in Headers */,
+				ECE4C3A919927D4F00FFD159 /* _EncryptCtx.h in Headers */,
+				ECE4C3AD19927D4F00FFD159 /* _RTCDTMFSender.h in Headers */,
+				ECE4C3BD19927D8000FFD159 /* RTCDataChannelEvent.h in Headers */,
 				EC23B3F11974E0E2000DFA4B /* MediaStreamTrack.h in Headers */,
 				EC23B3EB1974E0E2000DFA4B /* MediaSourceStates.h in Headers */,
 				EC23B3E81974E0E2000DFA4B /* BrowserCallback.h in Headers */,
 				EC23B3EF1974E0E2000DFA4B /* MediaStreamEvent.h in Headers */,
 				EC23B3ED1974E0E2000DFA4B /* MediaStream.h in Headers */,
+				ECE4C3C119927D8000FFD159 /* RTCDTMFToneChangeEvent.h in Headers */,
+				ECE4C3BB19927D8000FFD159 /* RTCDataChannel.h in Headers */,
 				EC23B3F91974E0E2000DFA4B /* RTCIceCandidate.h in Headers */,
 				EC23B3F61974E0E2000DFA4B /* Plugin.h in Headers */,
 				EC23B4011974E0E2000DFA4B /* SessionDescription.h in Headers */,
@@ -480,9 +536,15 @@
 				EC23B4A51975EB15000DFA4B /* _videocapturer.cc in Sources */,
 				EC2AEBF419734C6E00360EC6 /* _Common.cc in Sources */,
 				EC23B3F31974E0E2000DFA4B /* PeerConnection.cc in Sources */,
+				ECE4C3AC19927D4F00FFD159 /* _RTCDTMFSender.cc in Sources */,
 				EC23B3FC1974E0E2000DFA4B /* RTCStats.cc in Sources */,
 				EC23B4A71975EF7B000DFA4B /* _messagehandler.cc in Sources */,
+				ECE4C3B819927D8000FFD159 /* MessageEvent.cc in Sources */,
 				EC23B4041974E0E2000DFA4B /* Utils.cc in Sources */,
+				ECE4C3A819927D4E00FFD159 /* _EncryptCtx.cc in Sources */,
+				ECE4C3BA19927D8000FFD159 /* RTCDataChannel.cc in Sources */,
+				ECE4C3AA19927D4F00FFD159 /* _RTCDataChannel.cc in Sources */,
+				ECE4C3C019927D8000FFD159 /* RTCDTMFToneChangeEvent.cc in Sources */,
 				EC23B4A21975E861000DFA4B /* _webrtcvideocapturer.cc in Sources */,
 				EC23B3FE1974E0E2000DFA4B /* RTCStatsReport.cc in Sources */,
 				EC2AEBF919734C6E00360EC6 /* _MediaStream.cc in Sources */,
@@ -500,9 +562,11 @@
 				EC23B3EC1974E0E2000DFA4B /* MediaStream.cc in Sources */,
 				EC2AEC0919734C6E00360EC6 /* _RTCMediaConstraints.cc in Sources */,
 				EC2AEC0B19734C6E00360EC6 /* _SessionDescription.cc in Sources */,
+				ECE4C3BC19927D8000FFD159 /* RTCDataChannelEvent.cc in Sources */,
 				EC23B3EE1974E0E2000DFA4B /* MediaStreamEvent.cc in Sources */,
 				EC23B3F01974E0E2000DFA4B /* MediaStreamTrack.cc in Sources */,
 				EC2AEC0D19734C6E00360EC6 /* _Utils.cc in Sources */,
+				ECE4C3BE19927D8000FFD159 /* RTCDTMFSender.cc in Sources */,
 				EC23B3E71974E0E2000DFA4B /* BrowserCallback.cc in Sources */,
 				EC23B3F81974E0E2000DFA4B /* RTCIceCandidate.cc in Sources */,
 			);
@@ -559,9 +623,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
-				WE_CFLAGS = "-DPOSIX -DOSX -DHAVE_WEBRTC_VIDEO";
+				WE_CFLAGS = "-DPOSIX -DOSX -DHAVE_WEBRTC_VIDEO -DWE_CONFIG_CRYPT_KEY=\\\"0000000000000000\\\" -DWE_CONFIG_CRYPT_IV=\\\"0000000000000000\\\" -DV8_DEPRECATION_WARNINGS -DBLINK_SCALE_FILTERS_AT_RECORD_TIME -DEXPAT_RELATIVE_PATH -DFEATURE_ENABLE_VOICEMAIL -DGTEST_RELATIVE_PATH -DLOGGING=1 -DSRTP_RELATIVE_PATH -DFEATURE_ENABLE_SSL -DFEATURE_ENABLE_PSTN -DHAVE_SRTP -DHAVE_WEBRTC_VIDEO -DHAVE_WEBRTC_VOICE -DUSE_WEBRTC_DEV_BRANCH -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -DNOMINMAX -DPSAPI_VERSION=1 -D_CRT_RAND_S -DCERT_CHAIN_PARA_HAS_EXTRA_FIELDS -DWIN32_LEAN_AND_MEAN -D_ATL_NO_OPENGL -D_HAS_EXCEPTIONS=0 -D_SECURE_ATL -DCHROMIUM_BUILD -DTOOLKIT_VIEWS=1 -DUSE_AURA=1 -DUSE_ASH=1 -DUSE_DEFAULT_RENDER_THEME=1 -DUSE_LIBJPEG_TURBO=1 -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_PEPPER_CDMS -DENABLE_CONFIGURATION_POLICY -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_EGLIMAGE=1 -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -DNTDDI_VERSION=0x06020000 -D_USING_V110_SDK71_ -DENABLE_TASK_MANAGER=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PLUGINS=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_AUTOFILL_DIALOG=1 -DENABLE_BACKGROUND=1 -DENABLE_GOOGLE_NOW=1 -DCLD_VERSION=2 -DENABLE_FULL_PRINTING=1 -DENABLE_PRINTING=1 -DWIN_PDF_METAFILE_FOR_PRINTING=1 -DENABLE_SPELLCHECK=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DENABLE_APP_LIST=1 -DENABLE_SETTINGS_APP=1 -DENABLE_MANAGED_USERS=1 -DENABLE_MDNS=1 -DENABLE_SERVICE_DISCOVERY=1 -DENABLE_WIFI_BOOTSTRAPPING=1 -DLIBPEERCONNECTION_LIB=1 -DHAVE_SCTP -DSSL_USE_NSS -DHAVE_NSS_SSL_H -DSSL_USE_NSS_RNG -DNSS_PLATFORM_CLIENT_AUTH -DNO_NSPR_10_SUPPORT -DNSPR_STATIC -DNSS_STATIC -DNSS_USE_STATIC_LIBS -DUSE_UTIL_DIRECTLY -D_CRT_NONSTDC_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1";
 				WE_HOME = ..;
-				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/libyuv/include";
+				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/libyuv/include  $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/util $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/pr/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/ds $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/libc/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/cryptohi $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/certdb $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pkcs7 $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/smime $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pk11wrap ";
 				WE_LIBS = "";
 				"WE_LIBS[sdk=macosx*][arch=i386]" = "$(WE_HOME)/thirdparties/osx/lib/i386";
 				"WE_LIBS[sdk=macosx*][arch=x86_64]" = "$(WE_HOME)/thirdparties/osx/lib/x86_64";
@@ -599,9 +663,9 @@
 				MACH_O_TYPE = mh_bundle;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
-				WE_CFLAGS = "-DPOSIX -DOSX -DHAVE_WEBRTC_VIDEO";
+				WE_CFLAGS = "-DPOSIX -DOSX -DHAVE_WEBRTC_VIDEO -DWE_CONFIG_CRYPT_KEY=\\\"0000000000000000\\\" -DWE_CONFIG_CRYPT_IV=\\\"0000000000000000\\\" -DV8_DEPRECATION_WARNINGS -DBLINK_SCALE_FILTERS_AT_RECORD_TIME -DEXPAT_RELATIVE_PATH -DFEATURE_ENABLE_VOICEMAIL -DGTEST_RELATIVE_PATH -DLOGGING=1 -DSRTP_RELATIVE_PATH -DFEATURE_ENABLE_SSL -DFEATURE_ENABLE_PSTN -DHAVE_SRTP -DHAVE_WEBRTC_VIDEO -DHAVE_WEBRTC_VOICE -DUSE_WEBRTC_DEV_BRANCH -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -DNOMINMAX -DPSAPI_VERSION=1 -D_CRT_RAND_S -DCERT_CHAIN_PARA_HAS_EXTRA_FIELDS -DWIN32_LEAN_AND_MEAN -D_ATL_NO_OPENGL -D_HAS_EXCEPTIONS=0 -D_SECURE_ATL -DCHROMIUM_BUILD -DTOOLKIT_VIEWS=1 -DUSE_AURA=1 -DUSE_ASH=1 -DUSE_DEFAULT_RENDER_THEME=1 -DUSE_LIBJPEG_TURBO=1 -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_PEPPER_CDMS -DENABLE_CONFIGURATION_POLICY -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_EGLIMAGE=1 -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -DNTDDI_VERSION=0x06020000 -D_USING_V110_SDK71_ -DENABLE_TASK_MANAGER=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PLUGINS=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_AUTOFILL_DIALOG=1 -DENABLE_BACKGROUND=1 -DENABLE_GOOGLE_NOW=1 -DCLD_VERSION=2 -DENABLE_FULL_PRINTING=1 -DENABLE_PRINTING=1 -DWIN_PDF_METAFILE_FOR_PRINTING=1 -DENABLE_SPELLCHECK=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DENABLE_APP_LIST=1 -DENABLE_SETTINGS_APP=1 -DENABLE_MANAGED_USERS=1 -DENABLE_MDNS=1 -DENABLE_SERVICE_DISCOVERY=1 -DENABLE_WIFI_BOOTSTRAPPING=1 -DLIBPEERCONNECTION_LIB=1 -DHAVE_SCTP -DSSL_USE_NSS -DHAVE_NSS_SSL_H -DSSL_USE_NSS_RNG -DNSS_PLATFORM_CLIENT_AUTH -DNO_NSPR_10_SUPPORT -DNSPR_STATIC -DNSS_STATIC -DNSS_USE_STATIC_LIBS -DUSE_UTIL_DIRECTLY -D_CRT_NONSTDC_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1";
 				WE_HOME = ..;
-				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/libyuv/include";
+				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/libyuv/include  $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/util $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/pr/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/ds $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/libc/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/cryptohi $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/certdb $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pkcs7 $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/smime $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pk11wrap ";
 				WE_LIBS = "";
 				"WE_LIBS[sdk=macosx*][arch=i386]" = "$(WE_HOME)/thirdparties/osx/lib/i386";
 				"WE_LIBS[sdk=macosx*][arch=x86_64]" = "$(WE_HOME)/thirdparties/osx/lib/x86_64";

@@ -39,8 +39,8 @@ public:
 	NPObjectImpl_NPObjectRelease(RTCDataChannelEvent);
 	NPObjectImpl_IsInstanceOf(RTCDataChannelEvent);
 
-	WE_INLINE void SetEvent(std::shared_ptr<_RTCDataChannelEvent> & _event) { m_Event = _event; }
-	WE_INLINE std::shared_ptr<_RTCDataChannelEvent> GetEvent() { return m_Event; }
+	WE_INLINE void SetEvent(cpp11::shared_ptr<_RTCDataChannelEvent> & _event) { m_Event = _event; }
+	WE_INLINE cpp11::shared_ptr<_RTCDataChannelEvent> GetEvent() { return m_Event; }
 	
 
 private:

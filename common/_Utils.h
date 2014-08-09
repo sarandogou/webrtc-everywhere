@@ -47,6 +47,8 @@ public:
 #if WE_UNDER_WINDOWS
 	static HRESULT MsgBoxGUMA(bool &accepted, const char* protocol, const char* host, HWND hwndParent /*= NULL*/);
 	static HRESULT MsgBoxGUM(bool &accepted, const TCHAR* protocol, const TCHAR* host, HWND hwndParent = NULL);
+#elif WE_UNDER_APPLE
+    static WeError MsgBoxGUM(bool &accepted, const char* protocol, const char* host);
 #endif
 
 private:
