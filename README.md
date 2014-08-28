@@ -1,7 +1,6 @@
 **webrtc-everywhere** is an open source project (with **business-friendly** <a href="#license">license</a>) to add support for WebRTC features to Safari (Windows and MAC OSX) and Internet Explorer (Windows).
 
 # Downloads
-Version **1.0.1**:
  - <a href="https://ns313841.ovh.net/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> 
  - <a href="https://ns313841.ovh.net/webrtc/setup.exe" target="_blank">Windows</a>
 
