@@ -72,5 +72,9 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
  - Binaries and installers: All binaries and installers **from us** are released under **BSD** terms to allow using the project in your commercial products.
  - The source code: **GPLv3**. Please contact us for alternative license options.
 
+# Known issues
+ - On Safari/OSX, if you're getting *TypeError: undefined is not a function (evaluating 'getPlugin()...*:
+ 	- Change the security settings to manually enable the plugin: [http://support.apple.com/en-us/HT202819](http://support.apple.com/en-us/HT202819)
+
 # Getting help
 The best way to get help is via our <a href="https://groups.google.com/forum/#!forum/webrtc-everywhere" target="_blank">dev-group</a>.
