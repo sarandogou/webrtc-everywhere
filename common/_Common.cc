@@ -198,7 +198,7 @@ bool _File::Write(cpp11::shared_ptr<_Buffer>& buffer, bool append /*= false*/)
 				return false;
 			}
 		}
-		if (WriteFile(m_file, buffer->getPtr(), buffer->getSize(), &dwBytesWritten, &offset)) {
+		if (WriteFile(m_file, buffer->getPtr(), (DWORD)buffer->getSize(), &dwBytesWritten, &offset)) {
 			if (dwBytesWritten == buffer->getSize()) {
 				return (SetEndOfFile(m_file) == TRUE);
 			}

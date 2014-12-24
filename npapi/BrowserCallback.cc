@@ -97,7 +97,7 @@ bool BrowserCallback::Invoke()
 			}
 			}
 		}
-		ret = BrowserFuncs->invokeDefault(m_npp, m_callback, args, m_params_count, &result);
+		ret = BrowserFuncs->invokeDefault(m_npp, m_callback, args, (uint32_t)m_params_count, &result);
 		BrowserFuncs->releasevariantvalue(&result); 
 	}
 	return ret;

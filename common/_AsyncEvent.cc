@@ -26,14 +26,14 @@ bool _AsyncEventDispatcher::SetWindow(HWND hWnd, bool bSubClass /*= true*/)
 {
 #if WE_UNDER_WINDOWS
 	if (m_Hwnd && m_Proc) {
-		SetWindowLongPtr(m_Hwnd, GWL_WNDPROC, (LONG)m_Proc);
+		SetWindowLongPtr(m_Hwnd, GWLP_WNDPROC, (LONG_PTR)m_Proc);
 		// SetWindowLongPtr(m_Hwnd, DWLP_USER, (LONG)NULL);
 		m_Proc = NULL;
 	}
 
 	if ((m_Hwnd = hWnd)) {
 		if (bSubClass) {
-			m_Proc = (WNDPROC)SetWindowLongPtr(m_Hwnd, GWL_WNDPROC, (LONG)_Utils::WndProc);
+			m_Proc = (WNDPROC)SetWindowLongPtr(m_Hwnd, GWLP_WNDPROC, (LONG_PTR)_Utils::WndProc);
 			if (!m_Proc) {
 				WE_DEBUG_ERROR("SetWindowLongPtr() failed with errcode=%d", GetLastError());
 				return false;

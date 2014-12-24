@@ -75,7 +75,7 @@ NPError Utils::CreateJsArrayEx(NPP npp, std::vector<NPVariant> &vecValues, const
 	NPString npCreateArrayEvalString = { 0 };
 	sprintf(createArrayEvalString, "new %s(%u)", arrayClassName, vecValues.size());
 	npCreateArrayEvalString.UTF8Characters = createArrayEvalString;
-	npCreateArrayEvalString.UTF8Length = strlen(createArrayEvalString);
+	npCreateArrayEvalString.UTF8Length = (uint32_t)strlen(createArrayEvalString);
 	bRet = BrowserFuncs->evaluate(npp, npWindow, &npCreateArrayEvalString, &var);
 #else
 

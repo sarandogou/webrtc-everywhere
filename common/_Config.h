@@ -18,7 +18,7 @@
 #	define kPluginVersionMinor 2
 #endif
 #if !defined(kPluginVersionMicro)
-#	define kPluginVersionMicro 0
+#	define kPluginVersionMicro 1
 #endif
 #if !defined(kPluginVersionString)
 #	define kPluginVersionString WE_STRING(WE_CAT(kPluginVersionMajor, .)) WE_STRING(WE_CAT(kPluginVersionMinor, .)) WE_STRING(kPluginVersionMicro)

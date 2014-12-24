@@ -87,7 +87,7 @@ _EncryptCtx::_EncryptCtx()
 	* data and a length. Turn the raw key into a SECItem. */
 	keyItem.type = siBuffer;
 	keyItem.data = (unsigned char*)key_ptr;
-	keyItem.len = key_size;
+	keyItem.len = (unsigned int)key_size;
 
 	/* Turn the raw key into a key object. We use PK11_OriginUnwrap
 	* to indicate the key was unwrapped - which is what should be done
@@ -105,7 +105,7 @@ _EncryptCtx::_EncryptCtx()
 	*/
 	ivItem.type = siBuffer;
 	ivItem.data = (unsigned char*)iv_ptr;
-	ivItem.len = iv_size;
+	ivItem.len = (unsigned int)iv_size;
 	m_SecParam = PK11_ParamFromIV(g_cipherMech, &ivItem);
 	if (m_SecParam == NULL) {
 		WE_DEBUG_ERROR("Failure to set up PKCS11 param (err %d)", PR_GetError());
@@ -152,7 +152,7 @@ WeError _EncryptCtx::Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<
 		goto bail;
 	}
 
-	out_maxlen = in->getSize() + (encrypt ? (8 + PK11_GetBlockSize(g_cipherMech, m_SecParam)) : 0);
+	out_maxlen = (int)(in->getSize() + (encrypt ? (8 + PK11_GetBlockSize(g_cipherMech, m_SecParam)) : 0));
 	out_buff = (unsigned char*)malloc(out_maxlen);
 	out_len = 0, out2_len = 0;
 	if (!out_buff) {
@@ -160,7 +160,7 @@ WeError _EncryptCtx::Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<
 		err = WeError_OutOfMemory;
 		goto bail;
 	}
-	rv = PK11_CipherOp(EncContext, out_buff, &out_len, out_maxlen, (const unsigned char*)in->getPtr(), in->getSize());
+	rv = PK11_CipherOp(EncContext, out_buff, &out_len, out_maxlen, (const unsigned char*)in->getPtr(), (int)in->getSize());
 	if (rv != SECSuccess) {
 		WE_DEBUG_ERROR("PK11_CipherOp failed: %d", rv);
 		err = WeError_System;

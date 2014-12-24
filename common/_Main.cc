@@ -98,7 +98,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	_Utils::Initialize();
 	TakeFakePeerConnectionFactory();
 
-	WeError err;
+	WeError err = WeError_Success;
 
 	/*
 #if 1

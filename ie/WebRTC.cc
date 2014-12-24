@@ -74,6 +74,7 @@ void CWebRTC::FinalRelease()
 	ReleaseFakePeerConnectionFactory();
 }
 
+#if 0
 // IOleObjectImpl::SetClientSite()
 STDMETHODIMP CWebRTC::SetClientSite(_Inout_opt_ IOleClientSite *pClientSite)
 {
@@ -197,6 +198,7 @@ STDMETHODIMP CWebRTC::SetObjectRects(__RPC__in LPCRECT lprcPosRect, __RPC__in LP
 	}
 	return hr;
 }
+#endif
 
 // _RTCDisplay::Handle() implementation
 HWND CWebRTC::Handle()

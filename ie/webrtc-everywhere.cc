@@ -41,6 +41,7 @@ STDAPI DllUnregisterServer(void)
 STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
 {
     HRESULT hr = E_FAIL;
+	
     static const wchar_t szUserSwitch[] = _T("user");
 
     if (pszCmdLine != NULL) {

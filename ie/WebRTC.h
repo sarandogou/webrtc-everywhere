@@ -209,6 +209,7 @@ public:
 	STDMETHOD(get_videoHeight)(__out LONG* pVal);
 	STDMETHOD(get_isWebRtcPlugin)(__out VARIANT_BOOL* pVal);
 
+#if 0
 	// IOleObjectImpl::SetClientSite()
 	STDMETHOD(SetClientSite)(_Inout_opt_ IOleClientSite *pClientSite);
 
@@ -217,6 +218,7 @@ public:
 
 	// IOleInPlaceObject::SetObjectRects
 	STDMETHOD(SetObjectRects)(__RPC__in LPCRECT lprcPosRect, __RPC__in LPCRECT lprcClipRect);
+#endif
 	
 
 	// _RTCDisplay implementation

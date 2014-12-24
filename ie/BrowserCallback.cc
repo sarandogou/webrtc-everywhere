@@ -8,7 +8,7 @@ BrowserCallback::BrowserCallback(unsigned msgid, CComPtr<IDispatch> disp)
 	, m_disp(disp)
 	, m_params_count(0)
 {
-
+	
 }
 
 BrowserCallback::~BrowserCallback()

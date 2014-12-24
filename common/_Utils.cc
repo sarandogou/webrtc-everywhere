@@ -755,19 +755,19 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 #	define BI_RGB 0L
 #endif
 	
-	hdr_file.bfSize = *bmp_size_ptr;
+	hdr_file.bfSize = (DWORD)*bmp_size_ptr;
 	hdr_file.bfOffBits = sizeof(BMPFILEHEADER) + sizeof(BMPINFOHEADER);
 
 	hdr_info.biSize = sizeof(BMPINFOHEADER);
 	hdr_file.bfType = 0x4D42;
-	hdr_info.biWidth = width;
-	hdr_info.biHeight = height;
+	hdr_info.biWidth = (LONG)width;
+	hdr_info.biHeight = (LONG)height;
 	hdr_info.biXPelsPerMeter = 0;
 	hdr_info.biYPelsPerMeter = 0;
 	hdr_info.biPlanes = 1;
 	hdr_info.biBitCount = 32;
 	hdr_info.biCompression = BI_RGB;
-	hdr_info.biSizeImage = stride * height;
+	hdr_info.biSizeImage = (DWORD)(stride * height);
 	hdr_info.biClrImportant = 0;
 	hdr_info.biClrUsed = 0;
 #if WE_UNDER_WINDOWS || WE_UNDER_APPLE
