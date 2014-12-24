@@ -46,6 +46,16 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
 ... to be continued
 
 # Release notes
+ - **1.2.1**
+  - Fix [Issue #15](../../issues/15)
+  - Adds support for x64 (Windows)
+  - Change Windows setup:
+   * to register the ActiveX under HKCU instead of HKLM
+   * to install binaries under AppData folder instead of ProgramFiles
+   * to bundle 32bit and 64bit binaries
+
+**It's highly recommended to uninstall any old version before installing this one**
+
  - **1.2.0**
  	- Adds <a href="http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannel" target="_blank">DataChannel</a> API with support for **Strings**, **BLOBs** and **ArrayBuffers** (Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array and Float64Array).
  	- Adds support for <a href="http://www.w3.org/TR/webrtc/#rtcdtmfsender" target="_blank">DTMFSender</a> API.
