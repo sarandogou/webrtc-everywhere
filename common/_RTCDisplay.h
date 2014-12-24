@@ -40,7 +40,9 @@ public:
 	int GetVideoWidth();
 	int GetVideoHeight();
 	size_t CopyFromFrame(void* bufferPtr, size_t bufferSize);
+#if WE_UNDER_WINDOWS
 	void SetFnQuerySurfacePresentere(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter);
+#endif
 
 	// VideoRendererInterface implementation
 	virtual void SetSize(int width, int height);

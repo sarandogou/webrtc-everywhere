@@ -156,8 +156,7 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 		NPVariant protocol, host;
 		NPError err = Utils::GetLocation(This->m_npp, &protocol, &host);
 		CHECK_NPERR_BAIL(err);
-#if WE_UNDER_WINDOWS
-		std::string _protocol("");
+        std::string _protocol("");
 		std::string _host("");
 		if (NPVARIANT_IS_STRING(protocol)) {
 			_protocol = std::string(protocol.value.stringValue.UTF8Characters, protocol.value.stringValue.UTF8Length);
@@ -165,8 +164,11 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 		if (NPVARIANT_IS_STRING(host)) {
 			_host = std::string(host.value.stringValue.UTF8Characters, host.value.stringValue.UTF8Length);
 		}
+#if WE_UNDER_WINDOWS
 		HRESULT hr = _Utils::MsgBoxGUMA(gumAccepted, _protocol.c_str(), _host.c_str(), reinterpret_cast<HWND>(This->GetWindowHandle()));
 		CHECK_HR_BAIL(hr);
+#elif WE_UNDER_APPLE
+        _Utils::MsgBoxGUM(gumAccepted, _protocol.c_str(), _host.c_str());
 #else
 #error "Not implemented"
 #endif

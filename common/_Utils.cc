@@ -17,6 +17,7 @@
 #	include "resource.h"
 # elif WE_UNDER_MAC
 #	include "talk/base/maccocoasocketserver.h"
+#   import <CoreFoundation/CoreFoundation.h>
 #endif
 
 #ifdef _MSC_VER
@@ -35,7 +36,7 @@ static bool g_winCoInitialize = false;
 webrtc::CriticalSectionWrapper* _Utils::s_unique_objs_cs = webrtc::CriticalSectionWrapper::CreateCriticalSection();
 std::map<long, const _UniqueObject*> _Utils::s_unique_objs;
 _FTIME _Utils::s_time_config_modif = { 0 };
-cpp11::shared_ptr<_EncryptCtx> _Utils::s_encrypt_ctx = cpp11::shared_ptr<_EncryptCtx>(new _EncryptCtx());
+cpp11::shared_ptr<_EncryptCtx> _Utils::s_encrypt_ctx = nullPtr;
 
 
 _Utils::_Utils()
@@ -74,6 +75,8 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
         
 		talk_base::InitializeSSL();
 		talk_base::InitializeSSLThread();
+        
+        s_encrypt_ctx = cpp11::shared_ptr<_EncryptCtx>(new _EncryptCtx());
 
         g_bInitialized = true;
     }
@@ -377,6 +380,24 @@ cpp11::shared_ptr<_File> _Utils::FileConfigGet(bool write /*= false*/)
 			file_config = cpp11::shared_ptr<_File>(new _File(szPath, write));
 		}
 	}
+#elif WE_UNDER_APPLE
+    NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+	NSString *documentsDir = [[documentPaths objectAtIndex:0] stringByAppendingPathComponent:@"webrtc-everywhere"];
+    NSString *configPath = [documentsDir stringByAppendingPathComponent:@"config.json"];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isDirectory = NO;
+	BOOL exists = [fileManager fileExistsAtPath:documentsDir isDirectory:&isDirectory];
+	if(!exists){
+        NSError* error = nil;
+		BOOL created = [fileManager createDirectoryAtPath:documentsDir withIntermediateDirectories:YES attributes:nil error:&error];
+		if(!created){
+			NSLog(@"Failed to create folder (%@) to the file system: %@", documentsDir, error);
+			return nullPtr;
+		}
+	}
+    
+    file_config = cpp11::shared_ptr<_File>(new _File((const char*)[configPath UTF8String], write));
 #else
 #error "Not implemented"
 #endif
@@ -386,9 +407,6 @@ cpp11::shared_ptr<_File> _Utils::FileConfigGet(bool write /*= false*/)
 
 WeError _Utils::FileConfigGetKeyAndIV(const unsigned char* &key_ptr, size_t &key_size, const unsigned char* &iv_ptr, size_t &iv_size)
 {
-	static const unsigned char g_Key[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	static const unsigned char g_IV[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
 #if defined(WE_CONFIG_CRYPT_KEY) && defined(WE_CONFIG_CRYPT_IV)
 	static unsigned char *__key = NULL;
 	static size_t __key_size = 0;
@@ -398,31 +416,35 @@ WeError _Utils::FileConfigGetKeyAndIV(const unsigned char* &key_ptr, size_t &key
 		size_t key_len = we_strlen((const char*)WE_CONFIG_CRYPT_KEY);
 		size_t iv_len = we_strlen((const char*)WE_CONFIG_CRYPT_IV);
 		if (!key_len || (key_len & 1) || !iv_len || (iv_len & 1)) {
-			WE_DEBUG_ERROR("Crypto:key:iv not length (%u:%u)", key_len, iv_len);
+			WE_DEBUG_ERROR("Crypto:key:iv not length (%zu:%zu)", key_len, iv_len);
 			return WeError_System;
 		}
 		if (!__key) {
 			__key_size = key_len >> 1;
 			__key = (unsigned char *)malloc(__key_size);
 			if (!__key) {
-				WE_DEBUG_ERROR("failed to alloc memory with size = %u", __key_size);
+				WE_DEBUG_ERROR("failed to alloc memory with size = %zu", __key_size);
 				return WeError_OutOfMemory;
 			}
 			const char* ptr = (const char*)WE_CONFIG_CRYPT_KEY;
+            unsigned int u;
 			for (size_t i = 0; i < key_len; i+=2) {
-				sscanf(&ptr[i], "%2x", &__key[i >> 1]);
+                u = __key[i >> 1];
+				sscanf(&ptr[i], "%2x", &u);
 			}
 		}
 		if (!__iv) {
 			__iv_size = iv_len >> 1;
 			__iv = (unsigned char *)malloc(__iv_size);
 			if (!__iv) {
-				WE_DEBUG_ERROR("failed to alloc memory with size = %u", __iv_size);
+				WE_DEBUG_ERROR("failed to alloc memory with size = %zu", __iv_size);
 				return WeError_OutOfMemory;
 			}
 			const char* ptr = (const char*)WE_CONFIG_CRYPT_KEY;
+            unsigned int u;
 			for (size_t i = 0; i < iv_len; i += 2) {
-				sscanf(&ptr[i], "%2x", &__iv[i >> 1]);
+                u = __key[i >> 1];
+				sscanf(&ptr[i], "%2x", &u);
 			}
 		}
 	}
@@ -432,6 +454,9 @@ WeError _Utils::FileConfigGetKeyAndIV(const unsigned char* &key_ptr, size_t &key
 	iv_size = __iv_size;
 	return WeError_Success;
 #else
+    static const unsigned char g_Key[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	static const unsigned char g_IV[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    
 	key_ptr = g_Key;
 	key_size = sizeof(g_Key);
 	iv_ptr = g_IV;
@@ -479,7 +504,7 @@ WeError _Utils::FileConfigTrustedWebsiteAdd(const char* protocol, const char* ho
 		err = s_encrypt_ctx->Decrypt(enc_data, dec_data);
 		if (err == WeError_Success) {
 			if (!(reader.parse((const char*)dec_data->getPtr(), ((const char*)dec_data->getPtr() + dec_data->getSize()), configuration))) {
-				WE_DEBUG_ERROR("Invalid JSON content:%.*s", dec_data->getSize(), (const char*)dec_data->getPtr());
+				WE_DEBUG_ERROR("Invalid JSON content:%.*s", (int)dec_data->getSize(), (const char*)dec_data->getPtr());
 				// return WeError_InvalidJsonContent; /* do not exit -> override the content */
 			}
 		}
@@ -553,7 +578,8 @@ WeError _Utils::FileConfigTrustedWebsiteExist(const char* protocol, const char* 
 		if (err) {
 			return err;
 		}
-		if ((reader.parse((const char*)dec_data->getPtr(), ((const char*)dec_data->getPtr() + dec_data->getSize()), configuration))) {
+        std::string json_data = std::string((const char*)dec_data->getPtr(), dec_data->getSize());
+		if ((reader.parse(json_data, configuration))) {
 			Json::Value trustedWebsites = configuration["trusted_websites"];
 			if (trustedWebsites.isArray()) {
 				Json::Value entry;
@@ -898,4 +924,49 @@ HRESULT _Utils::MsgBoxGUM(bool &accepted, const TCHAR* protocol, const TCHAR* ho
 
 	return S_OK;
 }
-#endif
+#endif // WE_UNDER_WINDOWS
+
+
+#if WE_UNDER_APPLE
+
+WeError _Utils::MsgBoxGUM(bool &accepted, const char* protocol, const char* host)
+{
+    accepted = false;
+    
+    static const char __protocol_ptr[] = "http:";
+	static const char __host_ptr[] = "local";
+    
+	if (!we_strlen(host)) { // local file -> host = null
+		host = __host_ptr;
+	}
+	if (!we_strlen(protocol)) { // local file -> protocol = null
+		protocol = __protocol_ptr;
+	}
+    
+    _Utils::FileConfigTrustedWebsiteExist(protocol, host, accepted);
+    if (!accepted) {
+        CFOptionFlags cfRes;
+        CFUserNotificationDisplayAlert(0, 0/*kCFUserNotificationNoDefaultButtonFlag*/, NULL, NULL, NULL,
+                                       CFSTR("Media permission"), CFStringCreateWithFormat(NULL, NULL, CFSTR("[%s] would like to access your microphone and/or camera."), host),
+                                       CFSTR("Deny"), CFSTR("Allow"), NULL,
+                                       &cfRes);
+        switch (cfRes) {
+            case kCFUserNotificationDefaultResponse:
+                // Denny
+                break;
+            case kCFUserNotificationAlternateResponse:
+                // Allow
+                accepted = true;
+                if (!we_stricmp(protocol, "https:")) {
+                    _Utils::FileConfigTrustedWebsiteAdd(protocol, host);
+                }
+                break;
+        }
+    }
+    return WeError_Success;
+}
+
+#endif // WE_UNDER_APPLE
+
+
+

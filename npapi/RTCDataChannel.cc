@@ -72,12 +72,14 @@ RTCDataChannel::RTCDataChannel(NPP instance)
 RTCDataChannel::~RTCDataChannel()
 {
 	if (m_Channel) {
-		m_Channel->onopenSet(nullptr);
-		m_Channel->onerrorSet(nullptr);
-		m_Channel->oncloseSet(nullptr);
-		m_Channel->onmessageSet(nullptr);
+#if !WE_UNDER_APPLE // FIXME
+		m_Channel->onopenSet(nullPtr);
+		m_Channel->onerrorSet(nullPtr);
+		m_Channel->oncloseSet(nullPtr);
+		m_Channel->onmessageSet(nullPtr);
+#endif
 	}
-	m_Channel = nullptr;
+	m_Channel = nullPtr;
 
 	Utils::NPObjectRelease(&m_callback_onopen);
 	Utils::NPObjectRelease(&m_callback_onerror);
@@ -90,10 +92,10 @@ RTCDataChannel::~RTCDataChannel()
 void RTCDataChannel::SetChannel(cpp11::shared_ptr<_RTCDataChannel> & channel)
 {
 	if ((m_Channel = channel)) {
-		m_Channel->onopenSet(std::bind(&RTCDataChannel::onopen, this));
-		m_Channel->onerrorSet(std::bind(&RTCDataChannel::onerror, this, std::placeholders::_1));
-		m_Channel->oncloseSet(std::bind(&RTCDataChannel::onclose, this));
-		m_Channel->onmessageSet(std::bind(&RTCDataChannel::onmessage, this, std::placeholders::_1));
+		m_Channel->onopenSet(cpp11::bind(&RTCDataChannel::onopen, this));
+		m_Channel->onerrorSet(cpp11::bind(&RTCDataChannel::onerror, this, cpp11::placeholders::_1));
+		m_Channel->oncloseSet(cpp11::bind(&RTCDataChannel::onclose, this));
+		m_Channel->onmessageSet(cpp11::bind(&RTCDataChannel::onmessage, this, cpp11::placeholders::_1));
 	}
 }
 
@@ -147,12 +149,16 @@ bool RTCDataChannel::Invoke(NPObject* obj, NPIdentifier methodName,
 	}
 	else if (!strcmp(name, kFuncSend)) {
 		if (argCount > 0) {
-			std::shared_ptr<_Buffer> _data;
-
-			NPError err = Utils::BuildData(This->m_npp, &args[0], _data);
-			if (err == NPERR_NO_ERROR) {
-				ret_val = This->m_Channel->send(_data.get(), !NPVARIANT_IS_STRING(args[0]));
-			}
+            if (Utils::NPObjectIsJsBLOB(This->m_npp, Utils::VariantToObject((NPVariant*)&args[0]))) {
+                ret_val = (Utils::DataChannelSendBlob(This->m_npp, obj, Utils::VariantToObject((NPVariant*)&args[0])) == NPERR_NO_ERROR);
+            }
+            else {
+                cpp11::shared_ptr<_Buffer> _data;
+                NPError err = Utils::BuildData(This->m_npp, &args[0], _data);
+                if (err == NPERR_NO_ERROR) {
+                    ret_val = This->m_Channel->send(_data.get(), !NPVARIANT_IS_STRING(args[0]));
+                }
+            }
 		}
 	}
 
@@ -393,8 +399,8 @@ void RTCDataChannel::onmessage(cpp11::shared_ptr<_MessageEvent> e)
 {
 	if (m_callback_onmessage) {
 		MessageEvent* _event = NULL;
-		HRESULT _hr = MessageEvent::CreateInstanceWithRef(m_npp, &_event);
-		if (SUCCEEDED(_hr)) {
+		NPError err = MessageEvent::CreateInstanceWithRef(m_npp, &_event);
+		if (err == NPERR_NO_ERROR) {
 			_event->SetDispatcher(const_cast<_AsyncEventDispatcher*>(GetDispatcher()));
 			_event->SetEvent(e);
 			BrowserCallback* _cb = new BrowserCallback(m_npp, WM_SUCCESS, m_callback_onmessage);

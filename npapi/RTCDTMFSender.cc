@@ -68,14 +68,14 @@ RTCDTMFSender::~RTCDTMFSender()
 	SetDispatcher(NULL);
 }
 
-void RTCDTMFSender::SetSender(std::shared_ptr<_RTCDTMFSender> & sender)
+void RTCDTMFSender::SetSender(cpp11::shared_ptr<_RTCDTMFSender> & sender)
 {
 	if ((m_Sender = sender)) {
-		m_Sender->ontonechangeSet(std::bind(&RTCDTMFSender::ontonechange, this, std::placeholders::_1));
+		m_Sender->ontonechangeSet(cpp11::bind(&RTCDTMFSender::ontonechange, this, cpp11::placeholders::_1));
 	}
 }
 
-std::shared_ptr<_RTCDTMFSender> RTCDTMFSender::GetSender()
+cpp11::shared_ptr<_RTCDTMFSender> RTCDTMFSender::GetSender()
 {
 	return m_Sender;
 }

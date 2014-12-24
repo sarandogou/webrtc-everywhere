@@ -45,11 +45,12 @@ static CK_MECHANISM_TYPE  g_cipherMech = CKM_DES_CBC_PAD;
 _EncryptCtx::_EncryptCtx()
 	: m_SymKey(NULL)
 	, m_SecParam(NULL)
+    , m_Slot(NULL)
 {
 	if (!g_Initialized) {
 		enum _SECStatus rv = NSS_NoDB_Init(".");
 		if (rv != SECSuccess) {
-			WE_DEBUG_ERROR("NSS initialization failed (err %d)", PR_GetError());
+			WE_DEBUG_ERROR("NSS initialization failed (err %s)", PR_ErrorToName(PR_GetError()));
 			return;
 		}
 		/* choose mechanism: CKM_DES_CBC_PAD, CKM_DES3_ECB, CKM_DES3_CBC.....
@@ -69,17 +70,16 @@ _EncryptCtx::_EncryptCtx()
 	if (_Utils::FileConfigGetKeyAndIV(key_ptr, key_size, iv_ptr, iv_size) != WeError_Success) {
 		return;
 	}
-
-	PK11SlotInfo* slot = NULL;
+    
 	SECItem keyItem, ivItem;
 
-	slot = PK11_GetBestSlot(g_cipherMech, NULL);
+	m_Slot = PK11_GetBestSlot(g_cipherMech, NULL);
 	/* slot = PK11_GetInternalKeySlot(); is a simpler alternative but in
 	* theory, it *may not* return the optimal slot for the operation. For
 	* DES ops, Internal slot is typically the best slot
 	*/
-	if (slot == NULL) {
-		WE_DEBUG_ERROR("Unable to find security device (err %d)", PR_GetError());
+	if (m_Slot == NULL) {
+		WE_DEBUG_ERROR("Unable to find security device (err %s)", PR_ErrorToName(PR_GetError()));
 		return;
 	}
 
@@ -92,10 +92,9 @@ _EncryptCtx::_EncryptCtx()
 	/* Turn the raw key into a key object. We use PK11_OriginUnwrap
 	* to indicate the key was unwrapped - which is what should be done
 	* normally anyway - using raw keys isn't a good idea */
-	m_SymKey = PK11_ImportSymKey(slot, g_cipherMech, PK11_OriginUnwrap, CKA_ENCRYPT, &keyItem, NULL);
-	PK11_FreeSlot(slot);
+	m_SymKey = PK11_ImportSymKey(m_Slot, g_cipherMech, PK11_OriginUnwrap, CKA_ENCRYPT, &keyItem, NULL);
 	if (m_SymKey == NULL) {
-		WE_DEBUG_ERROR("Failure to import key into NSS (err %d)", PR_GetError());
+		WE_DEBUG_ERROR("Failure to import key into NSS (err %s)", PR_ErrorToName(PR_GetError()));
 		return;
 	}
 
@@ -108,7 +107,7 @@ _EncryptCtx::_EncryptCtx()
 	ivItem.len = (unsigned int)iv_size;
 	m_SecParam = PK11_ParamFromIV(g_cipherMech, &ivItem);
 	if (m_SecParam == NULL) {
-		WE_DEBUG_ERROR("Failure to set up PKCS11 param (err %d)", PR_GetError());
+		WE_DEBUG_ERROR("Failure to set up PKCS11 param (err %s)", PR_ErrorToName(PR_GetError()));
 	}
 }
 
@@ -119,6 +118,9 @@ _EncryptCtx::~_EncryptCtx()
 		PK11_FreeSymKey(m_SymKey);
 		m_SymKey = NULL;
 	}
+    if (m_Slot) {
+        PK11_FreeSlot(m_Slot);
+    }
 }
 
 WeError _EncryptCtx::Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out, bool encrypt)
@@ -128,7 +130,7 @@ WeError _EncryptCtx::Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<
 	return WeError_Success;
 #else
 	WeError err = WeError_System;
-	int out_maxlen;
+	int out_maxlen, result_len;
 	unsigned char* out_buff = NULL;
 	PK11Context* EncContext = NULL;
 	int out_len, out2_len;
@@ -162,17 +164,17 @@ WeError _EncryptCtx::Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<
 	}
 	rv = PK11_CipherOp(EncContext, out_buff, &out_len, out_maxlen, (const unsigned char*)in->getPtr(), (int)in->getSize());
 	if (rv != SECSuccess) {
-		WE_DEBUG_ERROR("PK11_CipherOp failed: %d", rv);
+		WE_DEBUG_ERROR("PK11_CipherOp failed: %s", PR_ErrorToName(PR_GetError()));
 		err = WeError_System;
 		goto bail;
 	}
 	rv = PK11_DigestFinal(EncContext, out_buff + out_len, (unsigned int*)&out2_len, out_maxlen - out_len);
 	if (rv != SECSuccess) {
-		WE_DEBUG_ERROR("PK11_DigestFinal failed: %d", rv);
+		WE_DEBUG_ERROR("PK11_DigestFinal failed: %s", PR_ErrorToName(PR_GetError()));
 		err = WeError_System;
 		goto bail;
 	}
-	int result_len = out_len + out2_len;
+    result_len = out_len + out2_len;
 	out = cpp11::shared_ptr<_Buffer>(new _Buffer(out_buff, result_len));
 	if (out && out->getPtr() && out->getSize() == result_len) {
 		err = WeError_Success;

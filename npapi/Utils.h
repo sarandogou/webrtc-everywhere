@@ -27,6 +27,7 @@ public:
 	static std::string VariantToString(NPVariant* var);
 	static NPError NPObjectToArray(NPP npp, NPObject* obj, std::vector<NPVariant>& vecVars);
 
+    static bool NPObjectIsJsBLOB(NPP npp, NPObject* obj);
 	static NPError NPObjectGetProp(NPP npp, NPObject* obj, const NPUTF8* name, NPVariant* var);
 	static NPError NPObjectGetPropString(NPP npp, NPObject* obj, const NPUTF8* name, std::string& str);
 	static NPError NPObjectGetPropNumber(NPP npp, NPObject* obj, const NPUTF8* name, double& number);
@@ -45,9 +46,19 @@ public:
 
 	static NPError GetLocation(NPP, NPVariant* protocol, NPVariant *host);
     
+    static NPError InstallScripts(NPP npp);
+    
+    static NPError WrapArrayBufferIntoUint8Array(NPP npp, NPObject* arrayBuffer, NPObject ** uint8Array);
+    
+    static NPError DataChannelSendBlob(NPP npp, NPObject * dataChannel, NPObject* blob);
+    
 	static void* MemAlloc(size_t n);
 	static void* MemDup(const void* mem, size_t n);
 	static void MemFree(void** mem);
+    
+private:
+    static NPIdentifier s_funcID_WE00_dataChannelSendBlob;
+    static NPIdentifier s_funcID_WE01_wrapArrayBufferIntoUint8Array;
 };
 
 #endif /* _WEBRTC_EVERYWHERE_NPAPI_UTILS_H_ */

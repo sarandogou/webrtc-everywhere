@@ -40,7 +40,7 @@ _RTCDataChannel::_RTCDataChannel(DataChannelInterfacePtr dataChannel)
 {
 	assert(dataChannel);
 	m_dataChannel = static_cast<webrtc::DataChannelInterface*>(dataChannel);
-	m_dataChannel->RegisterObserver(DummyDataChannelObserver::Create(std::bind(&_RTCDataChannel::OnStateChange, this), std::bind(&_RTCDataChannel::OnMessage, this, std::placeholders::_1)));
+	m_dataChannel->RegisterObserver(DummyDataChannelObserver::Create(cpp11::bind(&_RTCDataChannel::OnStateChange, this), cpp11::bind(&_RTCDataChannel::OnMessage, this, cpp11::placeholders::_1)));
 	// http://www.w3.org/TR/webrtc/#widl-RTCDataChannel-binaryType
 	// http://www.w3.org/TR/websockets/#dom-websocket-binarytype
 	// supported values: "blob" and "arraybuffer"
@@ -122,7 +122,7 @@ const char* _RTCDataChannel::binaryType()const
 // default value: "blob"
 bool _RTCDataChannel::binaryTypeSet(const char* _binaryType)
 {
-	if (_binaryType && stricmp(_binaryType, "blob") == 0 || stricmp(_binaryType, "arraybuffer") == 0) {
+	if (_binaryType && (stricmp(_binaryType, "blob") == 0 || stricmp(_binaryType, "arraybuffer") == 0)) {
 		m_binaryType = std::string(_binaryType);
 		return true;
 	}

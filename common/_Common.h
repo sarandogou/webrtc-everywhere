@@ -417,7 +417,7 @@ public:
 #if WE_UNDER_WINDOWS
 	_File(const TCHAR* path, bool write = false);
 #else
-#error "Not implemented"
+    _File(const char* path, bool write = false);
 #endif
 	virtual ~_File();
 	virtual bool IsValid()const;
@@ -430,7 +430,7 @@ private:
 #if WE_UNDER_WINDOWS
 	HANDLE m_file;
 #else
-#error "Not implemented"
+    int m_file;
 #endif
 	bool m_write;
 };

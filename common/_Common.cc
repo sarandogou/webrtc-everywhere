@@ -3,6 +3,7 @@
 #include "_Utils.h"
 #include "_Buffer.h"
 #include "_MediaStream.h"
+#include "_Debug.h"
 
 #include "webrtc/system_wrappers/interface/critical_section_wrapper.h"
 
@@ -218,7 +219,104 @@ bool _File::GetModificationTime(_FTIME *time)
 }
 
 #else // !WE_UNDER_WINDOWS
-#error "Not implemented"
-#endif
+
+
+_File::_File(const char* path, bool write /*= false*/)
+: m_write(write)
+
+{
+    m_file = open(path, write ? O_CREAT | O_RDWR : O_CREAT | O_RDONLY);
+}
+
+_File::~_File()
+{
+	if (IsValid()) {
+		close(m_file);
+		m_file = 0;
+	}
+}
+
+bool _File::IsValid()const
+{
+	return m_file != -1;
+}
+
+bool _File::LockInterProcess(bool exclusive /*= false*/)
+{
+	if (IsValid()) {
+        if (flock(m_file, exclusive ? LOCK_EX : LOCK_SH) == 0) {
+            return true;
+        }
+	}
+	return false;
+}
+
+bool _File::UnlockInterProcess()
+{
+	if (IsValid()) {
+        if (flock(m_file, LOCK_UN) == 0) {
+            return true;
+        }
+	}
+	return false;
+}
+
+// No safe: up to the caller to lock the file
+cpp11::shared_ptr<_Buffer> _File::Read()
+{
+	if (IsValid()) {
+        struct stat _stat;
+        if (fstat(m_file, &_stat) == 0 && _stat.st_size) {
+            cpp11::shared_ptr<_Buffer> buffer(new _Buffer(NULL, (size_t)_stat.st_size));
+            if (buffer && buffer->getPtr()) {
+                if (read(m_file, (void*)buffer->getPtr(), buffer->getSize()) == buffer->getSize()) {
+                    return buffer;
+                }
+            }
+        }
+	}
+	return nullPtr;
+}
+
+bool _File::Write(cpp11::shared_ptr<_Buffer>& buffer, bool append /*= false*/)
+{
+	if (IsValid() && buffer && buffer->getPtr() && buffer->getSize()) {
+        if (!append) {
+            FILE* fp = fdopen(m_file, "w"); // will be closed when close() is called
+            if (!fp) {
+                return false;
+            }
+            rewind(fp);
+        }
+        if (write(m_file, buffer->getPtr(), buffer->getSize()) == buffer->getSize()) {
+            if (!append) {
+                if (ftruncate(m_file, buffer->getSize()) != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+	}
+	return false;
+}
+
+bool _File::GetModificationTime(_FTIME *time)
+{
+    #define Int32x32To64(a, b) ((LONGLONG)((LONG)(a)) * (LONGLONG)((LONG)(b)))
+    #define LONG long
+	if (IsValid()) {
+		struct stat _stat;
+        if (fstat(m_file, &_stat) == 0) {
+            time_t tt = (time_t)_stat.st_mtimespec.tv_sec;
+            LONGLONG ll = Int32x32To64(tt, 10000000) + 116444736000000000;
+            time->dwLowDateTime = (unsigned long) ll;
+            time->dwHighDateTime = ll >>32;
+            return true;
+        }
+	}
+	return false;
+}
+
+#endif /* !WE_UNDER_WINDOWS */
 
 

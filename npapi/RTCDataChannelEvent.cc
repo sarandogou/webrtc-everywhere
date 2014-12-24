@@ -85,7 +85,7 @@ bool RTCDataChannelEvent::Invoke(NPObject* obj, NPIdentifier methodName,
 	const NPVariant* args, uint32_t argCount,
 	NPVariant* result)
 {
-	RTCDataChannelEvent *This = static_cast<RTCDataChannelEvent*>(obj);
+	// RTCDataChannelEvent *This = static_cast<RTCDataChannelEvent*>(obj);
 	char* name = BrowserFuncs->utf8fromidentifier(methodName);
 	bool ret_val = false;
 	if (!name) {

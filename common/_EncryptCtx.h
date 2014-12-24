@@ -20,6 +20,7 @@ private:
 private:
 	struct PK11SymKeyStr* m_SymKey;
 	struct SECItemStr* m_SecParam;
+    struct PK11SlotInfoStr* m_Slot;
 };
 
 #endif /* _WEBRTC_EVERYWHERE_COMMON_ENCRYPTCTX_H_ */
