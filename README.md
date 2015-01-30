@@ -47,7 +47,7 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
 
 # Release notes
  - **1.2.2**
-  - Fix [Issue #18](../../issues/18) and [Issue #19](../../issues/19)
+  - Fix [Issue #17](../../issues/17) and [Issue #18](../../issues/18)
   
 # Release notes
  - **1.2.1**
