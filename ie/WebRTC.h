@@ -209,10 +209,9 @@ public:
 	STDMETHOD(get_videoHeight)(__out LONG* pVal);
 	STDMETHOD(get_isWebRtcPlugin)(__out VARIANT_BOOL* pVal);
 
-#if 0
 	// IOleObjectImpl::SetClientSite()
 	STDMETHOD(SetClientSite)(_Inout_opt_ IOleClientSite *pClientSite);
-
+#if 0
 	// IPersistPropertyBagImpl::Load
 	STDMETHOD(Load)(__RPC__in_opt IPropertyBag *pPropBag, __RPC__in_opt IErrorLog *pErrorLog);
 
@@ -230,6 +229,9 @@ public:
 	
 	HRESULT GetDispatch(CComPtr<IDispatch> &spDispatch);
 	HRESULT GetHTMLWindow2(CComPtr<IHTMLWindow2> &spWindow2);
+
+	private:
+		HRESULT QueryWindow();
 
 	private:
 		_Buffer *m_pTempVideoBuff;

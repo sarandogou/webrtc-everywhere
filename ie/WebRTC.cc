@@ -74,12 +74,35 @@ void CWebRTC::FinalRelease()
 	ReleaseFakePeerConnectionFactory();
 }
 
-#if 0
+HRESULT CWebRTC::QueryWindow()
+{
+	if (m_spWindow) {
+		return S_OK;
+	}
+	else if (m_spClientSite) {
+		m_spContainer = NULL;
+		m_spDoc = NULL;
+		HRESULT hr = m_spClientSite->GetContainer(&m_spContainer);
+		if (SUCCEEDED(hr)) {
+			hr = m_spContainer->QueryInterface(IID_PPV_ARGS(&m_spDoc));
+			if (SUCCEEDED(hr)) {
+				hr = m_spDoc->get_parentWindow(&m_spWindow);
+				if (SUCCEEDED(hr)) {
+					hr = m_spWindow->get_location(&m_spLocation);
+				}
+			}
+		}
+		return hr;
+	}
+	return E_UNEXPECTED;
+}
+
 // IOleObjectImpl::SetClientSite()
 STDMETHODIMP CWebRTC::SetClientSite(_Inout_opt_ IOleClientSite *pClientSite)
 {
 	HRESULT hr = IOleObjectImpl::SetClientSite(pClientSite); // call base function
 	if (SUCCEEDED(hr) && m_spClientSite) {
+#if 0
 		HRESULT _hr = m_spClientSite->QueryInterface(IID_PPV_ARGS(&m_spPresentSite));
 		if (FAILED(_hr)) {
 			// IViewObjectPresentSite only supported on IE9 and later
@@ -87,26 +110,16 @@ STDMETHODIMP CWebRTC::SetClientSite(_Inout_opt_ IOleClientSite *pClientSite)
 		else {
 			/*hr = */m_spPresentSite->SetCompositionMode(VIEW_OBJECT_COMPOSITION_MODE_SURFACEPRESENTER);
 		}
+#endif
 
-		HRESULT hr = S_OK;
-
-		_hr = m_spClientSite->GetContainer(&m_spContainer);
-		if (SUCCEEDED(_hr)) {
-			_hr = m_spContainer->QueryInterface(IID_PPV_ARGS(&m_spDoc));
-			if (SUCCEEDED(_hr)) {
-				_hr = m_spDoc->get_parentWindow(&m_spWindow);
-				if (SUCCEEDED(_hr)) {
-					_hr = m_spWindow->get_location(&m_spLocation);
-				}
-			}
-		}
-
-		if (m_spWindow) {
-			_hr = Utils::InstallScripts(m_spWindow);
+		if (SUCCEEDED(QueryWindow())) {
+			hr = Utils::InstallScripts(m_spWindow);
 		}
 	}
 	return hr;
 }
+
+#if 0
 
 // IPersistPropertyBagImpl::Load
 STDMETHODIMP CWebRTC::Load(__RPC__in_opt IPropertyBag *pPropBag, __RPC__in_opt IErrorLog *pErrorLog)
@@ -289,7 +302,7 @@ bail:
 STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback, VARIANT errorCallback)
 {
 	HRESULT hr = S_OK;
-
+	
 	CComPtr<IDispatch>_constraints = Utils::VariantToDispatch(constraints);
 	CComPtr<IDispatch>_successCallback = Utils::VariantToDispatch(successCallback);
 	CComPtr<IDispatch>_errorCallback = Utils::VariantToDispatch(errorCallback);
@@ -619,7 +632,7 @@ STDMETHODIMP CWebRTC::get_isWebRtcPlugin(__out VARIANT_BOOL* pVal)
 HRESULT CWebRTC::GetDispatch(CComPtr<IDispatch> &spDispatch)
 {
 	if (!m_spWindow) {
-		CHECK_HR_RETURN(E_POINTER);
+		CHECK_HR_RETURN(QueryWindow());
 	}
 
 	CHECK_HR_RETURN(m_spWindow->QueryInterface(IID_PPV_ARGS(&spDispatch)));
@@ -629,7 +642,7 @@ HRESULT CWebRTC::GetDispatch(CComPtr<IDispatch> &spDispatch)
 HRESULT CWebRTC::GetHTMLWindow2(CComPtr<IHTMLWindow2> &spWindow2)
 {
 	if (!m_spWindow) {
-		CHECK_HR_RETURN(E_POINTER);
+		CHECK_HR_RETURN(QueryWindow());
 	}
 	spWindow2 = m_spWindow;
 	return S_OK;

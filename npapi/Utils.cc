@@ -760,7 +760,7 @@ NPError Utils::InstallScripts(NPP npp)
     
 	for (size_t i = 0; i < sizeof(__scripts) / sizeof(__scripts[0]); ++i) {
         npScript.UTF8Characters = __scripts[i].code;
-        npScript.UTF8Length = we_strlen(npScript.UTF8Characters);
+        npScript.UTF8Length = (uint32_t)we_strlen(npScript.UTF8Characters);
         if (!BrowserFuncs->evaluate(npp, npWindow, &npScript, &var)) {
             CHECK_NPERR_BAIL(err = NPERR_GENERIC_ERROR);
         }
