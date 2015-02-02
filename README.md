@@ -46,6 +46,10 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
 ... to be continued
 
 # Release notes
+ - **1.2.2**
+  - Fix [Issue #17](../../issues/17) and [Issue #18](../../issues/18)
+  
+# Release notes
  - **1.2.1**
   - Fix [Issue #15](../../issues/15)
   - Adds support for x64 (Windows)
