@@ -30,7 +30,7 @@ public:
     void Leave() { m_cs->Leave(); }
 
 #if WE_UNDER_WINDOWS
-	void SetHwnd(HWND hwnd);
+	void SetHwnd(HWND hwnd, LONG_PTR lpUsrData);
 	HWND GetHwnd();
 #elif WE_UNDER_APPLE
     void SetLayer(CALayer *layer);
@@ -41,7 +41,8 @@ public:
 	int GetVideoHeight();
 	size_t CopyFromFrame(void* bufferPtr, size_t bufferSize);
 #if WE_UNDER_WINDOWS
-	void SetFnQuerySurfacePresentere(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter);
+	void SetFnQuerySurfacePresenter(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter);
+	void SetFnQueryHwnd(cpp11::function<HWND()> fnQueryHwnd);
 #endif
 
 	// VideoRendererInterface implementation
@@ -56,8 +57,10 @@ private:
 
 #if WE_UNDER_WINDOWS
 	HWND m_Hwnd;
+	LONG_PTR m_lpUsrData;
 	BITMAPINFO m_bmi;
 	cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> m_fnQuerySurfacePresenter;
+	cpp11::function<HWND()> m_fnQueryHwnd;
 #elif WE_UNDER_APPLE
     CALayer *m_layer;
     CGContextRef m_context;
@@ -100,6 +103,10 @@ public:
 	virtual void QuerySurfacePresenter(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)
 	{
 		spPtr = NULL, spText = NULL, backBuffWidth = 0, backBuffHeight = 0;
+	}
+	virtual HWND QueryHwnd()
+	{
+		return Handle();
 	}
 #elif WE_UNDER_APPLE
     virtual CALayer *Layer() = 0;
