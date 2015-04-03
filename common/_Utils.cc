@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_Utils.h"
 #include "_RTCDisplay.h"
 #include "_AsyncEvent.h"
@@ -13,10 +13,11 @@
 #	include <shlwapi.h>
 #	include <shlobj.h>
 #	include <AtlConv.h>
-#	include "talk/base/win32socketinit.h"
+#	include "webrtc/base/win32socketinit.h"
+#	include "webrtc/base/win32socketserver.h"
 #	include "resource.h"
 # elif WE_UNDER_MAC
-#	include "talk/base/maccocoasocketserver.h"
+#	include "webrtc/base/maccocoasocketserver.h"
 #   import <CoreFoundation/CoreFoundation.h>
 #endif
 
@@ -24,9 +25,9 @@
 #pragma comment(lib,"shlwapi.lib")
 #endif
 
-#include "talk/base/ssladapter.h"
-#include "talk/base/thread.h"
-#include "talk/base/json.h"
+#include "webrtc/base/ssladapter.h"
+#include "webrtc/base/thread.h"
+#include "webrtc/base/json.h"
 
 static bool g_bInitialized = false;
 #if WE_UNDER_WINDOWS
@@ -37,6 +38,7 @@ webrtc::CriticalSectionWrapper* _Utils::s_unique_objs_cs = webrtc::CriticalSecti
 std::map<long, const _UniqueObject*> _Utils::s_unique_objs;
 _FTIME _Utils::s_time_config_modif = { 0 };
 cpp11::shared_ptr<_EncryptCtx> _Utils::s_encrypt_ctx = nullPtr;
+std::string _Utils::s_UserAgent = "Unknown";
 
 
 _Utils::_Utils()
@@ -59,24 +61,22 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 #if WE_UNDER_WINDOWS
 		HRESULT hr = E_FAIL; // CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		g_winCoInitialize = SUCCEEDED(hr);
-		talk_base::EnsureWinsockInit();
-#if 0
-		static talk_base::Thread w32_thread;
-		talk_base::ThreadManager::Instance()->SetCurrentThread(&w32_thread);
-#endif
+		rtc::EnsureWinsockInit();
+		static rtc::Win32Thread w32_thread;
+		rtc::ThreadManager::Instance()->SetCurrentThread(&w32_thread);
 #endif
         
 #if WE_UNDER_MAC
 #if 0 // NOT_USING_MAC_SERVER
-        static talk_base::MacCocoaSocketServer ss;
-        static talk_base::SocketServerScope ss_scope(&ss);
+        static rtc::MacCocoaSocketServer ss;
+        static rtc::SocketServerScope ss_scope(&ss);
 #endif
 #endif
         
-		talk_base::InitializeSSL();
-		talk_base::InitializeSSLThread();
+		rtc::InitializeSSL();
+		rtc::InitializeSSLThread();
         
-        s_encrypt_ctx = cpp11::shared_ptr<_EncryptCtx>(new _EncryptCtx());
+        s_encrypt_ctx = cpp11::shared_ptr<_EncryptCtx>(_EncryptCtx::New());
 
         g_bInitialized = true;
     }
@@ -89,7 +89,7 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 WeError _Utils::DeInitialize(void)
 {
 	if (g_bInitialized) {
-		talk_base::CleanupSSL();
+		rtc::CleanupSSL();
 		g_bInitialized = false;
 #if WE_UNDER_WINDOWS
 		if (g_winCoInitialize) {
@@ -408,6 +408,7 @@ cpp11::shared_ptr<_File> _Utils::FileConfigGet(bool write /*= false*/)
 WeError _Utils::FileConfigGetKeyAndIV(const unsigned char* &key_ptr, size_t &key_size, const unsigned char* &iv_ptr, size_t &iv_size)
 {
 #if defined(WE_CONFIG_CRYPT_KEY) && defined(WE_CONFIG_CRYPT_IV)
+#if WE_HAVE_NSS
 	static unsigned char *__key = NULL;
 	static size_t __key_size = 0;
 	static unsigned char *__iv = NULL;
@@ -453,6 +454,13 @@ WeError _Utils::FileConfigGetKeyAndIV(const unsigned char* &key_ptr, size_t &key
 	iv_ptr = __iv;
 	iv_size = __iv_size;
 	return WeError_Success;
+#else
+	key_ptr = (const unsigned char*)WE_CONFIG_CRYPT_KEY;
+	key_size = we_strlen((const char*)key_ptr);
+	iv_ptr = (const unsigned char*)WE_CONFIG_CRYPT_IV;
+	iv_size = we_strlen((const char*)iv_ptr);
+	return WeError_Success;
+#endif /* WE_HAVE_NSS */
 #else
     static const unsigned char g_Key[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	static const unsigned char g_IV[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -925,6 +933,18 @@ HRESULT _Utils::MsgBoxGUM(bool &accepted, const TCHAR* protocol, const TCHAR* ho
 	return S_OK;
 }
 #endif // WE_UNDER_WINDOWS
+
+void _Utils::SetUserAgent(const char* userAgent)
+{
+	if (userAgent) {
+		s_UserAgent = userAgent;
+	}
+}
+
+const char* _Utils::GetUserAgent()
+{
+	return s_UserAgent.c_str();
+}
 
 
 #if WE_UNDER_APPLE

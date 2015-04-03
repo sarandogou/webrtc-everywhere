@@ -1,9 +1,9 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_SessionDescription.h"
 #include "_Buffer.h"
 #include "_Debug.h"
 
-#include "talk/base/json.h"
+#include "webrtc/base/json.h"
 
 _SessionDescription::_SessionDescription()
 	: m_pSdp(NULL)

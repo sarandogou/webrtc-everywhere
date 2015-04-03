@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannel
 #ifndef _WEBRTC_EVERYWHERE_COMMON__RTCDATACHANNEL_H_
 #define _WEBRTC_EVERYWHERE_COMMON__RTCDATACHANNEL_H_
@@ -46,7 +46,7 @@ private:
 	_StringFunctionCallback m_onerror;
 	_VoidFunctionCallback m_onclose;
 	_onmessageCallback m_onmessage;
-	talk_base::scoped_refptr<webrtc::DataChannelInterface> m_dataChannel;
+	rtc::scoped_refptr<webrtc::DataChannelInterface> m_dataChannel;
 #if _MSC_VER
 #pragma warning(pop)
 #endif

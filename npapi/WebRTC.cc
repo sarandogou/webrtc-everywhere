@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "../common/_Utils.h"
 #include "../common/_NavigatorUserMedia.h"
 #include "../common/_Debug.h"

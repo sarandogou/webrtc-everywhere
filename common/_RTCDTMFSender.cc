@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/webrtc/#rtcdtmfsender
 #include "_RTCDTMFSender.h"
 #include "_MediaStreamTrack.h"
@@ -11,7 +11,7 @@ class DummyDtmfSenderObserver
 public:
 	static DummyDtmfSenderObserver* Create(_ontonechangeCallback ontonechange = nullPtr) {
 		return
-			new talk_base::RefCountedObject<DummyDtmfSenderObserver>(ontonechange);
+			new rtc::RefCountedObject<DummyDtmfSenderObserver>(ontonechange);
 	}
 	virtual void OnToneChange(const std::string& tone) {
 		if (m_ontonechange) {

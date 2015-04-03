@@ -1,15 +1,15 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_COMMON_RTCMEDIACONSTRAINTS_H_
 #define _WEBRTC_EVERYWHERE_COMMON_RTCMEDIACONSTRAINTS_H_
 
 #include "_Config.h"
 
 #include "talk/app/webrtc/mediaconstraintsinterface.h"
-#include "talk/base/refcount.h"
+#include "webrtc/base/refcount.h"
 
 class _RTCMediaConstraints 
 	: public webrtc::MediaConstraintsInterface
-	, public talk_base::RefCountInterface
+	, public rtc::RefCountInterface
 {
 public:
 	_RTCMediaConstraints();

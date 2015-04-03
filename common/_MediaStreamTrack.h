@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#mediastreamtrack
 #ifndef _WEBRTC_EVERYWHERE_COMMON_MEDIASTREAMTRACK_H_
 #define _WEBRTC_EVERYWHERE_COMMON_MEDIASTREAMTRACK_H_
@@ -127,11 +127,11 @@ class _MediaStreamTrackAudio
 	: public _MediaStreamTrackBase
 {
 public:
-	_MediaStreamTrackAudio(talk_base::scoped_refptr<webrtc::AudioTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
+	_MediaStreamTrackAudio(rtc::scoped_refptr<webrtc::AudioTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
 	virtual ~_MediaStreamTrackAudio();
 
 	WE_INLINE virtual bool IsValid() { return !!m_track; }
-	virtual talk_base::scoped_refptr<webrtc::AudioTrackInterface> track() { return m_track; };
+	virtual rtc::scoped_refptr<webrtc::AudioTrackInterface> track() { return m_track; };
 
 	// _MediaStreamTrackBase Interface
 	virtual webrtc::MediaStreamTrackInterface* _track() { return track(); }
@@ -140,7 +140,7 @@ public:
 	virtual bool muted();
 
 private:
-	talk_base::scoped_refptr<webrtc::AudioTrackInterface> m_track;
+	rtc::scoped_refptr<webrtc::AudioTrackInterface> m_track;
 };
 
 //
@@ -150,17 +150,17 @@ class _MediaStreamTrackVideo
 	: public _MediaStreamTrackBase
 {
 public:
-	_MediaStreamTrackVideo(talk_base::scoped_refptr<webrtc::VideoTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
+	_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoTrackInterface> track = NULL, const _MediaTrackConstraints* constrains = NULL);
 	virtual ~_MediaStreamTrackVideo();
 
 	WE_INLINE virtual bool IsValid() { return !!m_track; }
-	virtual talk_base::scoped_refptr<webrtc::VideoTrackInterface> track() { return m_track; };
+	virtual rtc::scoped_refptr<webrtc::VideoTrackInterface> track() { return m_track; };
 
 	// _MediaStreamTrackBase Interface
 	virtual webrtc::MediaStreamTrackInterface* _track() { return track(); }
 
 private:
-	talk_base::scoped_refptr<webrtc::VideoTrackInterface> m_track;
+	rtc::scoped_refptr<webrtc::VideoTrackInterface> m_track;
 };
 
 #endif /* _WEBRTC_EVERYWHERE_COMMON_MEDIASTREAMTRACK_H_ */

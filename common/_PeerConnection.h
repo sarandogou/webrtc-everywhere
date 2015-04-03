@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_COMMON_PEERCONNECTION_H_
 #define _WEBRTC_EVERYWHERE_COMMON_PEERCONNECTION_H_
 
@@ -7,7 +7,7 @@
 
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
-#include "talk/base/scoped_ptr.h"
+#include "webrtc/base/scoped_ptr.h"
 
 class _Buffer;
 class _MediaStream;
@@ -31,7 +31,7 @@ class VideoRenderer;
 //
 class _RTCPeerConnection
 	: public webrtc::PeerConnectionObserver
-	, public talk_base::RefCountInterface
+	, public rtc::RefCountInterface
 {
 public:
 	_RTCPeerConnection(const _PeerConnection* pcBase, const webrtc::PeerConnectionInterface::RTCConfiguration& configuration, const webrtc::MediaConstraintsInterface* constraints = NULL);
@@ -48,8 +48,8 @@ public:
 	bool addIceCandidate(const webrtc::IceCandidateInterface* candidate, _VoidFunctionCallback successCallback = nullPtr, _RTCPeerConnectionErrorCallback failureCallback = nullPtr);
 	const char* iceGatheringState();
 	const char* iceConnectionState();
-	talk_base::scoped_refptr<webrtc::StreamCollectionInterface> getLocalStreams();
-	talk_base::scoped_refptr<webrtc::StreamCollectionInterface> getRemoteStreams();
+	rtc::scoped_refptr<webrtc::StreamCollectionInterface> getLocalStreams();
+	rtc::scoped_refptr<webrtc::StreamCollectionInterface> getRemoteStreams();
 	webrtc::MediaStreamInterface* getStreamById(std::string streamId);
 	bool addStream(webrtc::MediaStreamInterface* stream, const webrtc::MediaConstraintsInterface* constraints);
 	bool removeStream(webrtc::MediaStreamInterface* stream);
@@ -69,14 +69,14 @@ protected:
 	virtual void OnAddStream(webrtc::MediaStreamInterface* stream);
 	virtual void OnRemoveStream(webrtc::MediaStreamInterface* stream);
 	virtual void OnRenegotiationNeeded();
-	virtual void OnIceChange();
+	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
 	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* candidate);
 	virtual void OnIceComplete();
 	virtual void OnDataChannel(webrtc::DataChannelInterface* data_channel);
 
 private:
-	talk_base::scoped_refptr<webrtc::PeerConnectionInterface> m_peer_connection;
-	talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peer_connection_factory;
+	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peer_connection;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peer_connection_factory;
 	const _PeerConnection* m_pcBase;
 	
 	bool m_bValid;
@@ -133,7 +133,7 @@ private:
 #pragma warning(push)
 #pragma warning(disable:4251)
 #endif
-	talk_base::scoped_refptr<_RTCPeerConnection> m_peer_connection;
+	rtc::scoped_refptr<_RTCPeerConnection> m_peer_connection;
 	cpp11::shared_ptr<_SessionDescription> m_sdp_local;
 	cpp11::shared_ptr<_SessionDescription> m_sdp_remote;
 	bool m_bInitialized;

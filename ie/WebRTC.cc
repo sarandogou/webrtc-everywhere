@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 
 // http://www.w3.org/wiki/HTML/Elements/video
 #include "stdafx.h"
@@ -76,13 +76,14 @@ void CWebRTC::FinalRelease()
 
 HRESULT CWebRTC::QueryWindow()
 {
+	HRESULT hr = E_UNEXPECTED;
 	if (m_spWindow) {
-		return S_OK;
+		hr = S_OK;
 	}
 	else if (m_spClientSite) {
 		m_spContainer = NULL;
 		m_spDoc = NULL;
-		HRESULT hr = m_spClientSite->GetContainer(&m_spContainer);
+		hr = m_spClientSite->GetContainer(&m_spContainer);
 		if (SUCCEEDED(hr)) {
 			hr = m_spContainer->QueryInterface(IID_PPV_ARGS(&m_spDoc));
 			if (SUCCEEDED(hr)) {
@@ -92,9 +93,28 @@ HRESULT CWebRTC::QueryWindow()
 				}
 			}
 		}
-		return hr;
 	}
-	return E_UNEXPECTED;
+	
+	if (SUCCEEDED(hr)) {
+		// UserAgent
+		static BOOL sUserAgentDefined = FALSE;
+		if (!sUserAgentDefined) {
+			IOmNavigator* pNavigator = NULL;
+			if (SUCCEEDED(m_spWindow->get_navigator(&pNavigator))) {
+				CComBSTR userAgentBSTR;
+				if (SUCCEEDED(pNavigator->get_userAgent(&userAgentBSTR)) && userAgentBSTR.Length() > 0) {
+					std::string userAgentStr;
+					if (SUCCEEDED(Utils::ToString(&userAgentBSTR, userAgentStr)) && userAgentStr.length() > 0) {
+						_Utils::SetUserAgent(userAgentStr.c_str());
+						sUserAgentDefined = TRUE;
+					}
+				}
+				SafeRelease(&pNavigator);
+			}
+		}
+	}
+
+	return hr;
 }
 
 // IOleObjectImpl::SetClientSite()

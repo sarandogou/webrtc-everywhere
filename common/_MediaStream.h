@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#mediastream
 #ifndef _WEBRTC_EVERYWHERE_COMMON_MEDIASTREAM_H_
 #define _WEBRTC_EVERYWHERE_COMMON_MEDIASTREAM_H_
@@ -8,7 +8,7 @@
 #include "_MediaStreamTrack.h"
 
 #include "talk/app/webrtc/mediastreaminterface.h"
-#include "talk/base/scoped_ptr.h"
+#include "webrtc/base/scoped_ptr.h"
 
 class _MediaStreamTrack;
 
@@ -59,7 +59,7 @@ private:
 #pragma warning(disable:4251)
 #endif
 	std::string m_id;
-	talk_base::scoped_refptr<webrtc::MediaStreamInterface> m_stream;
+	rtc::scoped_refptr<webrtc::MediaStreamInterface> m_stream;
 	static _MediaStreamAllocateFn s_Allocator;
 	_VoidFunctionCallback m_onended;
 	_VoidFunctionCallback m_onaddtrack;

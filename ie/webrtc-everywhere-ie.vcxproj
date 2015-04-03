@@ -102,8 +102,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;_DEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\thirdparties\win32\include;..\..\webrtc-checkout\src;..\..\webrtc-checkout\src\third_party;..\..\webrtc-checkout\src\third_party\webrtc;..\..\webrtc-checkout\src\webrtc;..\..\webrtc-checkout\src\third_party\wtl\include;..\..\webrtc-checkout\src\third_party\jsoncpp\overrides\include;..\..\webrtc-checkout\src\third_party\jsoncpp\source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;_DEBUG;_USRDLL;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -143,8 +143,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;_DEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\thirdparties\win32\include;..\..\webrtc-checkout\src;..\..\webrtc-checkout\src\third_party;..\..\webrtc-checkout\src\third_party\webrtc;..\..\webrtc-checkout\src\webrtc;..\..\webrtc-checkout\src\third_party\wtl\include;..\..\webrtc-checkout\src\third_party\jsoncpp\overrides\include;..\..\webrtc-checkout\src\third_party\jsoncpp\source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;_DEBUG;_USRDLL;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -184,13 +184,13 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;NDEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;NDEBUG;_USRDLL;WEBRTC_WIN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\thirdparties\win32\include;..\..\webrtc-checkout\src;..\..\webrtc-checkout\src\third_party;..\..\webrtc-checkout\src\third_party\webrtc;..\..\webrtc-checkout\src\webrtc;..\..\webrtc-checkout\src\third_party\wtl\include;..\..\webrtc-checkout\src\third_party\jsoncpp\overrides\include;..\..\webrtc-checkout\src\third_party\jsoncpp\source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -225,14 +225,14 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;NDEBUG;_USRDLL;JSONCPP_RELATIVE_PATH;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;NDEBUG;_USRDLL;WEBRTC_WIN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>../thirdparties/win32/include;../thirdparties/common/include;../thirdparties\common\include\webrtc-sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\thirdparties\win32\include;..\..\webrtc-checkout\src;..\..\webrtc-checkout\src\third_party;..\..\webrtc-checkout\src\third_party\webrtc;..\..\webrtc-checkout\src\webrtc;..\..\webrtc-checkout\src\third_party\wtl\include;..\..\webrtc-checkout\src\third_party\jsoncpp\overrides\include;..\..\webrtc-checkout\src\third_party\jsoncpp\source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

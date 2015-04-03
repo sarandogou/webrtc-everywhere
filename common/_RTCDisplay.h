@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_COMMON_RTCDISPLAY_H_
 #define _WEBRTC_EVERYWHERE_COMMON_RTCDISPLAY_H_
 
@@ -72,8 +72,8 @@ private:
 	int m_height;
 	cpp11::function<void()> m_fnOnStartVideoRenderer;
     webrtc::CriticalSectionWrapper *m_cs;
-	talk_base::scoped_ptr<uint8[]> m_image;
-	talk_base::scoped_refptr<webrtc::VideoTrackInterface> m_rendered_track;
+	rtc::scoped_ptr<uint8[]> m_image;
+	rtc::scoped_refptr<webrtc::VideoTrackInterface> m_rendered_track;
 };
 
 class WEBRTC_EVERYWHERE_API _RTCDisplay
@@ -117,7 +117,7 @@ private:
 #pragma warning(push)
 #pragma warning(disable:4251)
 #endif
-	talk_base::scoped_ptr<_VideoRenderer> m_renderer;
+	rtc::scoped_ptr<_VideoRenderer> m_renderer;
     webrtc::CriticalSectionWrapper *m_cs;
 #if _MSC_VER
 #pragma warning(pop)

@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_PeerConnection.h"
 #include "_Buffer.h"
 #include "_SessionDescription.h"
@@ -14,8 +14,9 @@
 #include "_Debug.h"
 
 #include "talk/app/webrtc/mediaconstraintsinterface.h"
-#include "talk/base/json.h"
-#include "talk/base/logging.h"
+#include "webrtc/base/thread.h"
+#include "webrtc/base/json.h"
+#include "webrtc/base/logging.h"
 
 // http://www.w3.org/TR/webrtc/#interface-definition
 
@@ -27,7 +28,7 @@ class DummySetSessionDescriptionObserver
 public:
 	static DummySetSessionDescriptionObserver* Create(_VoidFunctionCallback successCallback = nullPtr, _RTCPeerConnectionErrorCallback failureCallback = nullPtr) {
 		return
-			new talk_base::RefCountedObject<DummySetSessionDescriptionObserver>(successCallback, failureCallback);
+			new rtc::RefCountedObject<DummySetSessionDescriptionObserver>(successCallback, failureCallback);
 	}
 	virtual void OnSuccess() {
 		LOG(INFO) << __FUNCTION__;
@@ -62,7 +63,7 @@ class DummyCreateSessionDescriptionObserver
 public:
 	static DummyCreateSessionDescriptionObserver* Create(const _RTCPeerConnection* pc, _RTCSessionDescriptionCallback successCallback = nullPtr, _RTCPeerConnectionErrorCallback failureCallback = nullPtr) {
 		return
-			new talk_base::RefCountedObject<DummyCreateSessionDescriptionObserver>(pc, successCallback, failureCallback);
+			new rtc::RefCountedObject<DummyCreateSessionDescriptionObserver>(pc, successCallback, failureCallback);
 	}
 	virtual void OnSuccess(webrtc::SessionDescriptionInterface* desc) {
 		LOG(INFO) << __FUNCTION__;
@@ -110,9 +111,9 @@ class DummyStatsObserver
 public:
 	static DummyStatsObserver* Create(_RTCStatsCallback successCallback = nullPtr, _RTCPeerConnectionErrorCallback failureCallback = nullPtr) {
 		return
-			new talk_base::RefCountedObject<DummyStatsObserver>(successCallback, failureCallback);
+			new rtc::RefCountedObject<DummyStatsObserver>(successCallback, failureCallback);
 	}
-	virtual void OnComplete(const std::vector<webrtc::StatsReport>& reports) {
+	virtual void OnComplete(const webrtc::StatsReports& reports) {
 		LOG(INFO) << __FUNCTION__;
 		if (m_successCallback) {
 			cpp11::shared_ptr<_RTCStatsReport> _report(new _RTCStatsReport());
@@ -120,11 +121,12 @@ public:
 				for (size_t i = 0; i < reports.size(); ++i) {
 					cpp11::shared_ptr<_RTCStats> stats(new _RTCStats());
 					if (stats) {
-						stats->id = std::string(reports[i].id);
-						stats->type = std::string(reports[i].type);
-						stats->timestamp = reports[i].timestamp;
-						for (size_t j = 0; j < reports[i].values.size(); ++j) {
-							stats->names.insert(std::pair<std::string, std::string>(reports[i].values[j].name, reports[i].values[j].value));
+						stats->id = std::string(reports[i]->id()->ToString());
+						stats->type = std::string(reports[i]->TypeToString());
+						stats->timestamp = reports[i]->timestamp();
+						for (std::map<webrtc::StatsReport::StatsValueName, webrtc::StatsReport::ValuePtr>::const_iterator iter
+							= reports[i]->values().begin(); iter != reports[i]->values().end(); ++iter) {
+							stats->names.insert(std::pair<std::string, std::string>(iter->second->display_name(), iter->second->ToString()));
 						}
 						_report->values.insert(std::pair<std::string, cpp11::shared_ptr<_RTCStats> >(stats->id, stats));
 					}
@@ -160,9 +162,10 @@ _RTCPeerConnection::_RTCPeerConnection(const _PeerConnection* pcBase, const webr
 		return;
 	}
 
-	m_peer_connection = m_peer_connection_factory->CreatePeerConnection(configuration,
+	m_peer_connection = m_peer_connection_factory->CreatePeerConnection(
+		configuration,
 		constraints,
-		NULL,
+		GetPortAllocatorFactory(),
 		NULL,
 		this);
 	if (!m_peer_connection.get()) {
@@ -298,7 +301,7 @@ const char* _RTCPeerConnection::iceConnectionState()
 	return kIceConnectionStateNew;
 }
 
-talk_base::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getLocalStreams()
+rtc::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getLocalStreams()
 {
 	if (IsValid()) {
 		return m_peer_connection->local_streams();
@@ -306,7 +309,7 @@ talk_base::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::
 	return NULL;
 }
 
-talk_base::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getRemoteStreams()
+rtc::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getRemoteStreams()
 {
 	if (IsValid()) {
 		return m_peer_connection->remote_streams();
@@ -318,7 +321,7 @@ webrtc::MediaStreamInterface* _RTCPeerConnection::getStreamById(std::string stre
 {
 	if (IsValid()) {
 		webrtc::MediaStreamInterface* stream = NULL;
-		talk_base::scoped_refptr<webrtc::StreamCollectionInterface> streams;
+		rtc::scoped_refptr<webrtc::StreamCollectionInterface> streams;
 		if ((streams = m_peer_connection->local_streams()) && (stream = streams->find(streamId))) {
 			return stream;
 		}
@@ -332,7 +335,11 @@ webrtc::MediaStreamInterface* _RTCPeerConnection::getStreamById(std::string stre
 bool _RTCPeerConnection::addStream(webrtc::MediaStreamInterface* stream, const webrtc::MediaConstraintsInterface* constraints)
 {
 	if (IsValid()) {
+#if 0 // Was an bug in Google's code, "addStream" takes a single parameter
 		return m_peer_connection->AddStream(stream, constraints);
+#else
+		return m_peer_connection->AddStream(stream);
+#endif
 	}
 	return false;
 }
@@ -366,7 +373,7 @@ bool _RTCPeerConnection::getStats(webrtc::MediaStreamTrackInterface* selector /*
 cpp11::shared_ptr<_RTCDTMFSender> _RTCPeerConnection::createDTMFSender(webrtc::AudioTrackInterface *track)
 {
 	if (IsValid() && track) {
-		talk_base::scoped_refptr<webrtc::DtmfSenderInterface> sender = m_peer_connection->CreateDtmfSender(track);
+		rtc::scoped_refptr<webrtc::DtmfSenderInterface> sender = m_peer_connection->CreateDtmfSender(track);
 		if (sender) {
 			cpp11::shared_ptr<_RTCDTMFSender>_sender(new _RTCDTMFSender(sender));
 			return _sender;
@@ -378,7 +385,7 @@ cpp11::shared_ptr<_RTCDTMFSender> _RTCPeerConnection::createDTMFSender(webrtc::A
 cpp11::shared_ptr<_RTCDataChannel> _RTCPeerConnection::CreateDataChannel(const std::string& label, const webrtc::DataChannelInit* config)
 {
 	if (IsValid() && config) {
-		talk_base::scoped_refptr<webrtc::DataChannelInterface> dataChannel = m_peer_connection->CreateDataChannel(label, config);
+		rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel = m_peer_connection->CreateDataChannel(label, config);
 		if (dataChannel) {
 			cpp11::shared_ptr<_RTCDataChannel>_dataChannel(new _RTCDataChannel(dataChannel));
 			return _dataChannel;
@@ -441,9 +448,9 @@ void _RTCPeerConnection::OnRenegotiationNeeded()
 	}
 }
 
-void _RTCPeerConnection::OnIceChange()
+void _RTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state)
 {
-	WE_DEBUG_INFO("_RTCPeerConnection::OnIceChange");
+	WE_DEBUG_INFO("_RTCPeerConnection::OnIceConnectionChange");
 	if (m_pcBase && m_pcBase->oniceconnectionstatechange) {
 		m_pcBase->oniceconnectionstatechange();
 	}
@@ -536,7 +543,7 @@ bool _PeerConnection::Init(const _RTCConfiguration* configuration /*= NULL*/, co
 		}
 	}
 
-	talk_base::scoped_refptr<_RTCMediaConstraints> _constraints = BuildConstraints(constraints);
+	rtc::scoped_refptr<_RTCMediaConstraints> _constraints = BuildConstraints(constraints);
 
 	// DTLS is required, enable it unless the end-user decided to disable it
 	std::string value;
@@ -544,7 +551,7 @@ bool _PeerConnection::Init(const _RTCConfiguration* configuration /*= NULL*/, co
 		_constraints->AddMandatory(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, webrtc::MediaConstraintsInterface::kValueTrue);
 	}
 
-	m_peer_connection = new talk_base::RefCountedObject<_RTCPeerConnection>(this, _configuration, _constraints);
+	m_peer_connection = new rtc::RefCountedObject<_RTCPeerConnection>(this, _configuration, _constraints);
 	if (!m_peer_connection.get() || !m_peer_connection->IsValid()) {
 		WE_DEBUG_ERROR("Failed to create peer connection");
 		return false;
@@ -754,7 +761,7 @@ cpp11::shared_ptr<_Sequence<_MediaStream> > _PeerConnection::GetLocalStreams()
 	cpp11::shared_ptr<_Sequence<_MediaStream> > seq(new _Sequence<_MediaStream>());
 
 	if (IsInitialized()) {
-		talk_base::scoped_refptr<webrtc::StreamCollectionInterface> _streams = m_peer_connection->getLocalStreams();
+		rtc::scoped_refptr<webrtc::StreamCollectionInterface> _streams = m_peer_connection->getLocalStreams();
 		if (_streams) {
 			for (size_t i = 0; i < _streams->count(); ++i){
 				webrtc::MediaStreamInterface* _stream = _streams->at(i);
@@ -775,7 +782,7 @@ cpp11::shared_ptr<_Sequence<_MediaStream> > _PeerConnection::GetRemoteStreams()
 	cpp11::shared_ptr<_Sequence<_MediaStream> > seq(new _Sequence<_MediaStream>());
 
 	if (IsInitialized()) {
-		talk_base::scoped_refptr<webrtc::StreamCollectionInterface> _streams = m_peer_connection->getRemoteStreams();
+		rtc::scoped_refptr<webrtc::StreamCollectionInterface> _streams = m_peer_connection->getRemoteStreams();
 		if (_streams) {
 			for (size_t i = 0; i < _streams->count(); ++i){
 				webrtc::MediaStreamInterface* _stream = _streams->at(i);

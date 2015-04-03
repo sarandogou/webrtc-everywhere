@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_CONFIG_H_
 #define _WEBRTC_EVERYWHERE_CONFIG_H_
 
@@ -15,10 +15,10 @@
 #	define kPluginVersionMajor 1
 #endif
 #if !defined(kPluginVersionMinor)
-#	define kPluginVersionMinor 2
+#	define kPluginVersionMinor 3
 #endif
 #if !defined(kPluginVersionMicro)
-#	define kPluginVersionMicro 3
+#	define kPluginVersionMicro 1
 #endif
 #if !defined(kPluginVersionString)
 #	define kPluginVersionString WE_STRING(WE_CAT(kPluginVersionMajor, .)) WE_STRING(WE_CAT(kPluginVersionMinor, .)) WE_STRING(kPluginVersionMicro)
@@ -53,7 +53,9 @@ typedef void* HWND;
 
 
 #ifdef _MSC_VER
-#	define _CRT_SECURE_NO_WARNINGS
+#	if !defined(_CRT_SECURE_NO_WARNINGS)
+#		define _CRT_SECURE_NO_WARNINGS
+#	endif
 #	define WE_INLINE	_inline
 #	define we_stricmp	_stricmp
 #	ifndef __STDC_LIMIT_MACROS

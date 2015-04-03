@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/webrtc/#interface-definition
 // http://www.w3.org/TR/webrtc/#rtcpeerconnection-interface-extensions-1
 // http://www.w3.org/TR/webrtc/#rtcpeerconnection-interface-extensions-2

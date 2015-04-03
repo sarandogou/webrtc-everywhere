@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannel
 #include "_RTCDataChannel.h"
 #include "_Buffer.h"
@@ -10,7 +10,7 @@ class DummyDataChannelObserver
 public:
 	static DummyDataChannelObserver* Create(cpp11::function<void()> fnOnStateChange = nullPtr, cpp11::function<void(const webrtc::DataBuffer& buffe)> fnOnMessage = nullPtr) {
 		return
-			new talk_base::RefCountedObject<DummyDataChannelObserver>(fnOnStateChange, fnOnMessage);
+			new rtc::RefCountedObject<DummyDataChannelObserver>(fnOnStateChange, fnOnMessage);
 	}
 	virtual void OnStateChange()
 	{
@@ -137,7 +137,7 @@ void _RTCDataChannel::close()
 bool _RTCDataChannel::send(const _Buffer* data, bool binary /*= true*/)
 {
 	if (data && data->getPtr() && data->getSize()) {
-		talk_base::Buffer _data(data->getPtr(), data->getSize());
+		rtc::Buffer _data(data->getPtr(), data->getSize());
 		webrtc::DataBuffer buffer(_data, binary);
 		return m_dataChannel->Send(buffer);
 	}

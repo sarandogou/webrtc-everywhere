@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/webrtc/#rtcdtmfsender
 #ifndef _WEBRTC_EVERYWHERE_COMMON_RTCDTMFSENDER_H_
 #define _WEBRTC_EVERYWHERE_COMMON_RTCDTMFSENDER_H_
@@ -29,7 +29,7 @@ private:
 #pragma warning(disable:4251)
 #endif
 	_ontonechangeCallback m_ontonechange;
-	talk_base::scoped_refptr<webrtc::DtmfSenderInterface> m_sender;
+	rtc::scoped_refptr<webrtc::DtmfSenderInterface> m_sender;
 	std::string m_tones;
 #if _MSC_VER
 #pragma warning(pop)

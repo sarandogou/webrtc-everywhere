@@ -1,7 +1,28 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_EncryptCtx.h"
 #include "_Utils.h"
 #include "_Debug.h"
+
+#if WE_HAVE_NSS
+
+class _EncryptCtxNSS : public _EncryptCtx
+{
+protected:
+	_EncryptCtxNSS() {}
+public:
+	virtual ~_EncryptCtxNSS() {}
+
+	virtual WeError Encrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out) = 0;
+	virtual WeError Decrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out) = 0;
+
+private:
+	WeError Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out, bool encrypt);
+
+private:
+	struct PK11SymKeyStr* m_SymKey;
+	struct SECItemStr* m_SecParam;
+	struct PK11SlotInfoStr* m_Slot;
+};
 
 #if 1
 #include "third_party/nss/nss/lib/nss.h"
@@ -42,7 +63,7 @@ static CK_MECHANISM_TYPE  g_cipherMech = CKM_DES_CBC_PAD;
 
 // Code based on https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/nss_sample_code/NSS_Sample_Code_sample2
 
-_EncryptCtx::_EncryptCtx()
+_EncryptCtxNSS::_EncryptCtxNSS()
 	: m_SymKey(NULL)
 	, m_SecParam(NULL)
     , m_Slot(NULL)
@@ -111,7 +132,7 @@ _EncryptCtx::_EncryptCtx()
 	}
 }
 
-_EncryptCtx::~_EncryptCtx()
+_EncryptCtxNSS::~_EncryptCtxNSS()
 {
 	m_SecParam = NULL;
 	if (m_SymKey) {
@@ -123,7 +144,7 @@ _EncryptCtx::~_EncryptCtx()
     }
 }
 
-WeError _EncryptCtx::Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out, bool encrypt)
+WeError _EncryptCtxNSS::Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out, bool encrypt)
 {
 #if 0
 	out = in;
@@ -192,12 +213,107 @@ bail:
 #endif
 }
 
-WeError _EncryptCtx::Encrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out)
+WeError _EncryptCtxNSS::Encrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out)
 {
 	return this->Op(in, out, true);
 }
 
-WeError _EncryptCtx::Decrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out)
+WeError _EncryptCtxNSS::Decrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out)
 {
 	return this->Op(in, out, false);
+}
+
+#endif /* WE_HAVE_NSS */
+
+
+
+class _EncryptCtxXOR : public _EncryptCtx
+{
+public:
+	_EncryptCtxXOR()
+	{
+		static const char kCookie[] = "Doubango Telecom";
+		static const size_t kkCookieSize = sizeof(kCookie) / sizeof(kCookie[0]);
+		const unsigned char* key_ptr = NULL;
+		size_t key_size = 0;
+		const unsigned char* iv_ptr = NULL;
+		size_t iv_size = 0;
+		bool ok = (_Utils::FileConfigGetKeyAndIV(key_ptr, key_size, iv_ptr, iv_size) == WeError_Success);
+		assert(ok && key_ptr && key_size && iv_ptr && iv_size);
+
+		m_pKeyPtr = (unsigned char*)calloc(key_size, 1);
+		assert(m_pKeyPtr);
+		memcpy(m_pKeyPtr, key_ptr, key_size);
+		m_nKeySize = key_size;
+
+		for (size_t i = 0; i < key_size; ++i) {
+			m_pKeyPtr[i] ^= (iv_ptr[i % iv_size] ^ kCookie[i % kkCookieSize]);
+		}
+	}
+	virtual ~_EncryptCtxXOR()
+	{
+		if (m_pKeyPtr) {
+			free(m_pKeyPtr);
+		}
+		m_pKeyPtr = NULL;
+		m_nKeySize = 0;
+	}
+
+	virtual WeError Encrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out)
+	{
+		return Op(in, out, true);
+	}
+	virtual WeError Decrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out)
+	{
+		return Op(in, out, false);
+	}
+
+private:
+	WeError Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out, bool encrypt)
+	{
+		unsigned char* out_buff = NULL;
+		size_t out_size;
+		const unsigned char* in_buff;
+
+		WeError err = WeError_System;
+
+		if (!in || !in->getPtr() || !in->getSize()) {
+			WE_DEBUG_ERROR("Invalid parameter");
+			err = WeError_InvalidArgument;
+			goto bail;
+		}
+
+		out_size = in->getSize();
+		out_buff = (unsigned char*)malloc(out_size);
+		assert(out_buff);
+
+		in_buff = (const unsigned char*)in->getPtr();
+		for (size_t i = 0; i < in->getSize(); ++i) {
+			out_buff[i] = in_buff[i] ^ m_pKeyPtr[i % m_nKeySize];
+		}
+
+		out = cpp11::shared_ptr<_Buffer>(new _Buffer(out_buff, out_size));
+		if (out && out->getPtr() && out->getSize() == out_size) {
+			err = WeError_Success;
+		}
+
+	bail:
+		if (out_buff) {
+			free(out_buff);
+		}
+		return err;
+	}
+
+	unsigned char* m_pKeyPtr;
+	size_t m_nKeySize;
+};
+
+
+_EncryptCtx* _EncryptCtx::New()
+{
+#if WE_HAVE_NSS
+	return new _EncryptCtxNSS();
+#else
+	return new _EncryptCtxXOR();
+#endif
 }

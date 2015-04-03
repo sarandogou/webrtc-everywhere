@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#mediastreamtrack
 #include "_MediaStreamTrack.h"
 #include "_Common.h"
@@ -9,8 +9,8 @@
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
 #include "talk/media/devices/devicemanager.h"
-#include "talk/base/scoped_ptr.h"
-#include "talk/base/logging.h"
+#include "webrtc/base/scoped_ptr.h"
+#include "webrtc/base/logging.h"
 
 #if WE_UNDER_WINDOWS
 #	include <Windows.h>
@@ -40,7 +40,7 @@ cpp11::shared_ptr<_Sequence<_SourceInfo> > _MediaStreamTrack::getSourceInfos()
 	cpp11::shared_ptr<_Sequence<_SourceInfo> > infos(new _Sequence<_SourceInfo>());
 	cpp11::shared_ptr<_SourceInfo> info;
 
-	talk_base::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
+	rtc::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
 		cricket::DeviceManagerFactory::Create());
 	if (!dev_manager->Init()) {
 		LOG(LS_ERROR) << "Can't create device manager";
@@ -218,12 +218,12 @@ void _MediaStreamTrackBase::stop()
 //	_MediaStreamTrackAudio
 //
 
-_MediaStreamTrackAudio::_MediaStreamTrackAudio(talk_base::scoped_refptr<webrtc::AudioTrackInterface> track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
+_MediaStreamTrackAudio::_MediaStreamTrackAudio(rtc::scoped_refptr<webrtc::AudioTrackInterface> track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
 	: _MediaStreamTrackBase(_MediaStreamTrackTypeAudio, track, constrains)
 	, m_track(track)
 {
 	if (!m_track) {
-		talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
+		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
 		if (peer_connection_factory) {
 			m_label += "_audio_track";
 			__MediaConstraintsObj _constrainsObject(constrains ? constrains->optional() : nullPtr, constrains ? constrains->mandatory() : nullPtr);
@@ -255,15 +255,15 @@ bool _MediaStreamTrackAudio::muted()
 //
 static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id);
 
-_MediaStreamTrackVideo::_MediaStreamTrackVideo(talk_base::scoped_refptr<webrtc::VideoTrackInterface> track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
+_MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoTrackInterface> track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
 	: _MediaStreamTrackBase(_MediaStreamTrackTypeVideo, track, constrains)
 	, m_track(track)
 {
 	if (!m_track) {
-		talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
+		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
 		if (peer_connection_factory) {
 			__MediaConstraintsObj _constrainsObject(constrains ? constrains->optional() : nullPtr, constrains ? constrains->mandatory() : nullPtr);
-			talk_base::scoped_refptr<_RTCMediaConstraints> _constrains = BuildConstraints(&_constrainsObject);
+			rtc::scoped_refptr<_RTCMediaConstraints> _constrains = BuildConstraints(&_constrainsObject);
 			std::string sourceId;
 			if (_constrains) {
 				if (!_constrains->GetMandatory().FindFirst("sourceId", &sourceId)) {
@@ -311,7 +311,7 @@ public:
 #endif /* WE_UNDER_APPLE */
 
 static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
-	talk_base::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
+	rtc::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
 		cricket::DeviceManagerFactory::Create());
 	if (!dev_manager->Init()) {
 		LOG(LS_ERROR) << "Can't create device manager";

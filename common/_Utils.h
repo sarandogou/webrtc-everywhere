@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_UTILS_H_
 #define _WEBRTC_EVERYWHERE_UTILS_H_
 
@@ -51,6 +51,9 @@ public:
     static WeError MsgBoxGUM(bool &accepted, const char* protocol, const char* host);
 #endif
 
+	static void SetUserAgent(const char* userAgent);
+	static const char* GetUserAgent();
+
 private:
 #if _MSC_VER
 #pragma warning(push)
@@ -60,6 +63,7 @@ private:
     static std::map<long, const _UniqueObject*> s_unique_objs;
 	static _FTIME s_time_config_modif;
 	static cpp11::shared_ptr<_EncryptCtx> s_encrypt_ctx;
+	static std::string s_UserAgent;
 #if _MSC_VER
 #pragma warning(pop)
 #endif

@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_Common.h"
 #include "_Utils.h"
 #include "_Buffer.h"
@@ -6,6 +6,9 @@
 #include "_Debug.h"
 
 #include "webrtc/system_wrappers/interface/critical_section_wrapper.h"
+#include "talk/app/webrtc/portallocatorfactory.h"
+#include "webrtc/base/proxydetect.h"
+#include "webrtc/p2p/client/basicportallocator.h"
 
 #include <sys/stat.h>
 
@@ -14,17 +17,89 @@
 #endif
 
 #if PEERCONN_MODE == 1
-static talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _fake_peer_connection = NULL; // TODO: "getUserMedia" fails if no PeerconnectionFactory instance exists. Why?
+static rtc::Thread* _worker_thread = NULL;
+static rtc::scoped_refptr<webrtc::PortAllocatorFactoryInterface> _port_allocator_factory = NULL;
+static rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _fake_peer_connection = NULL; // TODO: "getUserMedia" fails if no PeerconnectionFactory instance exists. Why?
 static webrtc::CriticalSectionWrapper* _fake_peer_connection_cs = webrtc::CriticalSectionWrapper::CreateCriticalSection();
 #else
-talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _fake_peer_connection(webrtc::CreatePeerConnectionFactory());
+rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _fake_peer_connection(webrtc::CreatePeerConnectionFactory());
 #endif
 
-WEBRTC_EVERYWHERE_API talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> GetPeerConnectionFactory()
+static const char kFirefoxPattern[] = "Firefox";
+static const char kInternetExplorerPattern[] = "MSIE";
+static const char kAutoDetectPattern[] = "";
+#if 1
+#	define kAgentHoldingProxyInfo		kAutoDetectPattern
+#else
+#	if WE_UNDER_WINDOWS
+#		define kAgentHoldingProxyInfo	kInternetExplorerPattern
+#	else
+#		define kAgentHoldingProxyInfo	""
+#	endif
+#endif
+
+//
+//	_RTCPortAllocatorFactory
+//
+class _RTCPortAllocatorFactory : public webrtc::PortAllocatorFactory
+{
+public:
+	_RTCPortAllocatorFactory(rtc::Thread* worker_thread)
+		: webrtc::PortAllocatorFactory(worker_thread)
+	{
+
+	}
+	virtual ~_RTCPortAllocatorFactory()
+	{
+	}
+
+	virtual cricket::PortAllocator* CreatePortAllocator(
+		const std::vector<StunConfiguration>& stun,
+		const std::vector<TurnConfiguration>& turn)
+	{
+		cricket::PortAllocator* allocator_ = webrtc::PortAllocatorFactory::CreatePortAllocator(stun, turn);
+		if (allocator_) {
+			cricket::ProtocolType protocol;
+			rtc::ProxyInfo proxyInfo;
+			static const struct {
+				std::string scheme;
+				rtc::ProxyType proxy_type;
+			} PROXIES[] = {
+				{ "http", rtc::ProxyType::PROXY_HTTPS },
+				{ "https", rtc::ProxyType::PROXY_HTTPS },
+				{ "socks5", rtc::ProxyType::PROXY_SOCKS5 }
+			};
+			for (size_t i = 0; i < turn.size(); ++i) {
+				if (cricket::StringToProto(turn[i].transport_type.c_str(), &protocol)) {
+					if (protocol == cricket::ProtocolType::PROTO_TCP || protocol == cricket::ProtocolType::PROTO_SSLTCP) {
+						for (size_t j = 0; j < sizeof(PROXIES) / sizeof(PROXIES[0]); ++j) {
+							std::string url = PROXIES[j].scheme + "://" + turn[i].server.hostname();
+							if (rtc::GetProxySettingsForUrl(kAgentHoldingProxyInfo, url.c_str(), &proxyInfo, false)) {
+								if (proxyInfo.type != rtc::ProxyType::PROXY_NONE && !proxyInfo.address.IsAnyIP() && !proxyInfo.address.IsLoopbackIP() && proxyInfo.address.hostname() != "localhost") {
+									if (proxyInfo.type == rtc::ProxyType::PROXY_UNKNOWN) {
+										proxyInfo.type = PROXIES[j].proxy_type;
+									}
+									allocator_->set_proxy(kAgentHoldingProxyInfo, proxyInfo);
+									goto proxy_done;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+proxy_done:
+		return allocator_;
+	}
+private:
+
+};
+
+WEBRTC_EVERYWHERE_API rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> GetPeerConnectionFactory()
 {
 #if PEERCONN_MODE == 1
 	_fake_peer_connection_cs->Enter();
-	talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _peer = _fake_peer_connection;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _peer = _fake_peer_connection;
 	_fake_peer_connection_cs->Leave();
 	return _peer;
 #else
@@ -36,8 +111,14 @@ WEBRTC_EVERYWHERE_API void TakeFakePeerConnectionFactory()
 {
 #if PEERCONN_MODE == 1
 	_fake_peer_connection_cs->Enter();
+	if (!_worker_thread) {
+		_worker_thread = new rtc::Thread;
+		if (_worker_thread) {
+			_worker_thread->Start();
+		}
+	}
 	if (!_fake_peer_connection) {
-		_fake_peer_connection = webrtc::CreatePeerConnectionFactory();
+		_fake_peer_connection = webrtc::CreatePeerConnectionFactory(_worker_thread, _worker_thread, NULL, NULL, NULL);
 	}
 	else {
 		_fake_peer_connection->AddRef();
@@ -56,6 +137,10 @@ WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory()
 		tmp->AddRef();
 		if (tmp->Release() == 1) {
 			_fake_peer_connection = NULL;
+			_port_allocator_factory = NULL;
+			if (_worker_thread) {
+				delete _worker_thread, _worker_thread = NULL;
+			}
 		}
 		else {
 			_fake_peer_connection->Release();
@@ -65,9 +150,22 @@ WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory()
 #endif
 }
 
-talk_base::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _MediaConstraintsObj* _constraints)
+WEBRTC_EVERYWHERE_API rtc::Thread* GetWorkerThread()
 {
-	talk_base::scoped_refptr<_RTCMediaConstraints> contraints = new talk_base::RefCountedObject<_RTCMediaConstraints>();
+	return _worker_thread;
+}
+
+WEBRTC_EVERYWHERE_API rtc::scoped_refptr<webrtc::PortAllocatorFactoryInterface> GetPortAllocatorFactory()
+{
+	if (!_port_allocator_factory) {
+		_port_allocator_factory = new rtc::RefCountedObject<_RTCPortAllocatorFactory>(GetWorkerThread());
+	}
+	return _port_allocator_factory;
+}
+
+rtc::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _MediaConstraintsObj* _constraints)
+{
+	rtc::scoped_refptr<_RTCMediaConstraints> contraints = new rtc::RefCountedObject<_RTCMediaConstraints>();
 
 	_MediaConstraints::const_iterator it;
 

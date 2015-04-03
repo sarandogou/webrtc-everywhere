@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#mediastream
 #include "_MediaStream.h"
 #include "_MediaStreamTrack.h"
@@ -7,8 +7,8 @@
 #include "_Debug.h"
 
 #include "talk/app/webrtc/mediastreaminterface.h"
-#include "talk/base/scoped_ptr.h"
-#include "talk/base/logging.h"
+#include "webrtc/base/scoped_ptr.h"
+#include "webrtc/base/logging.h"
 
 #if WE_UNDER_WINDOWS
 #	include <Windows.h>
@@ -22,7 +22,7 @@ _MediaStream::_MediaStream(MediaStreamInterfacePtr _stream /*= NULL*/)
 {
 	m_stream = dynamic_cast<webrtc::MediaStreamInterface*>((webrtc::MediaStreamInterface*)_stream);
 	if (!m_stream) {
-		talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
+		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
 		if (peer_connection_factory) {
 			static long __id = 1;
 			std::string _id = _Utils::ToString(we_atomic_inc(&__id));
@@ -158,12 +158,12 @@ cpp11::shared_ptr<_MediaStreamTrack> _MediaStream::getTrackById(const char* trac
 {
 	cpp11::shared_ptr<_MediaStreamTrack> track = nullPtr;
 	if (trackId && IsValid()) {
-		talk_base::scoped_refptr<webrtc::AudioTrackInterface> track_audio = m_stream->FindAudioTrack(std::string(trackId));
+		rtc::scoped_refptr<webrtc::AudioTrackInterface> track_audio = m_stream->FindAudioTrack(std::string(trackId));
 		if (track_audio.get()) {
             track = cpp11::shared_ptr<_MediaStreamTrackAudio>(new _MediaStreamTrackAudio(track_audio));
 		}
 		else {
-			talk_base::scoped_refptr<webrtc::VideoTrackInterface> track_video = m_stream->FindVideoTrack(std::string(trackId));
+			rtc::scoped_refptr<webrtc::VideoTrackInterface> track_video = m_stream->FindVideoTrack(std::string(trackId));
 			if (track_video.get()) {
 				track = cpp11::shared_ptr<_MediaStreamTrackVideo>(new _MediaStreamTrackVideo(track_video));
 			}

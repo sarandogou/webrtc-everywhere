@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_COMMON_COMMON_H_
 #define _WEBRTC_EVERYWHERE_COMMON_COMMON_H_
 
@@ -8,6 +8,7 @@
 #include "talk/app/webrtc/peerconnectioninterface.h"
 #include "talk/app/webrtc/mediaconstraintsinterface.h"
 #include "talk/app/webrtc/mediastreaminterface.h"
+#include "webrtc/base/thread.h"
 
 #include <map>
 #include <vector>
@@ -574,10 +575,12 @@ struct __BrowserObject* ReleaseObject() { \
 #define CHECK_NPERR_BAIL(x) { NPError __err__ = (x); if (__err__ != NPERR_NO_ERROR) { WE_DEBUG_ERROR("Operation Failed (%08x)", __err__); goto bail; } }
 #define CHECK_NPERR_RETURN(x) { NPError __err__ = (x); if (__err__ != NPERR_NO_ERROR) { WE_DEBUG_ERROR("Operation Failed (%08x)", __err__); return __err__; } }
 
-extern WEBRTC_EVERYWHERE_API talk_base::scoped_refptr<webrtc::PeerConnectionFactoryInterface> GetPeerConnectionFactory();
+extern WEBRTC_EVERYWHERE_API rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> GetPeerConnectionFactory();
+extern WEBRTC_EVERYWHERE_API rtc::Thread* GetWorkerThread();
+extern WEBRTC_EVERYWHERE_API rtc::scoped_refptr<webrtc::PortAllocatorFactoryInterface> GetPortAllocatorFactory();
 extern WEBRTC_EVERYWHERE_API void TakeFakePeerConnectionFactory();
 extern WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory();
-extern talk_base::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _MediaConstraintsObj* constraints = NULL);
+extern rtc::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _MediaConstraintsObj* constraints = NULL);
 extern webrtc::MediaStreamInterface* BuildMediaStream(const _MediaStream* stream);
 
 #endif /* _WEBRTC_EVERYWHERE_COMMON_COMMON_H_ */

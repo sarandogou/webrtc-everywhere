@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#navigatorusermedia
 #include "_NavigatorUserMedia.h"
 #include "_MediaStream.h"
@@ -12,8 +12,8 @@
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
 #include "talk/media/devices/devicemanager.h"
-#include "talk/base/scoped_ptr.h"
-#include "talk/base/logging.h"
+#include "webrtc/base/scoped_ptr.h"
+#include "webrtc/base/logging.h"
 
 // void getUserMedia (MediaStreamConstraints? constraints, NavigatorUserMediaSuccessCallback successCallback, NavigatorUserMediaErrorCallback errorCallback);
 void _NavigatorUserMedia::getUserMedia(const _MediaStreamConstraints* constraints/*= NULL*/, _NavigatorUserMediaSuccessCallback successCallback/*= nullPtr*/, _NavigatorUserMediaErrorCallback errorCallback /*= nullPtr*/)

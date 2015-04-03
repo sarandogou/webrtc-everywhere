@@ -1,4 +1,4 @@
-/* Copyright(C) 2014 Sarandogou <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_COMMON_ENCRYPTCTX_H_
 #define _WEBRTC_EVERYWHERE_COMMON_ENCRYPTCTX_H_
 
@@ -7,20 +7,15 @@
 
 class WEBRTC_EVERYWHERE_API _EncryptCtx
 {
+protected:
+	_EncryptCtx() {}
 public:
-	_EncryptCtx();
-	virtual ~_EncryptCtx();
+	virtual ~_EncryptCtx() {}
 
-	WeError Encrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out);
-	WeError Decrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out);
+	virtual WeError Encrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out) = 0;
+	virtual WeError Decrypt(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out) = 0;
 
-private:
-	WeError Op(const cpp11::shared_ptr<_Buffer> &in, cpp11::shared_ptr<_Buffer> &out, bool encrypt);
-
-private:
-	struct PK11SymKeyStr* m_SymKey;
-	struct SECItemStr* m_SecParam;
-    struct PK11SlotInfoStr* m_Slot;
+	static _EncryptCtx* New();
 };
 
 #endif /* _WEBRTC_EVERYWHERE_COMMON_ENCRYPTCTX_H_ */

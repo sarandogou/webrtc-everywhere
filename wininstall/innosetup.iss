@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "webrtc-everywhere"
-#define MyAppVersion "1.2.0.3"
-#define MyAppPublisher "Sarandogou"
+#define MyAppVersion "1.3.0.1"
+#define MyAppPublisher "Doubango telecom"
 #define MyAppURL "https://ns313841.ovh.net/webrtc/"
 
 [Setup]
