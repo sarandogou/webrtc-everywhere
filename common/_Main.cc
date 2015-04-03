@@ -398,7 +398,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// from the session).
 	//
 	if (WinHttpGetProxyForUrl_(hHttpSession,
-		L"http://www.microsoft.com/ms.htm",
+		Url_,
 		&AutoProxyOptions,
 		&ProxyInfo))
 	{
@@ -635,7 +635,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	rtc::InitializeSSL();
 	rtc::InitializeSSLThread();
 
-	std::string strUrl = "http://www.microsoft.com/ms.htm"; // "stun.inspectionworks.com";
+	std::string strUrl = "http://www.microsoft.com/ms.htm";
 
 	if (argc > 0 && argv[1] && wcslen(argv[1]) > 0) {
 		int len = (int)wcslen(argv[1]);
