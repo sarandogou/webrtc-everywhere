@@ -1,35 +1,35 @@
 **webrtc-everywhere** is an open source project (with **business-friendly** <a href="#license">license</a>) to add support for WebRTC features to Safari (Windows and MAC OSX) and Internet Explorer (Windows).
 
 # Downloads
- - <a href="https://ns313841.ovh.net/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> 
- - <a href="https://ns313841.ovh.net/webrtc/setup.exe" target="_blank">Windows</a>
+ - <a href="http://doubango.org/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> 
+ - <a href="http://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
 
 # Online samples 
 The following samples use our <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> and could be tested on Safari and Internet Explorer (off course they also work on Firefox and Chrome): 
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia" target="_blank">getUserMedia()</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-resolution" target="_blank">Choose camera resolution</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-audio" target="_blank">Audio-only getUserMedia() output to local audio element</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/face" target="_blank">getUserMedia() + Face tracking</a> (<font color="red">requires version 1.2.0</font>)
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/datachannel" target="_blank">Data channels</a> (<font color="red">requires version 1.2.0</font>)
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection" target="_blank">Peer connection</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection-audio" target="_blank">Audio-only peer connection</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/multiple" target="_blank">Multiple peer connections</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/multiple-relay" target="_blank">Multiple relay</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/munge-sdp" target="_blank">Munge SDP</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/pr-answer" target="_blank">Accept incoming peer connection</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/peerconnection-states" target="_blank">Peer connection states</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/constraints" target="_blank">Constraints and stats</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/create-offer" target="_blank">Display createOffer output</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/trickle-ice" target="_blank">ICE candidate gathering</a>
- - <a href="https://ns313841.ovh.net/webrtc/samples/web/content/trickle-ice" target="_blank">DTMF</a> (<font color="red">requires version 1.2.0</font>)
+ - <a href="http://doubango.org/webrtc/samples/web/content/getusermedia" target="_blank">getUserMedia()</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/getusermedia-resolution" target="_blank">Choose camera resolution</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/getusermedia-audio" target="_blank">Audio-only getUserMedia() output to local audio element</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
+ - <a href="http://doubango.org/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
+ - <a href="http://doubango.org/webrtc/samples/web/content/face" target="_blank">getUserMedia() + Face tracking</a> (<font color="red">requires version 1.2.0</font>)
+ - <a href="http://doubango.org/webrtc/samples/web/content/datachannel" target="_blank">Data channels</a> (<font color="red">requires version 1.2.0</font>)
+ - <a href="http://doubango.org/webrtc/samples/web/content/peerconnection" target="_blank">Peer connection</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/peerconnection-audio" target="_blank">Audio-only peer connection</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/multiple" target="_blank">Multiple peer connections</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/multiple-relay" target="_blank">Multiple relay</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/munge-sdp" target="_blank">Munge SDP</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/pr-answer" target="_blank">Accept incoming peer connection</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/peerconnection-states" target="_blank">Peer connection states</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/constraints" target="_blank">Constraints and stats</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/create-offer" target="_blank">Display createOffer output</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/trickle-ice" target="_blank">ICE candidate gathering</a>
+ - <a href="http://doubango.org/webrtc/samples/web/content/trickle-ice" target="_blank">DTMF</a> (<font color="red">requires version 1.2.0</font>)
  
 
 
 # Using our plugin in your own project
- - Download and install the plugin for <a href="https://ns313841.ovh.net/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> or <a href="https://ns313841.ovh.net/webrtc/setup.exe" target="_blank">Windows</a>
+ - Download and install the plugin for <a href="http://doubango.org/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> or <a href="http://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
  - Include <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> in your code.
  - Change the code you're using to attach a stream to a &lt;audio/&gt; or &lt;video /&gt; HTML5 element: <br />
  from:
