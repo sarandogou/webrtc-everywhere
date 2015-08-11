@@ -137,7 +137,7 @@ void _RTCDataChannel::close()
 bool _RTCDataChannel::send(const _Buffer* data, bool binary /*= true*/)
 {
 	if (data && data->getPtr() && data->getSize()) {
-		rtc::Buffer _data(data->getPtr(), data->getSize());
+		rtc::Buffer _data((const uint8_t *)data->getPtr(), data->getSize());
 		webrtc::DataBuffer buffer(_data, binary);
 		return m_dataChannel->Send(buffer);
 	}

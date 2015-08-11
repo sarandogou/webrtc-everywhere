@@ -4,7 +4,7 @@
 #define MyAppName "webrtc-everywhere"
 #define MyAppVersion "1.3.0.1"
 #define MyAppPublisher "Doubango telecom"
-#define MyAppURL "https://ns313841.ovh.net/webrtc/"
+#define MyAppURL "https://github.com/sarandogou/webrtc-everywhere"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
