@@ -42,8 +42,64 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
   ```
 
 # Building source code
-To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC OSX).
-... to be continued
+ - fetch webrtc code as explained at [http://www.webrtc.org/native-code/development](http://www.webrtc.org/native-code/development) in the **same folder** as webrtc-everywhere.
+ - Move into **webrtc-checkout/src** directory <br />
+ ```
+ cd webrtc-checkout/src
+ ```
+ - **OSX x86_64**<br />
+ ```
+ python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=mac
+ ninja -C out/Debug
+ ninja -C out/Release
+
+ mv out/Debug out/Debug_x64
+ mv out/Release out/Release_x64
+ ```
+ 
+ - **OSX i386**<br />
+ ```
+ python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=mac
+ ninja -C out/Debug
+ ninja -C out/Release
+
+ mv out/Debug out/Debug_i386
+ mv out/Release out/Release_i386
+ ```
+ 
+ - **WIN64**<br />
+ ```
+ python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=win
+ ninja -C out/Debug
+ ninja -C out/Release
+
+ mv out/Debug out/Debug_x64
+ mv out/Release out/Release_x64
+ ```
+ 
+ - **WIN32**<br />
+ ```
+ python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=win
+ ninja -C out/Debug
+ ninja -C out/Release
+ ```
+ 
+<br />
+<br />
+To build the source code you'll need Visual Studio 2013+ (Windows) or Xcode (MAC OSX):
+  - Visual Studio solution: **webrtc-everywhere/webrtc-everywhere.sln**
+  - Xcode project: **webrtc-everywhere/xcode/webrtc-everywhere.xcodeproj**
+
+# License
+ - Binaries and installers: All binaries and installers **from us** are released under **BSD** terms to allow using the project in your commercial products.
+ - The source code: **GPLv3**. Please contact us for alternative license options.
+
+# Known issues
+ - On Safari/OSX, if you're getting *TypeError: undefined is not a function (evaluating 'getPlugin()...*:
+ 	- Change the security settings to manually enable the plugin: [http://support.apple.com/en-us/HT202819](http://support.apple.com/en-us/HT202819)
+
+# Getting help
+The best way to get help is via our <a href="https://groups.google.com/forum/#!forum/webrtc-everywhere" target="_blank">dev-group</a>.
 
 # Release notes
  - **1.3.1**
@@ -85,14 +141,3 @@ To build the source code you'll need Visual Studio 2013 (Windows) or Xcode (MAC 
     	- [Issue #8](../../issues/8): Color alignment issue in drawImage()
  - **1.0.1**
 	- Initial release **without** support for DataChannel
-
-# License
- - Binaries and installers: All binaries and installers **from us** are released under **BSD** terms to allow using the project in your commercial products.
- - The source code: **GPLv3**. Please contact us for alternative license options.
-
-# Known issues
- - On Safari/OSX, if you're getting *TypeError: undefined is not a function (evaluating 'getPlugin()...*:
- 	- Change the security settings to manually enable the plugin: [http://support.apple.com/en-us/HT202819](http://support.apple.com/en-us/HT202819)
-
-# Getting help
-The best way to get help is via our <a href="https://groups.google.com/forum/#!forum/webrtc-everywhere" target="_blank">dev-group</a>.
