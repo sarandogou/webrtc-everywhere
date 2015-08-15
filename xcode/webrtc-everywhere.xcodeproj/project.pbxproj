@@ -6,7 +6,31 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		152833331B7D76FF00099EF2 /* webrtc-everywhere.dmg */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 152833341B7D76FF00099EF2 /* Build configuration list for PBXAggregateTarget "webrtc-everywhere.dmg" */;
+			buildPhases = (
+				152833391B7D771000099EF2 /* Run Script */,
+			);
+			dependencies = (
+				152833381B7D770B00099EF2 /* PBXTargetDependency */,
+			);
+			name = "webrtc-everywhere.dmg";
+			productName = "webrtc-everywhere.dmg";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
+		152833161B7C41C100099EF2 /* GSS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 152833151B7C41C100099EF2 /* GSS.framework */; };
+		152833181B7C421600099EF2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 152833171B7C421600099EF2 /* SystemConfiguration.framework */; };
+		1528331A1B7D103E00099EF2 /* portallocatorfactory.cc in Sources */ = {isa = PBXBuildFile; fileRef = 152833191B7D103E00099EF2 /* portallocatorfactory.cc */; };
+		152833211B7D19FD00099EF2 /* _WebRtcVideoCapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1528331E1B7D19FD00099EF2 /* _WebRtcVideoCapturer.cc */; };
+		152833221B7D19FD00099EF2 /* _WebRtcVideoCapturer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1528331F1B7D19FD00099EF2 /* _WebRtcVideoCapturer.h */; };
+		152833261B7D21A800099EF2 /* sigslot.cc in Sources */ = {isa = PBXBuildFile; fileRef = 152833251B7D21A800099EF2 /* sigslot.cc */; };
+		152833291B7D248B00099EF2 /* videocapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 152833271B7D248B00099EF2 /* videocapturer.cc */; };
+		1528332A1B7D248B00099EF2 /* videocapturer.h in Headers */ = {isa = PBXBuildFile; fileRef = 152833281B7D248B00099EF2 /* videocapturer.h */; };
+		1528332C1B7D24E300099EF2 /* messagehandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1528332B1B7D24E300099EF2 /* messagehandler.cc */; };
 		EC23B3B219738D9B000DFA4B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC23B3B119738D9B000DFA4B /* OpenGL.framework */; };
 		EC23B3B419738DA2000DFA4B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC23B3B319738DA2000DFA4B /* GLUT.framework */; };
 		EC23B3E71974E0E2000DFA4B /* BrowserCallback.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC23B3BC1974E0E2000DFA4B /* BrowserCallback.cc */; };
@@ -41,10 +65,6 @@
 		EC23B4061974E0E2000DFA4B /* WebRTC.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC23B3E51974E0E2000DFA4B /* WebRTC.cc */; };
 		EC23B4071974E0E2000DFA4B /* WebRTC.h in Headers */ = {isa = PBXBuildFile; fileRef = EC23B3E61974E0E2000DFA4B /* WebRTC.h */; };
 		EC23B40B1974F8D1000DFA4B /* npapi-includes.h in Headers */ = {isa = PBXBuildFile; fileRef = EC23B40A1974F8D1000DFA4B /* npapi-includes.h */; };
-		EC23B4A21975E861000DFA4B /* _webrtcvideocapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC23B4A01975E861000DFA4B /* _webrtcvideocapturer.cc */; };
-		EC23B4A31975E861000DFA4B /* _webrtcvideocapturer.h in Headers */ = {isa = PBXBuildFile; fileRef = EC23B4A11975E861000DFA4B /* _webrtcvideocapturer.h */; };
-		EC23B4A51975EB15000DFA4B /* _videocapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC23B4A41975EB15000DFA4B /* _videocapturer.cc */; };
-		EC23B4A71975EF7B000DFA4B /* _messagehandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC23B4A61975EF7B000DFA4B /* _messagehandler.cc */; };
 		EC2AEBDF19734BFF00360EC6 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC2AEB761973449200360EC6 /* CoreFoundation.framework */; };
 		EC2AEBF019734C6E00360EC6 /* _AsyncEvent.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC2AEB8B1973457600360EC6 /* _AsyncEvent.cc */; };
 		EC2AEBF219734C6E00360EC6 /* _Buffer.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC2AEB8D1973457600360EC6 /* _Buffer.cc */; };
@@ -91,7 +111,26 @@
 		ECE4C3C119927D8000FFD159 /* RTCDTMFToneChangeEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = ECE4C3B719927D8000FFD159 /* RTCDTMFToneChangeEvent.h */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		152833371B7D770B00099EF2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EC2AEB6B1973449200360EC6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EC2AEBDD19734BFF00360EC6;
+			remoteInfo = "webrtc-everywhere";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		152833151B7C41C100099EF2 /* GSS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GSS.framework; path = System/Library/Frameworks/GSS.framework; sourceTree = SDKROOT; };
+		152833171B7C421600099EF2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		152833191B7D103E00099EF2 /* portallocatorfactory.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = portallocatorfactory.cc; path = "../../../webrtc-checkout/src/talk/app/webrtc/portallocatorfactory.cc"; sourceTree = "<group>"; };
+		1528331E1B7D19FD00099EF2 /* _WebRtcVideoCapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _WebRtcVideoCapturer.cc; sourceTree = "<group>"; };
+		1528331F1B7D19FD00099EF2 /* _WebRtcVideoCapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _WebRtcVideoCapturer.h; sourceTree = "<group>"; };
+		152833251B7D21A800099EF2 /* sigslot.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sigslot.cc; path = "../../../webrtc-checkout/src/webrtc/base/sigslot.cc"; sourceTree = "<group>"; };
+		152833271B7D248B00099EF2 /* videocapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = videocapturer.cc; path = "../../../webrtc-checkout/src/talk/media/base/videocapturer.cc"; sourceTree = "<group>"; };
+		152833281B7D248B00099EF2 /* videocapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = videocapturer.h; path = "../../../webrtc-checkout/src/talk/media/base/videocapturer.h"; sourceTree = "<group>"; };
+		1528332B1B7D24E300099EF2 /* messagehandler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = messagehandler.cc; path = "../../../webrtc-checkout/src/webrtc/base/messagehandler.cc"; sourceTree = "<group>"; };
 		EC23B3B119738D9B000DFA4B /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		EC23B3B319738DA2000DFA4B /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		EC23B3B519739370000DFA4B /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
@@ -129,10 +168,6 @@
 		EC23B3E61974E0E2000DFA4B /* WebRTC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebRTC.h; sourceTree = "<group>"; };
 		EC23B4081974F22A000DFA4B /* WebRTC.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = WebRTC.htm; path = ../WebRTC.htm; sourceTree = "<group>"; };
 		EC23B40A1974F8D1000DFA4B /* npapi-includes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "npapi-includes.h"; sourceTree = "<group>"; };
-		EC23B4A01975E861000DFA4B /* _webrtcvideocapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _webrtcvideocapturer.cc; sourceTree = "<group>"; };
-		EC23B4A11975E861000DFA4B /* _webrtcvideocapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _webrtcvideocapturer.h; sourceTree = "<group>"; };
-		EC23B4A41975EB15000DFA4B /* _videocapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _videocapturer.cc; sourceTree = "<group>"; };
-		EC23B4A61975EF7B000DFA4B /* _messagehandler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _messagehandler.cc; sourceTree = "<group>"; };
 		EC2AEB761973449200360EC6 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		EC2AEB7A1973449200360EC6 /* webrtc-everywhere-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "webrtc-everywhere-Info.plist"; sourceTree = "<group>"; };
 		EC2AEB7C1973449200360EC6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -212,6 +247,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				152833181B7C421600099EF2 /* SystemConfiguration.framework in Frameworks */,
+				152833161B7C41C100099EF2 /* GSS.framework in Frameworks */,
 				EC23B3B419738DA2000DFA4B /* GLUT.framework in Frameworks */,
 				EC23B3B219738D9B000DFA4B /* OpenGL.framework in Frameworks */,
 				EC2AEC29197358BB00360EC6 /* AVFoundation.framework in Frameworks */,
@@ -287,10 +324,13 @@
 		EC23B49B1975E72F000DFA4B /* mac */ = {
 			isa = PBXGroup;
 			children = (
-				EC23B4A61975EF7B000DFA4B /* _messagehandler.cc */,
-				EC23B4A41975EB15000DFA4B /* _videocapturer.cc */,
-				EC23B4A01975E861000DFA4B /* _webrtcvideocapturer.cc */,
-				EC23B4A11975E861000DFA4B /* _webrtcvideocapturer.h */,
+				1528332B1B7D24E300099EF2 /* messagehandler.cc */,
+				152833271B7D248B00099EF2 /* videocapturer.cc */,
+				152833281B7D248B00099EF2 /* videocapturer.h */,
+				152833251B7D21A800099EF2 /* sigslot.cc */,
+				1528331E1B7D19FD00099EF2 /* _WebRtcVideoCapturer.cc */,
+				1528331F1B7D19FD00099EF2 /* _WebRtcVideoCapturer.h */,
+				152833191B7D103E00099EF2 /* portallocatorfactory.cc */,
 			);
 			path = mac;
 			sourceTree = "<group>";
@@ -318,6 +358,8 @@
 		EC2AEB751973449200360EC6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				152833171B7C421600099EF2 /* SystemConfiguration.framework */,
+				152833151B7C41C100099EF2 /* GSS.framework */,
 				EC23B3B91973B64E000DFA4B /* libc++abi.dylib */,
 				EC23B3B519739370000DFA4B /* libstdc++.6.dylib */,
 				EC23B3B319738DA2000DFA4B /* GLUT.framework */,
@@ -423,6 +465,7 @@
 				ECE4C3AB19927D4F00FFD159 /* _RTCDataChannel.h in Headers */,
 				EC23B4031974E0E2000DFA4B /* SourceInfo.h in Headers */,
 				EC23B4071974E0E2000DFA4B /* WebRTC.h in Headers */,
+				152833221B7D19FD00099EF2 /* _WebRtcVideoCapturer.h in Headers */,
 				ECE4C3BF19927D8000FFD159 /* RTCDTMFSender.h in Headers */,
 				ECE4C3B919927D8000FFD159 /* MessageEvent.h in Headers */,
 				EC23B3FB1974E0E2000DFA4B /* RTCPeerConnectionIceEvent.h in Headers */,
@@ -432,6 +475,7 @@
 				EC23B3F11974E0E2000DFA4B /* MediaStreamTrack.h in Headers */,
 				EC23B3EB1974E0E2000DFA4B /* MediaSourceStates.h in Headers */,
 				EC23B3E81974E0E2000DFA4B /* BrowserCallback.h in Headers */,
+				1528332A1B7D248B00099EF2 /* videocapturer.h in Headers */,
 				EC23B3EF1974E0E2000DFA4B /* MediaStreamEvent.h in Headers */,
 				EC23B3ED1974E0E2000DFA4B /* MediaStream.h in Headers */,
 				ECE4C3C119927D8000FFD159 /* RTCDTMFToneChangeEvent.h in Headers */,
@@ -443,7 +487,6 @@
 				EC23B3F41974E0E2000DFA4B /* PeerConnection.h in Headers */,
 				EC23B4051974E0E2000DFA4B /* Utils.h in Headers */,
 				EC23B3F21974E0E2000DFA4B /* NPCommon.h in Headers */,
-				EC23B4A31975E861000DFA4B /* _webrtcvideocapturer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,7 +501,6 @@
 				EC2AEBDB19734BFF00360EC6 /* Frameworks */,
 				EC2AEBDC19734BFF00360EC6 /* Headers */,
 				EC23B4091974F2A6000DFA4B /* ShellScript */,
-				ECE4C39D1984F38E00FFD159 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -475,8 +517,13 @@
 		EC2AEB6B1973449200360EC6 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0640;
 				ORGANIZATIONNAME = sarandogou;
+				TargetAttributes = {
+					152833331B7D76FF00099EF2 = {
+						CreatedOnToolsVersion = 6.4;
+					};
+				};
 			};
 			buildConfigurationList = EC2AEB6E1973449200360EC6 /* Build configuration list for PBXProject "webrtc-everywhere" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -491,11 +538,26 @@
 			projectRoot = "";
 			targets = (
 				EC2AEBDD19734BFF00360EC6 /* webrtc-everywhere */,
+				152833331B7D76FF00099EF2 /* webrtc-everywhere.dmg */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		152833391B7D771000099EF2 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here\nset -ex\n\ndir=\"$TEMP_FILES_DIR/disk\"\ndmg=\"$BUILT_PRODUCTS_DIR/$PROJECT_NAME-$MACOSX_DEPLOYMENT_TARGET.dmg\"\n\nrm -rf \"$dir\"\nmkdir \"$dir\"\ncp -Rfv \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \"$dir\"\nln -s \"${USER_LIBRARY_DIR}/Internet Plug-Ins\" \"$dir/Internet Plug-Ins\"\nrm -f \"$dmg\"\n\nhdiutil create -srcfolder \"$dir\" -volname \"$PRODUCT_NAME\" \"$dmg\"\nhdiutil internet-enable -yes \"$dmg\"\n\nrm -rf \"$dir\"";
+		};
 		EC23B4091974F2A6000DFA4B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -509,19 +571,6 @@
 			shellPath = /bin/sh;
 			shellScript = "# clean up any previous products/symbolic links in the Internet Plug-Ins folder\nif [ -a \"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\" ]; then\nrm -Rf \"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\"\nfi\n\n# Depending on the build configuration, either copy or link to the most recent product\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n# if we're debugging, add a symbolic link to the plug-in\nln -sf \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \\\n\"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\"\nelif [ \"${CONFIGURATION}\" == \"Release\" ]; then\n# if we're compiling for release, just copy the plugin to the Internet Plug-ins folder\ncp -Rfv \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \\\n\"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\"\nfi";
 		};
-		ECE4C39D1984F38E00FFD159 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\nset -ex\n\n[ \"$ACTION\" = build ] || exit 0\n[ \"$BUILD_VARIANTS\" = \"normal\" ] || exit 0\n[ \"$CONFIGURATION\" = \"Release\" ] || exit 0\n\ndir=\"$TEMP_FILES_DIR/disk\"\ndmg=\"$BUILT_PRODUCTS_DIR/$PROJECT_NAME-$NATIVE_ARCH-$MACOSX_DEPLOYMENT_TARGET.dmg\"\n\nrm -rf \"$dir\"\nmkdir \"$dir\"\ncp -Rfv \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \"$dir\"\nln -s \"${USER_LIBRARY_DIR}/Internet Plug-Ins\" \"$dir/Internet Plug-Ins\"\nrm -f \"$dmg\"\n\nhdiutil create -srcfolder \"$dir\" -volname \"$PRODUCT_NAME\" \"$dmg\"\nhdiutil internet-enable -yes \"$dmg\"\n\nrm -rf \"$dir\"";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -529,23 +578,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1528332C1B7D24E300099EF2 /* messagehandler.cc in Sources */,
 				EC23B4061974E0E2000DFA4B /* WebRTC.cc in Sources */,
 				EC2AEBF019734C6E00360EC6 /* _AsyncEvent.cc in Sources */,
 				EC2AEBF219734C6E00360EC6 /* _Buffer.cc in Sources */,
 				EC23B4021974E0E2000DFA4B /* SourceInfo.cc in Sources */,
-				EC23B4A51975EB15000DFA4B /* _videocapturer.cc in Sources */,
 				EC2AEBF419734C6E00360EC6 /* _Common.cc in Sources */,
 				EC23B3F31974E0E2000DFA4B /* PeerConnection.cc in Sources */,
+				152833211B7D19FD00099EF2 /* _WebRtcVideoCapturer.cc in Sources */,
 				ECE4C3AC19927D4F00FFD159 /* _RTCDTMFSender.cc in Sources */,
 				EC23B3FC1974E0E2000DFA4B /* RTCStats.cc in Sources */,
-				EC23B4A71975EF7B000DFA4B /* _messagehandler.cc in Sources */,
 				ECE4C3B819927D8000FFD159 /* MessageEvent.cc in Sources */,
 				EC23B4041974E0E2000DFA4B /* Utils.cc in Sources */,
 				ECE4C3A819927D4E00FFD159 /* _EncryptCtx.cc in Sources */,
 				ECE4C3BA19927D8000FFD159 /* RTCDataChannel.cc in Sources */,
 				ECE4C3AA19927D4F00FFD159 /* _RTCDataChannel.cc in Sources */,
 				ECE4C3C019927D8000FFD159 /* RTCDTMFToneChangeEvent.cc in Sources */,
-				EC23B4A21975E861000DFA4B /* _webrtcvideocapturer.cc in Sources */,
+				152833291B7D248B00099EF2 /* videocapturer.cc in Sources */,
 				EC23B3FE1974E0E2000DFA4B /* RTCStatsReport.cc in Sources */,
 				EC2AEBF919734C6E00360EC6 /* _MediaStream.cc in Sources */,
 				EC23B3EA1974E0E2000DFA4B /* MediaSourceStates.cc in Sources */,
@@ -568,11 +617,21 @@
 				EC2AEC0D19734C6E00360EC6 /* _Utils.cc in Sources */,
 				ECE4C3BE19927D8000FFD159 /* RTCDTMFSender.cc in Sources */,
 				EC23B3E71974E0E2000DFA4B /* BrowserCallback.cc in Sources */,
+				152833261B7D21A800099EF2 /* sigslot.cc in Sources */,
 				EC23B3F81974E0E2000DFA4B /* RTCIceCandidate.cc in Sources */,
+				1528331A1B7D103E00099EF2 /* portallocatorfactory.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		152833381B7D770B00099EF2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EC2AEBDD19734BFF00360EC6 /* webrtc-everywhere */;
+			targetProxy = 152833371B7D770B00099EF2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		EC2AEB7B1973449200360EC6 /* InfoPlist.strings */ = {
@@ -586,11 +645,24 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		152833351B7D76FF00099EF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		152833361B7D76FF00099EF2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		EC2AEB851973449200360EC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -620,15 +692,16 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
-				WE_CFLAGS = "-DPOSIX -DOSX -DHAVE_WEBRTC_VIDEO -DWE_CONFIG_CRYPT_KEY=\\\"0000000000000000\\\" -DWE_CONFIG_CRYPT_IV=\\\"0000000000000000\\\" -DV8_DEPRECATION_WARNINGS -DBLINK_SCALE_FILTERS_AT_RECORD_TIME -DEXPAT_RELATIVE_PATH -DFEATURE_ENABLE_VOICEMAIL -DGTEST_RELATIVE_PATH -DLOGGING=1 -DSRTP_RELATIVE_PATH -DFEATURE_ENABLE_SSL -DFEATURE_ENABLE_PSTN -DHAVE_SRTP -DHAVE_WEBRTC_VIDEO -DHAVE_WEBRTC_VOICE -DUSE_WEBRTC_DEV_BRANCH -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -DNOMINMAX -DPSAPI_VERSION=1 -D_CRT_RAND_S -DCERT_CHAIN_PARA_HAS_EXTRA_FIELDS -DWIN32_LEAN_AND_MEAN -D_ATL_NO_OPENGL -D_HAS_EXCEPTIONS=0 -D_SECURE_ATL -DCHROMIUM_BUILD -DTOOLKIT_VIEWS=1 -DUSE_AURA=1 -DUSE_ASH=1 -DUSE_DEFAULT_RENDER_THEME=1 -DUSE_LIBJPEG_TURBO=1 -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_PEPPER_CDMS -DENABLE_CONFIGURATION_POLICY -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_EGLIMAGE=1 -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -DNTDDI_VERSION=0x06020000 -D_USING_V110_SDK71_ -DENABLE_TASK_MANAGER=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PLUGINS=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_AUTOFILL_DIALOG=1 -DENABLE_BACKGROUND=1 -DENABLE_GOOGLE_NOW=1 -DCLD_VERSION=2 -DENABLE_FULL_PRINTING=1 -DENABLE_PRINTING=1 -DWIN_PDF_METAFILE_FOR_PRINTING=1 -DENABLE_SPELLCHECK=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DENABLE_APP_LIST=1 -DENABLE_SETTINGS_APP=1 -DENABLE_MANAGED_USERS=1 -DENABLE_MDNS=1 -DENABLE_SERVICE_DISCOVERY=1 -DENABLE_WIFI_BOOTSTRAPPING=1 -DLIBPEERCONNECTION_LIB=1 -DHAVE_SCTP -DSSL_USE_NSS -DHAVE_NSS_SSL_H -DSSL_USE_NSS_RNG -DNSS_PLATFORM_CLIENT_AUTH -DNO_NSPR_10_SUPPORT -DNSPR_STATIC -DNSS_STATIC -DNSS_USE_STATIC_LIBS -DUSE_UTIL_DIRECTLY -D_CRT_NONSTDC_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1";
+				WEBRTC_HOME = "../../webrtc-checkout";
+				WE_CFLAGS = "-DPOSIX -DWEBRTC_POSIX -DOSX -DHAVE_WEBRTC_VIDEO -DWE_CONFIG_CRYPT_KEY=\\\"0000000000000000\\\" -DWE_CONFIG_CRYPT_IV=\\\"0000000000000000\\\" -DV8_DEPRECATION_WARNINGS -DBLINK_SCALE_FILTERS_AT_RECORD_TIME -DEXPAT_RELATIVE_PATH -DFEATURE_ENABLE_VOICEMAIL -DGTEST_RELATIVE_PATH -DLOGGING=1 -DSRTP_RELATIVE_PATH -DFEATURE_ENABLE_SSL -DFEATURE_ENABLE_PSTN -DHAVE_SRTP -DHAVE_WEBRTC_VIDEO -DHAVE_WEBRTC_VOICE -DUSE_WEBRTC_DEV_BRANCH -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -DNOMINMAX -DPSAPI_VERSION=1 -D_CRT_RAND_S -DCERT_CHAIN_PARA_HAS_EXTRA_FIELDS -DWIN32_LEAN_AND_MEAN -D_ATL_NO_OPENGL -D_HAS_EXCEPTIONS=0 -D_SECURE_ATL -DCHROMIUM_BUILD -DTOOLKIT_VIEWS=1 -DUSE_AURA=1 -DUSE_ASH=1 -DUSE_DEFAULT_RENDER_THEME=1 -DUSE_LIBJPEG_TURBO=1 -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_PEPPER_CDMS -DENABLE_CONFIGURATION_POLICY -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_EGLIMAGE=1 -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -DNTDDI_VERSION=0x06020000 -D_USING_V110_SDK71_ -DENABLE_TASK_MANAGER=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PLUGINS=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_AUTOFILL_DIALOG=1 -DENABLE_BACKGROUND=1 -DENABLE_GOOGLE_NOW=1 -DCLD_VERSION=2 -DENABLE_FULL_PRINTING=1 -DENABLE_PRINTING=1 -DWIN_PDF_METAFILE_FOR_PRINTING=1 -DENABLE_SPELLCHECK=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DENABLE_APP_LIST=1 -DENABLE_SETTINGS_APP=1 -DENABLE_MANAGED_USERS=1 -DENABLE_MDNS=1 -DENABLE_SERVICE_DISCOVERY=1 -DENABLE_WIFI_BOOTSTRAPPING=1 -DLIBPEERCONNECTION_LIB=1 -DHAVE_SCTP -DSSL_USE_NSS -DHAVE_NSS_SSL_H -DSSL_USE_NSS_RNG -DNSS_PLATFORM_CLIENT_AUTH -DNO_NSPR_10_SUPPORT -DNSPR_STATIC -DNSS_STATIC -DNSS_USE_STATIC_LIBS -DUSE_UTIL_DIRECTLY -D_CRT_NONSTDC_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1 -DCARBON_DEPRECATED";
 				WE_HOME = ..;
-				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/libyuv/include  $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/util $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/pr/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/ds $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/libc/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/cryptohi $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/certdb $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pkcs7 $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/smime $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pk11wrap ";
+				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WEBRTC_HOME)/src $(WEBRTC_HOME)/src/third_party $(WEBRTC_HOME)/src/third_party/webrtc $(WEBRTC_HOME)/src/webrtc $(WEBRTC_HOME)/src/third_party/wtl/include; $(WEBRTC_HOME)/src/third_party/jsoncpp/overrides/include $(WEBRTC_HOME)/src/third_party/jsoncpp/source/include $(WEBRTC_HOME)/src/chromium/src/third_party/libyuv/include";
 				WE_LIBS = "";
-				"WE_LIBS[sdk=macosx*][arch=i386]" = "$(WE_HOME)/thirdparties/osx/lib/i386";
-				"WE_LIBS[sdk=macosx*][arch=x86_64]" = "$(WE_HOME)/thirdparties/osx/lib/x86_64";
+				"WE_LIBS[sdk=macosx*][arch=i386]" = "$(WEBRTC_HOME)/src/out/Debug_i386";
+				"WE_LIBS[sdk=macosx*][arch=x86_64]" = "$(WEBRTC_HOME)/src/out/Debug_x64";
 			};
 			name = Debug;
 		};
@@ -636,7 +709,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -661,14 +733,15 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "";
-				WE_CFLAGS = "-DPOSIX -DOSX -DHAVE_WEBRTC_VIDEO -DWE_CONFIG_CRYPT_KEY=\\\"0000000000000000\\\" -DWE_CONFIG_CRYPT_IV=\\\"0000000000000000\\\" -DV8_DEPRECATION_WARNINGS -DBLINK_SCALE_FILTERS_AT_RECORD_TIME -DEXPAT_RELATIVE_PATH -DFEATURE_ENABLE_VOICEMAIL -DGTEST_RELATIVE_PATH -DLOGGING=1 -DSRTP_RELATIVE_PATH -DFEATURE_ENABLE_SSL -DFEATURE_ENABLE_PSTN -DHAVE_SRTP -DHAVE_WEBRTC_VIDEO -DHAVE_WEBRTC_VOICE -DUSE_WEBRTC_DEV_BRANCH -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -DNOMINMAX -DPSAPI_VERSION=1 -D_CRT_RAND_S -DCERT_CHAIN_PARA_HAS_EXTRA_FIELDS -DWIN32_LEAN_AND_MEAN -D_ATL_NO_OPENGL -D_HAS_EXCEPTIONS=0 -D_SECURE_ATL -DCHROMIUM_BUILD -DTOOLKIT_VIEWS=1 -DUSE_AURA=1 -DUSE_ASH=1 -DUSE_DEFAULT_RENDER_THEME=1 -DUSE_LIBJPEG_TURBO=1 -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_PEPPER_CDMS -DENABLE_CONFIGURATION_POLICY -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_EGLIMAGE=1 -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -DNTDDI_VERSION=0x06020000 -D_USING_V110_SDK71_ -DENABLE_TASK_MANAGER=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PLUGINS=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_AUTOFILL_DIALOG=1 -DENABLE_BACKGROUND=1 -DENABLE_GOOGLE_NOW=1 -DCLD_VERSION=2 -DENABLE_FULL_PRINTING=1 -DENABLE_PRINTING=1 -DWIN_PDF_METAFILE_FOR_PRINTING=1 -DENABLE_SPELLCHECK=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DENABLE_APP_LIST=1 -DENABLE_SETTINGS_APP=1 -DENABLE_MANAGED_USERS=1 -DENABLE_MDNS=1 -DENABLE_SERVICE_DISCOVERY=1 -DENABLE_WIFI_BOOTSTRAPPING=1 -DLIBPEERCONNECTION_LIB=1 -DHAVE_SCTP -DSSL_USE_NSS -DHAVE_NSS_SSL_H -DSSL_USE_NSS_RNG -DNSS_PLATFORM_CLIENT_AUTH -DNO_NSPR_10_SUPPORT -DNSPR_STATIC -DNSS_STATIC -DNSS_USE_STATIC_LIBS -DUSE_UTIL_DIRECTLY -D_CRT_NONSTDC_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1";
+				WEBRTC_HOME = "../../webrtc-checkout";
+				WE_CFLAGS = "-DPOSIX -DWEBRTC_POSIX -DOSX -DHAVE_WEBRTC_VIDEO -DWE_CONFIG_CRYPT_KEY=\\\"0000000000000000\\\" -DWE_CONFIG_CRYPT_IV=\\\"0000000000000000\\\" -DV8_DEPRECATION_WARNINGS -DBLINK_SCALE_FILTERS_AT_RECORD_TIME -DEXPAT_RELATIVE_PATH -DFEATURE_ENABLE_VOICEMAIL -DGTEST_RELATIVE_PATH -DLOGGING=1 -DSRTP_RELATIVE_PATH -DFEATURE_ENABLE_SSL -DFEATURE_ENABLE_PSTN -DHAVE_SRTP -DHAVE_WEBRTC_VIDEO -DHAVE_WEBRTC_VOICE -DUSE_WEBRTC_DEV_BRANCH -D_WIN32_WINNT=0x0501 -DWINVER=0x0501 -DNOMINMAX -DPSAPI_VERSION=1 -D_CRT_RAND_S -DCERT_CHAIN_PARA_HAS_EXTRA_FIELDS -DWIN32_LEAN_AND_MEAN -D_ATL_NO_OPENGL -D_HAS_EXCEPTIONS=0 -D_SECURE_ATL -DCHROMIUM_BUILD -DTOOLKIT_VIEWS=1 -DUSE_AURA=1 -DUSE_ASH=1 -DUSE_DEFAULT_RENDER_THEME=1 -DUSE_LIBJPEG_TURBO=1 -DENABLE_ONE_CLICK_SIGNIN -DENABLE_REMOTING=1 -DENABLE_WEBRTC=1 -DENABLE_PEPPER_CDMS -DENABLE_CONFIGURATION_POLICY -DENABLE_NOTIFICATIONS -DENABLE_HIDPI=1 -DENABLE_EGLIMAGE=1 -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -DNTDDI_VERSION=0x06020000 -D_USING_V110_SDK71_ -DENABLE_TASK_MANAGER=1 -DENABLE_EXTENSIONS=1 -DENABLE_PLUGIN_INSTALLATION=1 -DENABLE_PLUGINS=1 -DENABLE_SESSION_SERVICE=1 -DENABLE_THEMES=1 -DENABLE_AUTOFILL_DIALOG=1 -DENABLE_BACKGROUND=1 -DENABLE_GOOGLE_NOW=1 -DCLD_VERSION=2 -DENABLE_FULL_PRINTING=1 -DENABLE_PRINTING=1 -DWIN_PDF_METAFILE_FOR_PRINTING=1 -DENABLE_SPELLCHECK=1 -DENABLE_CAPTIVE_PORTAL_DETECTION=1 -DENABLE_APP_LIST=1 -DENABLE_SETTINGS_APP=1 -DENABLE_MANAGED_USERS=1 -DENABLE_MDNS=1 -DENABLE_SERVICE_DISCOVERY=1 -DENABLE_WIFI_BOOTSTRAPPING=1 -DLIBPEERCONNECTION_LIB=1 -DHAVE_SCTP -DSSL_USE_NSS -DHAVE_NSS_SSL_H -DSSL_USE_NSS_RNG -DNSS_PLATFORM_CLIENT_AUTH -DNO_NSPR_10_SUPPORT -DNSPR_STATIC -DNSS_STATIC -DNSS_USE_STATIC_LIBS -DUSE_UTIL_DIRECTLY -D_CRT_NONSTDC_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -DDYNAMIC_ANNOTATIONS_ENABLED=1 -DWTF_USE_DYNAMIC_ANNOTATIONS=1 -DCARBON_DEPRECATED";
 				WE_HOME = ..;
-				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/libyuv/include  $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/util $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/pr/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/ds $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nspr/lib/libc/include $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/cryptohi $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/certdb $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pkcs7 $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/smime $(WE_HOME)/thirdparties/common/include/webrtc-sdk/third_party/nss/nss/lib/pk11wrap ";
+				WE_INCLUDES = "$(WE_HOME)/thirdparties/common/include $(WEBRTC_HOME)/src $(WEBRTC_HOME)/src/third_party $(WEBRTC_HOME)/src/third_party/webrtc $(WEBRTC_HOME)/src/webrtc $(WEBRTC_HOME)/src/third_party/wtl/include; $(WEBRTC_HOME)/src/third_party/jsoncpp/overrides/include $(WEBRTC_HOME)/src/third_party/jsoncpp/source/include $(WEBRTC_HOME)/src/chromium/src/third_party/libyuv/include";
 				WE_LIBS = "";
-				"WE_LIBS[sdk=macosx*][arch=i386]" = "$(WE_HOME)/thirdparties/osx/lib/i386";
-				"WE_LIBS[sdk=macosx*][arch=x86_64]" = "$(WE_HOME)/thirdparties/osx/lib/x86_64";
+				"WE_LIBS[sdk=macosx*][arch=i386]" = "$(WEBRTC_HOME)/src/out/Release_i386";
+				"WE_LIBS[sdk=macosx*][arch=x86_64]" = "$(WEBRTC_HOME)/src/out/Release_x64";
 			};
 			name = Release;
 		};
@@ -693,59 +766,55 @@
 				OTHER_CFLAGS = "$(WE_CFLAGS)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
-					"-lcrssl",
-					"-lcrnspr",
-					"-lcrnss",
-					"-ljsoncpp",
 					"-ljingle_peerconnection",
-					"-lnss_static",
-					"-lsqlite3",
-					"-licui18n",
-					"-licuuc",
-					"-licudata",
-					"-ljingle",
+					"-ljsoncpp",
 					"-lexpat",
+					"-lrtc_base",
+					"-lwebrtc_common",
+					"-lrtc_base_approved",
+					"-lboringssl",
 					"-ljingle_media",
 					"-lyuv",
 					"-ljpeg_turbo",
 					"-lusrsctplib",
-					"-lvideo_capture_module",
+					"-lvideo_render_module",
 					"-lwebrtc_utility",
 					"-laudio_coding_module",
 					"-lCNG",
 					"-lcommon_audio",
 					"-lsystem_wrappers",
-					"-lwebrtc_base",
+					"-lopenmax_dl",
 					"-lcommon_audio_sse2",
+					"-laudio_encoder_interface",
 					"-lG711",
 					"-lG722",
 					"-liLBC",
 					"-liSAC",
-					"-liSACFix",
+					"-laudio_decoder_interface",
 					"-lPCM16B",
+					"-lred",
 					"-lwebrtc_opus",
 					"-lopus",
-					"-lNetEq4",
+					"-lneteq",
 					"-lmedia_file",
-					"-lwebrtc_video_coding",
-					"-lwebrtc_i420",
 					"-lcommon_video",
-					"-lvideo_coding_utility",
-					"-lwebrtc_vp8",
-					"-lvpx",
-					"-lvpx_asm_offsets_vp8",
-					"-lvpx_intrinsics_mmx",
-					"-lvpx_intrinsics_sse2",
-					"-lvpx_intrinsics_ssse3",
-					"-lvideo_render_module",
 					"-lwebrtc",
-					"-lwebrtc_common",
-					"-lvideo_engine_core",
 					"-lrtp_rtcp",
 					"-lpaced_sender",
 					"-lremote_bitrate_estimator",
-					"-lrbe_components",
 					"-lbitrate_controller",
+					"-lvideo_capture_module",
+					"-lwebrtc_video_coding",
+					"-lwebrtc_i420",
+					"-lvideo_coding_utility",
+					"-lwebrtc_vp8",
+					"-lvpx",
+					"-lvpx_intrinsics_mmx",
+					"-lvpx_intrinsics_sse2",
+					"-lvpx_intrinsics_ssse3",
+					"-lvpx_intrinsics_sse4_1",
+					"-lvpx_intrinsics_avx2",
+					"-lwebrtc_vp9",
 					"-lvideo_processing",
 					"-lvideo_processing_sse2",
 					"-lvoice_engine",
@@ -755,10 +824,17 @@
 					"-lprotobuf_lite",
 					"-laudio_processing_sse2",
 					"-laudio_device",
+					"-lrtc_sound",
 					"-lfield_trial_default",
-					"-ljingle_sound",
+					"-lmetrics_default",
+					"-lrtc_xmllite",
+					"-lrtc_xmpp",
+					"-lrtc_p2p",
+					"-lvideo_capture_module_internal_impl",
+					"-lvideo_render_module_internal_impl",
 					"-ljingle_p2p",
 					"-lsrtp",
+					"-lwebrtc_h264",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = plugin;
@@ -769,6 +845,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "webrtc-everywhere/webrtc-everywhere-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -782,59 +860,55 @@
 				OTHER_CFLAGS = "$(WE_CFLAGS)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
-					"-lcrssl",
-					"-lcrnspr",
-					"-lcrnss",
-					"-ljsoncpp",
 					"-ljingle_peerconnection",
-					"-lnss_static",
-					"-lsqlite3",
-					"-licui18n",
-					"-licuuc",
-					"-licudata",
-					"-ljingle",
+					"-ljsoncpp",
 					"-lexpat",
+					"-lrtc_base",
+					"-lwebrtc_common",
+					"-lrtc_base_approved",
+					"-lboringssl",
 					"-ljingle_media",
 					"-lyuv",
 					"-ljpeg_turbo",
 					"-lusrsctplib",
-					"-lvideo_capture_module",
+					"-lvideo_render_module",
 					"-lwebrtc_utility",
 					"-laudio_coding_module",
 					"-lCNG",
 					"-lcommon_audio",
 					"-lsystem_wrappers",
-					"-lwebrtc_base",
+					"-lopenmax_dl",
 					"-lcommon_audio_sse2",
+					"-laudio_encoder_interface",
 					"-lG711",
 					"-lG722",
 					"-liLBC",
 					"-liSAC",
-					"-liSACFix",
+					"-laudio_decoder_interface",
 					"-lPCM16B",
+					"-lred",
 					"-lwebrtc_opus",
 					"-lopus",
-					"-lNetEq4",
+					"-lneteq",
 					"-lmedia_file",
-					"-lwebrtc_video_coding",
-					"-lwebrtc_i420",
 					"-lcommon_video",
-					"-lvideo_coding_utility",
-					"-lwebrtc_vp8",
-					"-lvpx",
-					"-lvpx_asm_offsets_vp8",
-					"-lvpx_intrinsics_mmx",
-					"-lvpx_intrinsics_sse2",
-					"-lvpx_intrinsics_ssse3",
-					"-lvideo_render_module",
 					"-lwebrtc",
-					"-lwebrtc_common",
-					"-lvideo_engine_core",
 					"-lrtp_rtcp",
 					"-lpaced_sender",
 					"-lremote_bitrate_estimator",
-					"-lrbe_components",
 					"-lbitrate_controller",
+					"-lvideo_capture_module",
+					"-lwebrtc_video_coding",
+					"-lwebrtc_i420",
+					"-lvideo_coding_utility",
+					"-lwebrtc_vp8",
+					"-lvpx",
+					"-lvpx_intrinsics_mmx",
+					"-lvpx_intrinsics_sse2",
+					"-lvpx_intrinsics_ssse3",
+					"-lvpx_intrinsics_sse4_1",
+					"-lvpx_intrinsics_avx2",
+					"-lwebrtc_vp9",
 					"-lvideo_processing",
 					"-lvideo_processing_sse2",
 					"-lvoice_engine",
@@ -844,10 +918,17 @@
 					"-lprotobuf_lite",
 					"-laudio_processing_sse2",
 					"-laudio_device",
+					"-lrtc_sound",
 					"-lfield_trial_default",
-					"-ljingle_sound",
+					"-lmetrics_default",
+					"-lrtc_xmllite",
+					"-lrtc_xmpp",
+					"-lrtc_p2p",
+					"-lvideo_capture_module_internal_impl",
+					"-lvideo_render_module_internal_impl",
 					"-ljingle_p2p",
 					"-lsrtp",
+					"-lwebrtc_h264",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = plugin;
@@ -857,6 +938,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		152833341B7D76FF00099EF2 /* Build configuration list for PBXAggregateTarget "webrtc-everywhere.dmg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				152833351B7D76FF00099EF2 /* Debug */,
+				152833361B7D76FF00099EF2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		EC2AEB6E1973449200360EC6 /* Build configuration list for PBXProject "webrtc-everywhere" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

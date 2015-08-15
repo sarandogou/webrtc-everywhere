@@ -53,6 +53,8 @@ public:
 
 	static void SetUserAgent(const char* userAgent);
 	static const char* GetUserAgent();
+    
+    static rtc::Thread* GetInitThread() { return  s_InitThread; }
 
 private:
 #if _MSC_VER
@@ -64,6 +66,7 @@ private:
 	static _FTIME s_time_config_modif;
 	static cpp11::shared_ptr<_EncryptCtx> s_encrypt_ctx;
 	static std::string s_UserAgent;
+    static rtc::Thread* s_InitThread;
 #if _MSC_VER
 #pragma warning(pop)
 #endif

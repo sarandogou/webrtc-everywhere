@@ -39,6 +39,7 @@ std::map<long, const _UniqueObject*> _Utils::s_unique_objs;
 _FTIME _Utils::s_time_config_modif = { 0 };
 cpp11::shared_ptr<_EncryptCtx> _Utils::s_encrypt_ctx = nullPtr;
 std::string _Utils::s_UserAgent = "Unknown";
+rtc::Thread* _Utils::s_InitThread = nullptr;
 
 
 _Utils::_Utils()
@@ -53,7 +54,8 @@ _Utils::~_Utils()
 
 WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 {
-    if(!g_bInitialized) {
+    if (!g_bInitialized) {
+        s_InitThread = rtc::Thread::Current();
 #if 0
         StartDebug();
 #endif
@@ -67,10 +69,8 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 #endif
         
 #if WE_UNDER_MAC
-#if 0 // NOT_USING_MAC_SERVER
         static rtc::MacCocoaSocketServer ss;
         static rtc::SocketServerScope ss_scope(&ss);
-#endif
 #endif
         
 		rtc::InitializeSSL();
@@ -96,6 +96,7 @@ WeError _Utils::DeInitialize(void)
 			CoUninitialize();
 		}
 #endif
+        s_InitThread = nullptr;
 	}
 	return WeError_Success;
 }
@@ -738,14 +739,14 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 #endif
 	typedef struct WE_PACKED tagBMPINFOHEADER{
 		uint32_t      biSize;
-		long       biWidth;
-		long       biHeight;
+		uint32_t       biWidth;
+		uint32_t       biHeight;
 		uint16_t       biPlanes;
 		uint16_t       biBitCount;
 		uint32_t      biCompression;
 		uint32_t      biSizeImage;
-		long       biXPelsPerMeter;
-		long       biYPelsPerMeter;
+		uint32_t      biXPelsPerMeter;
+		uint32_t      biYPelsPerMeter;
 		uint32_t      biClrUsed;
 		uint32_t      biClrImportant;
 	} BMPINFOHEADER;
@@ -789,19 +790,19 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 #	define BI_RGB 0L
 #endif
 	
-	hdr_file.bfSize = (DWORD)*bmp_size_ptr;
+	hdr_file.bfSize = (uint32_t)*bmp_size_ptr;
 	hdr_file.bfOffBits = sizeof(BMPFILEHEADER) + sizeof(BMPINFOHEADER);
 
 	hdr_info.biSize = sizeof(BMPINFOHEADER);
 	hdr_file.bfType = 0x4D42;
-	hdr_info.biWidth = (LONG)width;
-	hdr_info.biHeight = (LONG)height;
+	hdr_info.biWidth = (uint32_t)width;
+	hdr_info.biHeight = (uint32_t)height;
 	hdr_info.biXPelsPerMeter = 0;
 	hdr_info.biYPelsPerMeter = 0;
 	hdr_info.biPlanes = 1;
 	hdr_info.biBitCount = 32;
 	hdr_info.biCompression = BI_RGB;
-	hdr_info.biSizeImage = (DWORD)(stride * height);
+	hdr_info.biSizeImage = (uint32_t)(stride * height);
 	hdr_info.biClrImportant = 0;
 	hdr_info.biClrUsed = 0;
 #if WE_UNDER_WINDOWS || WE_UNDER_APPLE
@@ -823,7 +824,8 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 	}
 
 #if 0
-	FILE* file = fopen("C:\\Projects\\webrtc-everywhere\\screenshot.png", "wb");
+	//FILE* file = fopen("C:\\Projects\\webrtc-everywhere\\screenshot.png", "wb");
+    FILE* file = fopen("/Users/mamadou/Library/Application Support/webrtc-everywhere/screenshot.png", "wb");
 	if (file) {
 		fwrite(*bmp_pptr, 1, *bmp_size_ptr, file);
 		fclose(file);

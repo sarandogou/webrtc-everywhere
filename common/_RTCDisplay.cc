@@ -428,6 +428,8 @@ void _RTCDisplay::StopVideoRenderer()
 	if (m_renderer) {
 		m_renderer->SetHwnd(m_renderer->GetHwnd(), NULL);
 	}
+#elif WE_UNDER_APPLE
+    
 #endif
 
 	m_renderer.reset();

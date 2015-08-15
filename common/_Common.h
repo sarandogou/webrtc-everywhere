@@ -431,7 +431,7 @@ private:
 #if WE_UNDER_WINDOWS
 	HANDLE m_file;
 #else
-    int m_file;
+    FILE* m_file;
 #endif
 	bool m_write;
 };

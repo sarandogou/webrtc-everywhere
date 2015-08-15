@@ -294,7 +294,7 @@ _MediaStreamTrackVideo:: ~_MediaStreamTrackVideo()
 #if WE_UNDER_APPLE
 #include "mac/_webrtcvideocapturer.h"
 #include "webrtc/modules/video_capture/include/video_capture_factory.h"
-class _VideoCapturerFactory : public cricket::VideoCapturerFactory {
+class _VideoCapturerFactory : public cricket::VideoDeviceCapturerFactory {
 public:
     _VideoCapturerFactory() {}
     virtual ~_VideoCapturerFactory() {}
@@ -321,7 +321,7 @@ static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
     // ISSUE: https://groups.google.com/forum/#!topic/discuss-webrtc/RV6oKhY2qEM
 #if WE_UNDER_APPLE
     cricket::DeviceManager* device_manager = static_cast<cricket::DeviceManager*>(dev_manager.get());
-    device_manager->set_device_video_capturer_factory(new _VideoCapturerFactory());
+    device_manager->SetVideoDeviceCapturerFactory(new _VideoCapturerFactory());
 #endif /* WE_UNDER_APPLE  */
     
 	std::vector<cricket::Device> devs;

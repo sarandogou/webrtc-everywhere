@@ -55,7 +55,7 @@ bool _RTCDTMFSender::canInsertDTMF()
 
 void _RTCDTMFSender::insertDTMF(const char* tones, long duration /*= 100*/, long interToneGap /*= 50*/)
 {
-	m_sender->InsertDtmf(std::string(tones), duration, interToneGap);
+	m_sender->InsertDtmf(std::string(tones), (int)duration, (int)interToneGap);
 }
 
 cpp11::shared_ptr<_MediaStreamTrack> _RTCDTMFSender::track()

@@ -25,8 +25,10 @@ static webrtc::CriticalSectionWrapper* _fake_peer_connection_cs = webrtc::Critic
 rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> _fake_peer_connection(webrtc::CreatePeerConnectionFactory());
 #endif
 
+#if 0
 static const char kFirefoxPattern[] = "Firefox";
 static const char kInternetExplorerPattern[] = "MSIE";
+#endif
 static const char kAutoDetectPattern[] = "";
 #if 1
 #	define kAgentHoldingProxyInfo		kAutoDetectPattern
@@ -38,6 +40,8 @@ static const char kAutoDetectPattern[] = "";
 #	endif
 #endif
 
+// TODO(mdi): On OSX We have to include "portallocatorfactory.cc" because it seems like "portallocatorfactory.o" is missing in libjingle_peerconnection
+// This could cause duplicated symbols if the bug get fixed by Google
 //
 //	_RTCPortAllocatorFactory
 //
@@ -158,7 +162,7 @@ WEBRTC_EVERYWHERE_API rtc::Thread* GetWorkerThread()
 WEBRTC_EVERYWHERE_API rtc::scoped_refptr<webrtc::PortAllocatorFactoryInterface> GetPortAllocatorFactory()
 {
 	if (!_port_allocator_factory) {
-		_port_allocator_factory = new rtc::RefCountedObject<_RTCPortAllocatorFactory>(GetWorkerThread());
+        _port_allocator_factory =  new rtc::RefCountedObject<_RTCPortAllocatorFactory>(GetWorkerThread());
 	}
 	return _port_allocator_factory;
 }
@@ -323,26 +327,26 @@ _File::_File(const char* path, bool write /*= false*/)
 : m_write(write)
 
 {
-    m_file = open(path, write ? O_CREAT | O_RDWR : O_CREAT | O_RDONLY);
+    m_file = fopen(path, write ? "w" : "r");
 }
 
 _File::~_File()
 {
 	if (IsValid()) {
-		close(m_file);
+		fclose(m_file);
 		m_file = 0;
 	}
 }
 
 bool _File::IsValid()const
 {
-	return m_file != -1;
+	return !!m_file;
 }
 
 bool _File::LockInterProcess(bool exclusive /*= false*/)
 {
 	if (IsValid()) {
-        if (flock(m_file, exclusive ? LOCK_EX : LOCK_SH) == 0) {
+        if (flock(fileno(m_file), exclusive ? LOCK_EX : LOCK_SH) == 0) {
             return true;
         }
 	}
@@ -352,7 +356,7 @@ bool _File::LockInterProcess(bool exclusive /*= false*/)
 bool _File::UnlockInterProcess()
 {
 	if (IsValid()) {
-        if (flock(m_file, LOCK_UN) == 0) {
+        if (flock(fileno(m_file), LOCK_UN) == 0) {
             return true;
         }
 	}
@@ -364,10 +368,10 @@ cpp11::shared_ptr<_Buffer> _File::Read()
 {
 	if (IsValid()) {
         struct stat _stat;
-        if (fstat(m_file, &_stat) == 0 && _stat.st_size) {
+        if (fstat(fileno(m_file), &_stat) == 0 && _stat.st_size) {
             cpp11::shared_ptr<_Buffer> buffer(new _Buffer(NULL, (size_t)_stat.st_size));
             if (buffer && buffer->getPtr()) {
-                if (read(m_file, (void*)buffer->getPtr(), buffer->getSize()) == buffer->getSize()) {
+                if (read(fileno(m_file), (void*)buffer->getPtr(), buffer->getSize()) == buffer->getSize()) {
                     return buffer;
                 }
             }
@@ -380,15 +384,15 @@ bool _File::Write(cpp11::shared_ptr<_Buffer>& buffer, bool append /*= false*/)
 {
 	if (IsValid() && buffer && buffer->getPtr() && buffer->getSize()) {
         if (!append) {
-            FILE* fp = fdopen(m_file, "w"); // will be closed when close() is called
+            FILE* fp = fdopen(fileno(m_file), "w"); // will be closed when close() is called
             if (!fp) {
                 return false;
             }
             rewind(fp);
         }
-        if (write(m_file, buffer->getPtr(), buffer->getSize()) == buffer->getSize()) {
+        if (write(fileno(m_file), buffer->getPtr(), buffer->getSize()) == buffer->getSize()) {
             if (!append) {
-                if (ftruncate(m_file, buffer->getSize()) != 0) {
+                if (ftruncate(fileno(m_file), buffer->getSize()) != 0) {
                     return false;
                 }
             }
@@ -404,7 +408,7 @@ bool _File::GetModificationTime(_FTIME *time)
     #define LONG long
 	if (IsValid()) {
 		struct stat _stat;
-        if (fstat(m_file, &_stat) == 0) {
+        if (fstat(fileno(m_file), &_stat) == 0) {
             time_t tt = (time_t)_stat.st_mtimespec.tv_sec;
             LONGLONG ll = Int32x32To64(tt, 10000000) + 116444736000000000;
             time->dwLowDateTime = (unsigned long) ll;

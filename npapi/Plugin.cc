@@ -77,10 +77,10 @@ NP_GetValue(void* future, NPPVariable aVariable, void* aValue)
 {
     switch (aVariable) {
     case NPPVpluginNameString:
-        *((char**)aValue) = (kPluginName);
+        *((char**)aValue) = (char*)(kPluginName);
         break;
     case NPPVpluginDescriptionString:
-		*((char**)aValue) = (kPluginDescription);
+		*((char**)aValue) = (char*)(kPluginDescription);
         break;
     default:
         CHECK_NPERR_RETURN(NPERR_INVALID_PARAM);
@@ -256,11 +256,11 @@ NPP_GetValue(NPP instance, NPPVariable variable, void *value)
         return NPERR_GENERIC_ERROR;
     }
     case NPPVpluginNameString: {
-        *((char **)value) = kPluginName;
+        *((char **)value) = (char*)kPluginName;
         return NPERR_NO_ERROR;
     }
     case NPPVpluginDescriptionString: {
-        *((char **)value) = kPluginDescription;
+        *((char **)value) = (char*)kPluginDescription;
         return NPERR_NO_ERROR;
     }
 #if WE_UNDER_APPLE

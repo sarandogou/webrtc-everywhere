@@ -10,29 +10,41 @@
 	<string>webrtc-everywhere</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>E254B6ED-4A36-483B-958E-9FFACD22ACF0</key>
+		<key>70B3A2C8ADAA4E37012293F15ABDC2FE552E5D0A</key>
 		<string>https://github.com/sarandogou/webrtc-everywhere.git</string>
+		<key>8FFACF9194D48576A22F6F0C4F6B4F0BA1ABFC64</key>
+		<string>https://chromium.googlesource.com/external/webrtc.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>xcode/webrtc-everywhere/webrtc-everywhere.xcodeproj/project.xcworkspace</string>
+	<string>xcode/webrtc-everywhere.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>E254B6ED-4A36-483B-958E-9FFACD22ACF0</key>
-		<string>../../../..</string>
+		<key>70B3A2C8ADAA4E37012293F15ABDC2FE552E5D0A</key>
+		<string>../../..</string>
+		<key>8FFACF9194D48576A22F6F0C4F6B4F0BA1ABFC64</key>
+		<string>../../../../webrtc-checkout/src</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/sarandogou/webrtc-everywhere.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>E254B6ED-4A36-483B-958E-9FFACD22ACF0</string>
+	<string>70B3A2C8ADAA4E37012293F15ABDC2FE552E5D0A</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>E254B6ED-4A36-483B-958E-9FFACD22ACF0</string>
+			<string>8FFACF9194D48576A22F6F0C4F6B4F0BA1ABFC64</string>
+			<key>IDESourceControlWCCName</key>
+			<string>src</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>70B3A2C8ADAA4E37012293F15ABDC2FE552E5D0A</string>
 			<key>IDESourceControlWCCName</key>
 			<string>webrtc-everywhere</string>
 		</dict>
