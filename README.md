@@ -47,6 +47,8 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  ```
  cd webrtc-checkout/src
  ```
+ - For Windows you'll need to apply [this patch](/webrtc_win.patch)
+
  - **OSX x86_64**<br />
  ```
  python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=mac
