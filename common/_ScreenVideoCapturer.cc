@@ -9,6 +9,11 @@
 #include "webrtc/modules/desktop_capture/desktop_region.h"
 #include "webrtc/modules/desktop_capture/desktop_frame.h"
 
+#if WE_UNDER_APPLE
+#import <ApplicationServices/ApplicationServices.h>
+#define MAX_DISPLAYS    32
+#endif /* WE_UNDER_APPLE */
+
 #if !defined(kDoubangoSharedMemoryId)
 #	define kDoubangoSharedMemoryId 85697421
 #endif /* kDoubangoSharedMemoryId */
@@ -84,7 +89,17 @@ public:
 		formats.push_back(cricket::VideoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
 			cricket::VideoFormat::FpsToInterval(kDefaultScreencastFps), defaultFourCC));
 #elif WE_UNDER_APPLE
-		dstatic enum cricket::FourCC defaultFourCC = cricket::FOURCC_ARGB; // TODO: check
+		static enum cricket::FourCC defaultFourCC = cricket::FOURCC_ARGB;
+        CGDisplayCount displayCount;
+        CGDirectDisplayID displays[MAX_DISPLAYS];
+        if (CGGetActiveDisplayList(sizeof(displays)/sizeof(displays[0]), displays, &displayCount) == kCGErrorSuccess) {
+            for (CGDisplayCount i=0; i<displayCount; i++) {
+                // make a snapshot of the current display
+                // CGImageRef image = CGDisplayCreateImage(displays[i]);
+                formats.push_back(cricket::VideoFormat((int)CGDisplayPixelsWide(displays[i]), (int)CGDisplayPixelsHigh(displays[i]),
+                                                       cricket::VideoFormat::FpsToInterval(kDefaultScreencastFps), defaultFourCC));
+            }
+    }
 #endif
 		formats.push_back(cricket::VideoFormat(1280, 720,
 			cricket::VideoFormat::FpsToInterval(kDefaultScreencastFps), defaultFourCC));

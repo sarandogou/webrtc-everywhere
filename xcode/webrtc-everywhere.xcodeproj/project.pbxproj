@@ -31,6 +31,12 @@
 		152833291B7D248B00099EF2 /* videocapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 152833271B7D248B00099EF2 /* videocapturer.cc */; };
 		1528332A1B7D248B00099EF2 /* videocapturer.h in Headers */ = {isa = PBXBuildFile; fileRef = 152833281B7D248B00099EF2 /* videocapturer.h */; };
 		1528332C1B7D24E300099EF2 /* messagehandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1528332B1B7D24E300099EF2 /* messagehandler.cc */; };
+		15F1FCC71B8D508900CCB05F /* _ScreenVideoCapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 15F1FCC51B8D508900CCB05F /* _ScreenVideoCapturer.cc */; };
+		15F1FCC81B8D508900CCB05F /* _ScreenVideoCapturer.h in Headers */ = {isa = PBXBuildFile; fileRef = 15F1FCC61B8D508900CCB05F /* _ScreenVideoCapturer.h */; };
+		15F1FCCB1B8D54C900CCB05F /* thread.cc in Sources */ = {isa = PBXBuildFile; fileRef = 15F1FCC91B8D54C900CCB05F /* thread.cc */; };
+		15F1FCCC1B8D54C900CCB05F /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 15F1FCCA1B8D54C900CCB05F /* thread.h */; };
+		15F1FCCF1B8D550200CCB05F /* messagequeue.cc in Sources */ = {isa = PBXBuildFile; fileRef = 15F1FCCD1B8D550200CCB05F /* messagequeue.cc */; };
+		15F1FCD01B8D550200CCB05F /* messagequeue.h in Headers */ = {isa = PBXBuildFile; fileRef = 15F1FCCE1B8D550200CCB05F /* messagequeue.h */; };
 		EC23B3B219738D9B000DFA4B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC23B3B119738D9B000DFA4B /* OpenGL.framework */; };
 		EC23B3B419738DA2000DFA4B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC23B3B319738DA2000DFA4B /* GLUT.framework */; };
 		EC23B3E71974E0E2000DFA4B /* BrowserCallback.cc in Sources */ = {isa = PBXBuildFile; fileRef = EC23B3BC1974E0E2000DFA4B /* BrowserCallback.cc */; };
@@ -131,6 +137,12 @@
 		152833271B7D248B00099EF2 /* videocapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = videocapturer.cc; path = "../../../webrtc-checkout/src/talk/media/base/videocapturer.cc"; sourceTree = "<group>"; };
 		152833281B7D248B00099EF2 /* videocapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = videocapturer.h; path = "../../../webrtc-checkout/src/talk/media/base/videocapturer.h"; sourceTree = "<group>"; };
 		1528332B1B7D24E300099EF2 /* messagehandler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = messagehandler.cc; path = "../../../webrtc-checkout/src/webrtc/base/messagehandler.cc"; sourceTree = "<group>"; };
+		15F1FCC51B8D508900CCB05F /* _ScreenVideoCapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _ScreenVideoCapturer.cc; sourceTree = "<group>"; };
+		15F1FCC61B8D508900CCB05F /* _ScreenVideoCapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ScreenVideoCapturer.h; sourceTree = "<group>"; };
+		15F1FCC91B8D54C900CCB05F /* thread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = thread.cc; path = "../../../webrtc-checkout/src/webrtc/base/thread.cc"; sourceTree = "<group>"; };
+		15F1FCCA1B8D54C900CCB05F /* thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = thread.h; path = "../../../webrtc-checkout/src/webrtc/base/thread.h"; sourceTree = "<group>"; };
+		15F1FCCD1B8D550200CCB05F /* messagequeue.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = messagequeue.cc; path = "../../../webrtc-checkout/src/webrtc/base/messagequeue.cc"; sourceTree = "<group>"; };
+		15F1FCCE1B8D550200CCB05F /* messagequeue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = messagequeue.h; path = "../../../webrtc-checkout/src/webrtc/base/messagequeue.h"; sourceTree = "<group>"; };
 		EC23B3B119738D9B000DFA4B /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		EC23B3B319738DA2000DFA4B /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		EC23B3B519739370000DFA4B /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
@@ -324,6 +336,10 @@
 		EC23B49B1975E72F000DFA4B /* mac */ = {
 			isa = PBXGroup;
 			children = (
+				15F1FCCD1B8D550200CCB05F /* messagequeue.cc */,
+				15F1FCCE1B8D550200CCB05F /* messagequeue.h */,
+				15F1FCC91B8D54C900CCB05F /* thread.cc */,
+				15F1FCCA1B8D54C900CCB05F /* thread.h */,
 				1528332B1B7D24E300099EF2 /* messagehandler.cc */,
 				152833271B7D248B00099EF2 /* videocapturer.cc */,
 				152833281B7D248B00099EF2 /* videocapturer.h */,
@@ -447,6 +463,8 @@
 				EC2AEBA71973457600360EC6 /* _SessionDescription.h */,
 				EC2AEBA81973457600360EC6 /* _Utils.cc */,
 				EC2AEBA91973457600360EC6 /* _Utils.h */,
+				15F1FCC51B8D508900CCB05F /* _ScreenVideoCapturer.cc */,
+				15F1FCC61B8D508900CCB05F /* _ScreenVideoCapturer.h */,
 				EC2AEBAF1973457600360EC6 /* resource.h */,
 			);
 			name = common;
@@ -482,10 +500,13 @@
 				ECE4C3BB19927D8000FFD159 /* RTCDataChannel.h in Headers */,
 				EC23B3F91974E0E2000DFA4B /* RTCIceCandidate.h in Headers */,
 				EC23B3F61974E0E2000DFA4B /* Plugin.h in Headers */,
+				15F1FCD01B8D550200CCB05F /* messagequeue.h in Headers */,
 				EC23B4011974E0E2000DFA4B /* SessionDescription.h in Headers */,
 				EC23B3FF1974E0E2000DFA4B /* RTCStatsReport.h in Headers */,
+				15F1FCC81B8D508900CCB05F /* _ScreenVideoCapturer.h in Headers */,
 				EC23B3F41974E0E2000DFA4B /* PeerConnection.h in Headers */,
 				EC23B4051974E0E2000DFA4B /* Utils.h in Headers */,
+				15F1FCCC1B8D54C900CCB05F /* thread.h in Headers */,
 				EC23B3F21974E0E2000DFA4B /* NPCommon.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -594,10 +615,13 @@
 				ECE4C3BA19927D8000FFD159 /* RTCDataChannel.cc in Sources */,
 				ECE4C3AA19927D4F00FFD159 /* _RTCDataChannel.cc in Sources */,
 				ECE4C3C019927D8000FFD159 /* RTCDTMFToneChangeEvent.cc in Sources */,
+				15F1FCC71B8D508900CCB05F /* _ScreenVideoCapturer.cc in Sources */,
 				152833291B7D248B00099EF2 /* videocapturer.cc in Sources */,
 				EC23B3FE1974E0E2000DFA4B /* RTCStatsReport.cc in Sources */,
 				EC2AEBF919734C6E00360EC6 /* _MediaStream.cc in Sources */,
+				15F1FCCF1B8D550200CCB05F /* messagequeue.cc in Sources */,
 				EC23B3EA1974E0E2000DFA4B /* MediaSourceStates.cc in Sources */,
+				15F1FCCB1B8D54C900CCB05F /* thread.cc in Sources */,
 				EC23B4001974E0E2000DFA4B /* SessionDescription.cc in Sources */,
 				EC2AEBFB19734C6E00360EC6 /* _MediaStreamConstraints.cc in Sources */,
 				EC2AEBFD19734C6E00360EC6 /* _MediaStreamTrack.cc in Sources */,
@@ -766,6 +790,7 @@
 				OTHER_CFLAGS = "$(WE_CFLAGS)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
+					"-lsystem_wrappers",
 					"-ljingle_peerconnection",
 					"-ljsoncpp",
 					"-lexpat",
@@ -782,7 +807,6 @@
 					"-laudio_coding_module",
 					"-lCNG",
 					"-lcommon_audio",
-					"-lsystem_wrappers",
 					"-lopenmax_dl",
 					"-lcommon_audio_sse2",
 					"-laudio_encoder_interface",
@@ -832,6 +856,7 @@
 					"-lrtc_p2p",
 					"-lvideo_capture_module_internal_impl",
 					"-lvideo_render_module_internal_impl",
+					"-ldesktop_capture",
 					"-ljingle_p2p",
 					"-lsrtp",
 					"-lwebrtc_h264",
@@ -860,6 +885,7 @@
 				OTHER_CFLAGS = "$(WE_CFLAGS)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
+					"-lsystem_wrappers",
 					"-ljingle_peerconnection",
 					"-ljsoncpp",
 					"-lexpat",
@@ -876,7 +902,6 @@
 					"-laudio_coding_module",
 					"-lCNG",
 					"-lcommon_audio",
-					"-lsystem_wrappers",
 					"-lopenmax_dl",
 					"-lcommon_audio_sse2",
 					"-laudio_encoder_interface",
@@ -926,6 +951,7 @@
 					"-lrtc_p2p",
 					"-lvideo_capture_module_internal_impl",
 					"-lvideo_render_module_internal_impl",
+					"-ldesktop_capture",
 					"-ljingle_p2p",
 					"-lsrtp",
 					"-lwebrtc_h264",
@@ -945,6 +971,7 @@
 				152833361B7D76FF00099EF2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		EC2AEB6E1973449200360EC6 /* Build configuration list for PBXProject "webrtc-everywhere" */ = {
 			isa = XCConfigurationList;
