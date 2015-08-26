@@ -70,11 +70,8 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - **WIN64**<br />
  ```
  python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=win
- ninja -C out/Debug
- ninja -C out/Release
-
- mv out/Debug out/Debug_x64
- mv out/Release out/Release_x64
+ ninja -C out/Debug_x64
+ ninja -C out/Release_x64
  ```
  
  - **WIN32**<br />
