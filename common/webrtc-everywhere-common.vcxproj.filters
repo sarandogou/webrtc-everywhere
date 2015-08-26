@@ -66,6 +66,9 @@
     <ClCompile Include="_EncryptCtx.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="_ScreenVideoCapturer.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="_Buffer.h">
@@ -126,6 +129,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="_EncryptCtx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="_ScreenVideoCapturer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

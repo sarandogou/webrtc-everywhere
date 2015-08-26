@@ -1,6 +1,7 @@
 /* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#mediastreamtrack
 #include "_MediaStreamTrack.h"
+#include "_ScreenVideoCapturer.h"
 #include "_Common.h"
 #include "_Utils.h"
 #include "_Debug.h"
@@ -26,7 +27,7 @@ _MediaStreamTrack::_MediaStreamTrack(_MediaStreamTrackType eType, MediaStreamTra
 	, m_pConstraints(nullPtr)
 {
 	static long __label = 1;
-	
+
 	m_label = _Utils::ToString(we_atomic_inc(&__label));
 }
 
@@ -42,14 +43,17 @@ cpp11::shared_ptr<_Sequence<_SourceInfo> > _MediaStreamTrack::getSourceInfos()
 
 	rtc::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
 		cricket::DeviceManagerFactory::Create());
+
 	if (!dev_manager->Init()) {
 		LOG(LS_ERROR) << "Can't create device manager";
 		return infos;
 	}
+	// Set ScreenCapturer Factory
+	dev_manager->SetScreenCapturerFactory(new _ScreenVideoCapturerFactory());
 
 	// VideoCapture
 	std::vector<cricket::Device> devs;
-    std::string video("video");
+	std::string video("video");
 	if (dev_manager->GetVideoCaptureDevices(&devs)) {
 		std::vector<cricket::Device>::iterator dev_it = devs.begin();
 		for (; dev_it != devs.end(); ++dev_it) {
@@ -66,7 +70,7 @@ cpp11::shared_ptr<_Sequence<_SourceInfo> > _MediaStreamTrack::getSourceInfos()
 	// AudioOut
 	if (dev_manager->GetAudioOutputDevices(&devs)) {
 		std::vector<cricket::Device>::iterator dev_it = devs.begin();
-        std::string audio("audio");
+		std::string audio("audio");
 		for (; dev_it != devs.end(); ++dev_it) {
 			info = cpp11::shared_ptr<_SourceInfo>(new _SourceInfo(dev_it->id, audio, dev_it->name));
 			if (info.get()) {
@@ -82,7 +86,7 @@ cpp11::shared_ptr<_Sequence<_SourceInfo> > _MediaStreamTrack::getSourceInfos()
 	// AudioIn
 	if (dev_manager->GetAudioInputDevices(&devs)) {
 		std::vector<cricket::Device>::iterator dev_it = devs.begin();
-        std::string audio("audio");
+		std::string audio("audio");
 		for (; dev_it != devs.end(); ++dev_it) {
 			info = cpp11::shared_ptr<_SourceInfo>(new _SourceInfo(dev_it->id, audio, dev_it->name));
 			if (info.get()) {
@@ -93,7 +97,13 @@ cpp11::shared_ptr<_Sequence<_SourceInfo> > _MediaStreamTrack::getSourceInfos()
 	else {
 		LOG(LS_ERROR) << "Can't enumerate audioIn devices";
 		return infos;
-	}	
+	}
+
+	// ScreenCapturer
+	info = cpp11::shared_ptr<_SourceInfo>(new _SourceInfo(kDoubangoScreenshareSourceId, kDoubangoScreenshareKind, kDoubangoScreenshareLabel));
+	if (info.get()) {
+		infos->Add(info);
+	}
 
 	return infos;
 }
@@ -186,7 +196,7 @@ cpp11::shared_ptr<_AllCapabilities> _MediaStreamTrackBase::capabilities()
 void _MediaStreamTrackBase::applyConstraints(const _MediaTrackConstraints* constrains)
 {
 	if (_track()) {
-		
+
 	}
 
 	// http://www.w3.org/TR/mediacapture-streams/#widl-MediaStreamTrack-applyConstraints-void-MediaTrackConstraints-constraints
@@ -206,7 +216,7 @@ cpp11::shared_ptr<_MediaStreamTrack> _MediaStreamTrackBase::clone()
 void _MediaStreamTrackBase::stop()
 {
 	if (_track()) {
-		
+
 	}
 
 	// http://www.w3.org/TR/mediacapture-streams/#widl-MediaStreamTrack-stop-void
@@ -296,34 +306,39 @@ _MediaStreamTrackVideo:: ~_MediaStreamTrackVideo()
 #include "webrtc/modules/video_capture/include/video_capture_factory.h"
 class _VideoCapturerFactory : public cricket::VideoDeviceCapturerFactory {
 public:
-    _VideoCapturerFactory() {}
-    virtual ~_VideoCapturerFactory() {}
-    
-    cricket::VideoCapturer* Create(const cricket::Device& device) {
-        cricket::WebRtcVideoCapturer* return_value = new cricket::WebRtcVideoCapturer();
-        if (!return_value->Init(device)) {
-            delete return_value;
-            return NULL;
-        }
-        return return_value;
-    }
+	_VideoCapturerFactory() {}
+	virtual ~_VideoCapturerFactory() {}
+
+	cricket::VideoCapturer* Create(const cricket::Device& device) {
+		cricket::WebRtcVideoCapturer* return_value = new cricket::WebRtcVideoCapturer();
+		if (!return_value->Init(device)) {
+			delete return_value;
+			return NULL;
+		}
+		return return_value;
+	}
 };
 #endif /* WE_UNDER_APPLE */
 
 static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
+	// Create device manager
 	rtc::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
 		cricket::DeviceManagerFactory::Create());
+	
 	if (!dev_manager->Init()) {
 		LOG(LS_ERROR) << "Can't create device manager";
 		return NULL;
 	}
-    
-    // ISSUE: https://groups.google.com/forum/#!topic/discuss-webrtc/RV6oKhY2qEM
+
+	// Set ScreenCapturer Factory
+	dev_manager->SetScreenCapturerFactory(new _ScreenVideoCapturerFactory());
+
+	// ISSUE: https://groups.google.com/forum/#!topic/discuss-webrtc/RV6oKhY2qEM
 #if WE_UNDER_APPLE
     cricket::DeviceManager* device_manager = static_cast<cricket::DeviceManager*>(dev_manager.get());
     device_manager->SetVideoDeviceCapturerFactory(new _VideoCapturerFactory());
 #endif /* WE_UNDER_APPLE  */
-    
+
 	std::vector<cricket::Device> devs;
 	if (!dev_manager->GetVideoCaptureDevices(&devs)) {
 		LOG(LS_ERROR) << "Can't enumerate video devices";
@@ -332,7 +347,22 @@ static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
 	std::vector<cricket::Device>::iterator dev_it;
 	cricket::VideoCapturer* capturer = NULL;
 
+// To force ScreenCast
+#if 0
+	capturer = dev_manager->CreateScreenCapturer(cricket::ScreencastId(rtc::WindowId(0)));
+	if (capturer) {
+		return capturer;
+	}
+#endif
+
 	if (!id.empty()) {
+		if (id == kDoubangoScreenshareSourceId) {
+			capturer = dev_manager->CreateScreenCapturer(cricket::ScreencastId(rtc::WindowId(0)));
+			if (capturer) {
+				return capturer;
+			}
+		}
+
 		for (dev_it = devs.begin(); dev_it != devs.end(); ++dev_it) {
 			if ((*dev_it).id == id) {
 				capturer = dev_manager->CreateVideoCapturer(*dev_it);
@@ -342,37 +372,37 @@ static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
 			}
 		}
 	}
-    
+
 #if 0
-    webrtc::VideoCaptureModule::DeviceInfo *info = webrtc::VideoCaptureFactory::CreateDeviceInfo(0);
-    if (info) {
-        // Find the desired camera, by name.
-        // In the future, comparing IDs will be more robust.
-        // TODO(juberti): Figure what's needed to allow this.
-        int num_cams = info->NumberOfDevices();
-        char vcm_id[256] = "";
-        bool found = false;
-        for (int index = 0; index < num_cams; ++index) {
-            char vcm_name[256];
-            if (info->GetDeviceName(index, vcm_name, ARRAY_SIZE(vcm_name),
-                                    vcm_id, ARRAY_SIZE(vcm_id)) != -1) {
-                if ((*devs.begin()).name == reinterpret_cast<char*>(vcm_name)) {
-                    found = true;
-                    break;
-                }
-            }
-        }
-        if (found) {
-            //std::vector<VideoFormat> supported;
-            int32_t num_caps = info->NumberOfCapabilities(vcm_id);
-            for (int32_t i = 0; i < num_caps; ++i) {
-                webrtc::VideoCaptureCapability cap;
-                if (info->GetCapability(vcm_id, i, cap) != -1) {
-                    printf("");
-                }
-            }
-        }
-    }
+	webrtc::VideoCaptureModule::DeviceInfo *info = webrtc::VideoCaptureFactory::CreateDeviceInfo(0);
+	if (info) {
+		// Find the desired camera, by name.
+		// In the future, comparing IDs will be more robust.
+		// TODO(juberti): Figure what's needed to allow this.
+		int num_cams = info->NumberOfDevices();
+		char vcm_id[256] = "";
+		bool found = false;
+		for (int index = 0; index < num_cams; ++index) {
+			char vcm_name[256];
+			if (info->GetDeviceName(index, vcm_name, ARRAY_SIZE(vcm_name),
+				vcm_id, ARRAY_SIZE(vcm_id)) != -1) {
+				if ((*devs.begin()).name == reinterpret_cast<char*>(vcm_name)) {
+					found = true;
+					break;
+				}
+			}
+		}
+		if (found) {
+			//std::vector<VideoFormat> supported;
+			int32_t num_caps = info->NumberOfCapabilities(vcm_id);
+			for (int32_t i = 0; i < num_caps; ++i) {
+				webrtc::VideoCaptureCapability cap;
+				if (info->GetCapability(vcm_id, i, cap) != -1) {
+					printf("");
+				}
+			}
+		}
+	}
 #endif
 
 	for (dev_it = devs.begin(); dev_it != devs.end(); ++dev_it) {
@@ -380,5 +410,6 @@ static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
 		if (capturer != NULL)
 			break;
 	}
+
 	return capturer;
 }

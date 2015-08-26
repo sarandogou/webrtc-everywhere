@@ -12,13 +12,13 @@
 #endif
 
 #if !defined(kPluginVersionMajor)
-#	define kPluginVersionMajor 1
+#	define kPluginVersionMajor 2
 #endif
 #if !defined(kPluginVersionMinor)
-#	define kPluginVersionMinor 3
+#	define kPluginVersionMinor 0
 #endif
 #if !defined(kPluginVersionMicro)
-#	define kPluginVersionMicro 1
+#	define kPluginVersionMicro 0
 #endif
 #if !defined(kPluginVersionString)
 #	define kPluginVersionString WE_STRING(WE_CAT(kPluginVersionMajor, .)) WE_STRING(WE_CAT(kPluginVersionMinor, .)) WE_STRING(kPluginVersionMicro)

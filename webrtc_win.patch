@@ -1,0 +1,32 @@
+ webrtc/base/win32window.cc | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/webrtc/base/win32window.cc b/webrtc/base/win32window.cc
+index 4d41014..715f181 100644
+--- a/webrtc/base/win32window.cc
++++ b/webrtc/base/win32window.cc
+@@ -53,13 +53,21 @@ bool Win32Window::Create(HWND parent, const wchar_t* title, DWORD style,
+     wcex.lpfnWndProc = &Win32Window::WndProc;
+     wcex.lpszClassName = kWindowBaseClassName;
+     window_class_ = ::RegisterClassEx(&wcex);
+-    if (!window_class_) {
+-      LOG_GLE(LS_ERROR) << "RegisterClassEx failed";
+-      return false;
++	if (!window_class_) {
++		if (GetLastError() == ERROR_CLASS_ALREADY_EXISTS) {
++			LOG_GLE(LS_WARNING) << "RegisterClassEx failed: ERROR_CLASS_ALREADY_EXISTS";
++		}
++		else {
++			LOG_GLE(LS_ERROR) << "RegisterClassEx failed";
++			return false;
++		}
+     }
+   }
+   wnd_ = ::CreateWindowEx(exstyle, kWindowBaseClassName, title, style,
+                           x, y, cx, cy, parent, NULL, instance_, this);
++  if (wnd_ && !window_class_) {
++	  window_class_ = GetClassWord(wnd_, GCW_ATOM);
++  }
+   return (NULL != wnd_);
+ }
+ 

@@ -92,6 +92,11 @@ static const char kRTCDataChannelStateOpen[] = "open";
 static const char kRTCDataChannelStateClosing[] = "closing";
 static const char kRTCDataChannelStateClosed[] = "closed";
 
+// ScreenShare
+static const char kDoubangoScreenshareSourceId[] = "X978DoubangoTelecomScreenCapturer785";
+static const char kDoubangoScreenshareLabel[] = "ScreenCapturer (Doubango Telecom)";
+static const char kDoubangoScreenshareKind[] = "video";
+
 #define kMaxParamArgs 10
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays

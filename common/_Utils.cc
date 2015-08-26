@@ -64,8 +64,10 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 		HRESULT hr = E_FAIL; // CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		g_winCoInitialize = SUCCEEDED(hr);
 		rtc::EnsureWinsockInit();
+#if 1
 		static rtc::Win32Thread w32_thread;
 		rtc::ThreadManager::Instance()->SetCurrentThread(&w32_thread);
+#endif
 #endif
         
 #if WE_UNDER_MAC
