@@ -113,9 +113,9 @@ The best way to get help is via our <a href="https://groups.google.com/forum/#!f
 
 # Release notes
  - **2.0.0**
-  - Adds support for Screenshare on OSX and Windows 
+  - Adds support for Screenshare on OSX and Windows
+  - Adds support for OSX X86_64
   - Fix issue [#1](../../issues/1), [#16](../../issues/16), [#26](../../issues/26), [#28](../../issues/28), [#29](../../issues/29), [#31](../../issues/31) and [#32](../../issues/32)
-  - Adds support for x64 (Windows)
 
  - **1.3.1**
   - Fix issue [Issue #24](../../issues/24), [Issue #23](../../issues/23), [Issue #22](../../issues/22), [Issue #21](../../issues/21), [Issue #19](../../issues/19), [Issue #15](../../issues/15), [Issue #13](../../issues/13) and [Issue #2](../../issues/2)
