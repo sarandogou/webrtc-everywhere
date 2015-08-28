@@ -120,7 +120,6 @@ The best way to get help is via our <a href="https://groups.google.com/forum/#!f
  - **1.3.1**
   - Fix issue [Issue #24](../../issues/24), [Issue #23](../../issues/23), [Issue #22](../../issues/22), [Issue #21](../../issues/21), [Issue #19](../../issues/19), [Issue #15](../../issues/15), [Issue #13](../../issues/13) and [Issue #2](../../issues/2)
 
-# Release notes
  - **1.2.2**
   - Fix [Issue #17](../../issues/17) and [Issue #18](../../issues/18)
 
