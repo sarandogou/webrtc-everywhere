@@ -8,7 +8,7 @@
 The following samples use our <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> and could be tested on Safari and Internet Explorer (off course they also work on Firefox and Chrome): 
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia" target="_blank">getUserMedia()</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-resolution" target="_blank">Choose camera resolution</a>
- - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone </a> (on version 2.0.0 it's also used to test screenshare)
+ - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-audio" target="_blank">Audio-only getUserMedia() output to local audio element</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-canvas" target="_blank">getUserMedia() + Canvas</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-filter" target="_blank">getUserMedia() + Canvas + CSS filters</a> (<font color="red">slowness issue fixed in 1.1.0</font>)
@@ -40,17 +40,6 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
   ```
  attachMediaStream(document.getElementById("eltId"), mediaStream);
   ```
-
-# Screenshare
-Support for screenshare was added in version 2.0. To choose your screen as video media source (instead of the camera) you need to use ***"X978DoubangoTelecomScreenCapturer785"*** as **sourceId**.
-
-![alt Screenshare](ScreenShare.png)
-
-
-Sample code to select your screen as media source: 
- ```
- navigator.getUserMedia({ "video": {optional: [{sourceId: "X978DoubangoTelecomScreenCapturer785"}]}}, okfn, errfn);
- ```
 
 # Building source code
  - fetch webrtc code as explained at [http://www.webrtc.org/native-code/development](http://www.webrtc.org/native-code/development) in the **same folder** as webrtc-everywhere.
