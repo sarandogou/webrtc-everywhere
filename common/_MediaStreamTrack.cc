@@ -353,10 +353,7 @@ static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string _deviceId, std
 
 // To force ScreenCast
 #if 0
-	capturer = dev_manager->CreateScreenCapturer(cricket::ScreencastId(rtc::WindowId(0)));
-	if (capturer) {
-		return capturer;
-	}
+	_deviceId = kDoubangoScreenshareSourceId;
 #endif
 
 	if (!_deviceId.empty()) {

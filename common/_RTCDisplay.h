@@ -11,8 +11,6 @@
 #	include <atlbase.h>
 #	include <atlcom.h>
 #	include <atlctl.h>
-#	include <D3D10_1.h> // Requires Windows Vista or later
-#	include <DXGI.h> // Requires Windows 7 or later
 #endif
 #if WE_UNDER_APPLE
 #import <Cocoa/Cocoa.h>
@@ -36,13 +34,14 @@ public:
     void SetLayer(CALayer *layer);
     CALayer *GetLayer();
 #endif
-	bool PaintFrame();
+	bool PaintFrame(intptr_t layer = 0);
 	int GetVideoWidth();
 	int GetVideoHeight();
 	size_t CopyFromFrame(void* bufferPtr, size_t bufferSize);
 #if WE_UNDER_WINDOWS
-	void SetFnQuerySurfacePresenter(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter);
 	void SetFnQueryHwnd(cpp11::function<HWND()> fnQueryHwnd);
+	void SetFnIsWindowless(cpp11::function<BOOL()> fnIsWindowless);
+	void SetFnInvalidateWindowless(cpp11::function<HRESULT(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase)> fnInvalidateWindowless);
 #endif
 
 	// VideoRendererInterface implementation
@@ -59,8 +58,9 @@ private:
 	HWND m_Hwnd;
 	LONG_PTR m_lpUsrData;
 	BITMAPINFO m_bmi;
-	cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> m_fnQuerySurfacePresenter;
 	cpp11::function<HWND()> m_fnQueryHwnd;
+	cpp11::function<BOOL()> m_fnIsWindowless;
+	cpp11::function<HRESULT(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase)> m_fnInvalidateWindowless;
 #elif WE_UNDER_APPLE
     CALayer *m_layer;
     CGContextRef m_context;
@@ -92,7 +92,7 @@ public:
 	
 	void StartVideoRenderer(VideoTrackInterfacePtr video);
 	void StopVideoRenderer();
-	bool PaintFrame();
+	bool PaintFrame(intptr_t layer = 0);
 
 	int GetVideoWidth();
 	int GetVideoHeight();
@@ -100,9 +100,10 @@ public:
 
 #if WE_UNDER_WINDOWS
 	virtual HWND Handle() = 0;
-	virtual void QuerySurfacePresenter(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)
-	{
-		spPtr = NULL, spText = NULL, backBuffWidth = 0, backBuffHeight = 0;
+	virtual BOOL IsWindowless() { return FALSE; };
+	virtual HRESULT InvalidateWindowless(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase) {
+		assert(IsWindowless());
+		return S_OK;
 	}
 	virtual HWND QueryHwnd()
 	{

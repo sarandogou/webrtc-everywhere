@@ -18,6 +18,9 @@
 #	define kDoubangoSharedMemoryId 85697421
 #endif /* kDoubangoSharedMemoryId */
 
+static const int64 kNumNanoSecsPerMilliSec = 1000000;
+static const int kDefaultScreencastFps = 5;
+
 
 class _SharedMemory : public webrtc::SharedMemory {
 public:
@@ -73,6 +76,9 @@ public:
 		capture_(webrtc::WindowCapturer::Create()),
 		capture_thread_(NULL),
 		startThread_(NULL),
+		start_time_ns_(0),
+		last_frame_timestamp_ns_(0),
+		start_read_time_ms_(0),
 		rotation_(webrtc::kVideoRotation_0) {
 
 #ifdef HAVE_WEBRTC_VIDEO
@@ -83,7 +89,6 @@ public:
 
 		// Default supported formats. Use ResetSupportedFormats to over write.
 		std::vector<cricket::VideoFormat> formats;
-		static const int kDefaultScreencastFps = 5;
 #if WE_UNDER_WINDOWS
 		static enum cricket::FourCC defaultFourCC = cricket::FOURCC_ARGB;
 		formats.push_back(cricket::VideoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
@@ -130,6 +135,7 @@ public:
 		return true;
 	}
 	bool CaptureFrame() {
+		start_read_time_ms_ = rtc::Time();
 		capture_->Capture(webrtc::DesktopRegion());
 		return IsRunning();
 	}
@@ -158,6 +164,8 @@ public:
 		// frames need to be sent to.
 		DCHECK(!startThread_);
 		startThread_ = rtc::Thread::Current();
+
+		start_time_ns_ = kNumNanoSecsPerMilliSec * static_cast<int64>(rtc::Time());
 
 		bool ret = capture_thread_->Start();
 		if (ret) {
@@ -243,6 +251,9 @@ public:
 			curr_frame_.fourcc = GetCaptureFormat()->fourcc;
 			curr_frame_.data_size = data_size;
 			curr_frame_.data = desktopFrame->data();
+			curr_frame_.time_stamp = kNumNanoSecsPerMilliSec *
+				static_cast<int64>(start_read_time_ms_);
+			curr_frame_.elapsed_time = curr_frame_.time_stamp - start_time_ns_;
 
 			if (startThread_->IsCurrent()) {
 				SignalFrameCaptured(this, &curr_frame_);
@@ -269,6 +280,9 @@ private:
 	rtc::scoped_ptr<webrtc::DesktopFrame> next_frame_;
 	cricket::CapturedFrame curr_frame_;
 	rtc::Thread* startThread_;  // Set in Start(), unset in Stop().
+	int64 start_time_ns_;  // Time when the video capturer starts.
+	int64 last_frame_timestamp_ns_;  // Timestamp of last read frame.
+	uint32 start_read_time_ms_; // Timestamp we requested screenshot
 	DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturer);
 };
 

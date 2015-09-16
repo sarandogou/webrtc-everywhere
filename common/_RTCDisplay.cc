@@ -9,8 +9,6 @@
 
 #if WE_UNDER_WINDOWS
 #include <Windows.h>
-#include <D3D9.h>
-
 #endif
 
 
@@ -140,23 +138,43 @@ CALayer *_VideoRenderer::GetLayer()
 
 // On Windows, must be called inside OnPaint()
 // Requires valid m_Hwnd
-bool _VideoRenderer::PaintFrame()
+bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 {
     _AutoLock<_VideoRenderer> lock(this);
 
 #if WE_UNDER_WINDOWS
     const uint8* image = m_image.get();
-	if (m_Hwnd && image) {
+	ATL_DRAWINFO* drawInfo  = reinterpret_cast<ATL_DRAWINFO*>(layer);
+	if ((m_Hwnd || drawInfo) && image) {
 		PAINTSTRUCT ps;
 		HDC hdc;
-		if (!(hdc = ::BeginPaint(m_Hwnd, &ps))) {
-			return false;
+		if (m_Hwnd) {
+			if (!(hdc = ::BeginPaint(m_Hwnd, &ps))) {
+				return false;
+			}
+		}
+		else {
+			memset(&ps, 0, sizeof(ps));
+			ps.hdc = hdc = drawInfo->hdcDraw;
 		}
 
 		RECT rc;
-		if (!::GetClientRect(m_Hwnd, &rc)) {
-			::EndPaint(m_Hwnd, &ps);
-			return false;
+		if (m_Hwnd) {
+			if (!::GetClientRect(m_Hwnd, &rc)) {
+				::EndPaint(m_Hwnd, &ps);
+				return false;
+			}
+		}
+		else {
+			//TODO(dmi): Image not at the right position
+			rc.left = 0;
+			rc.right = abs(drawInfo->prcBounds->left) + abs(drawInfo->prcBounds->right);
+			rc.top = 0;
+			rc.bottom = abs(drawInfo->prcBounds->top) + abs(drawInfo->prcBounds->bottom);
+			/* rc.left = drawInfo->prcBounds->left;
+			rc.right = drawInfo->prcBounds->right;
+			rc.top = drawInfo->prcBounds->top;
+			rc.bottom = drawInfo->prcBounds->bottom; */
 		}
 
 #if 1
@@ -202,8 +220,9 @@ bool _VideoRenderer::PaintFrame()
 		::StretchDIBits(hdc, 0, 0, (rc.right - rc.left), (rc.bottom - rc.top),
 			0, 0, m_bmi.bmiHeader.biWidth, abs(m_bmi.bmiHeader.biHeight), image, &m_bmi, DIB_RGB_COLORS, SRCCOPY);
 #endif
-
-		::EndPaint(m_Hwnd, &ps);
+		if (m_Hwnd) {
+			::EndPaint(m_Hwnd, &ps);
+		}
 
 		return true;
 	}
@@ -245,18 +264,25 @@ size_t _VideoRenderer::CopyFromFrame(void* bufferPtr, size_t bufferSize)
 }
 
 #if WE_UNDER_WINDOWS
-void _VideoRenderer::SetFnQuerySurfacePresenter(cpp11::function<void(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight)> fnQuerySurfacePresenter)
-{
-	_AutoLock<_VideoRenderer> lock(this);
-
-	m_fnQuerySurfacePresenter = fnQuerySurfacePresenter;
-}
-
 void _VideoRenderer::SetFnQueryHwnd(cpp11::function<HWND()> fnQueryHwnd)
 {
 	_AutoLock<_VideoRenderer> lock(this);
 
 	m_fnQueryHwnd = fnQueryHwnd;
+}
+
+void _VideoRenderer::SetFnIsWindowless(cpp11::function<BOOL()> fnIsWindowless)
+{
+	_AutoLock<_VideoRenderer> lock(this);
+
+	m_fnIsWindowless = fnIsWindowless;
+}
+
+void _VideoRenderer::SetFnInvalidateWindowless(cpp11::function<HRESULT(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase)> fnInvalidateWindowless)
+{
+	_AutoLock<_VideoRenderer> lock(this);
+
+	m_fnInvalidateWindowless = fnInvalidateWindowless;
 }
 
 #endif /* WE_UNDER_WINDOWS */
@@ -333,29 +359,21 @@ void _VideoRenderer::RenderFrame(const cricket::VideoFrame* frame)
 		m_bmi.bmiHeader.biWidth *
 		m_bmi.bmiHeader.biBitCount / 8);
 
-	if (!m_Hwnd && m_fnQueryHwnd) {
-		SetHwnd(m_fnQueryHwnd(), m_lpUsrData);
-	}
-	
-	if (m_Hwnd) {
-		InvalidateRect(m_Hwnd, NULL, TRUE);
-	}
-#if 0
-	else if (m_fnQuerySurfacePresenter){
-		CComPtr<ISurfacePresenter> spSurfacePresenter = NULL;
-		CComPtr<ID3D10Texture2D> spText = NULL;
-		int backBuffWidth = 0, backBuffHeight = 0;
-		m_fnQuerySurfacePresenter(spSurfacePresenter, spText, backBuffWidth, backBuffHeight);
-		if (spSurfacePresenter && spText && backBuffWidth && backBuffHeight) {
-			D3D10_MAPPED_TEXTURE2D pMappedTex2D = { 0 };
-			HRESULT hr = spText->Map(D3D10CalcSubresource(0, 0, 1), D3D10_MAP_WRITE_DISCARD, 0/* D3D10_MAP_FLAG_DO_NOT_WAIT*/, &pMappedTex2D);
-			if (SUCCEEDED(hr)) {
-				memcpy(pMappedTex2D.pData, m_image.get(), (m_width * 10 * 4));
-				spText->Unmap(D3D10CalcSubresource(0, 0, 1));
-			}
+	if (m_fnIsWindowless && m_fnIsWindowless()) {
+		// windowless
+		if (m_fnInvalidateWindowless) {
+			m_fnInvalidateWindowless(NULL, TRUE);
 		}
 	}
-#endif
+	else {
+		// windowed
+		if (!m_Hwnd && m_fnQueryHwnd) {
+			SetHwnd(m_fnQueryHwnd(), m_lpUsrData);
+		}
+		if (m_Hwnd) {
+			InvalidateRect(m_Hwnd, NULL, TRUE);
+		}
+	}
 #elif WE_UNDER_APPLE
     if (m_context_buff && m_context && m_layer) {
         frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, m_image.get(), m_context_buff_size, m_width * 4);
@@ -409,8 +427,9 @@ void _RTCDisplay::StartVideoRenderer(VideoTrackInterfacePtr video)
 		_VideoRenderer* _video = new _VideoRenderer(1, 1, cpp11::bind(&_RTCDisplay::OnStartVideoRenderer, this), _v);
 		if (_video) {
 #if WE_UNDER_WINDOWS
-            _video->SetFnQuerySurfacePresenter(cpp11::bind(&_RTCDisplay::QuerySurfacePresenter, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 			_video->SetFnQueryHwnd(cpp11::bind(&_RTCDisplay::QueryHwnd, this));
+			_video->SetFnIsWindowless(cpp11::bind(&_RTCDisplay::IsWindowless, this));
+			_video->SetFnInvalidateWindowless(cpp11::bind(&_RTCDisplay::InvalidateWindowless, this, std::placeholders::_1, std::placeholders::_2));
 			_video->SetHwnd(Handle(), reinterpret_cast<LONG_PTR>(this));
 #elif WE_UNDER_APPLE
             _video->SetLayer(Layer());
@@ -438,14 +457,14 @@ void _RTCDisplay::StopVideoRenderer()
 
 
 // On Windows, must be called inside OnPaint()
-bool _RTCDisplay::PaintFrame()
+bool _RTCDisplay::PaintFrame(intptr_t layer /*= 0*/)
 {	
 	_AutoLock<_RTCDisplay> lock(this);
 	
 	bool ret = false;
 
 	if (m_renderer.get()) {
-		ret = m_renderer->PaintFrame();
+		ret = m_renderer->PaintFrame(layer);
 	}
 
 	return ret;

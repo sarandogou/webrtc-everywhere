@@ -138,48 +138,7 @@ public:
 
 // IWebRTC
 public:
-    HRESULT OnDraw(ATL_DRAWINFO& di) {
-        RECT& rc = *(RECT*)di.prcBounds;
-        // Set Clip region to the rectangle specified by di.prcBounds
-        HRGN hRgnOld = NULL;
-        if (GetClipRgn(di.hdcDraw, hRgnOld) != 1) {
-            hRgnOld = NULL;
-        }
-        bool bSelectOldRgn = false;
-
-        HRGN hRgnNew = CreateRectRgn(rc.left, rc.top, rc.right, rc.bottom);
-
-        if (hRgnNew != NULL) {
-            bSelectOldRgn = (SelectClipRgn(di.hdcDraw, hRgnNew) != ERROR);
-        }
-
-        Rectangle(di.hdcDraw, rc.left, rc.top, rc.right, rc.bottom);
-        SetTextAlign(di.hdcDraw, TA_CENTER|TA_BASELINE);
-        LPCTSTR pszText = _T("ATL 8.0 : WebRTC");
-#ifndef _WIN32_WCE
-        TextOut(di.hdcDraw,
-                (rc.left + rc.right) / 2,
-                (rc.top + rc.bottom) / 2,
-                pszText,
-                lstrlen(pszText));
-#else
-        ExtTextOut(di.hdcDraw,
-                   (rc.left + rc.right) / 2,
-                   (rc.top + rc.bottom) / 2,
-                   ETO_OPAQUE,
-                   NULL,
-                   pszText,
-                   ATL::lstrlen(pszText),
-                   NULL);
-#endif
-
-        if (bSelectOldRgn) {
-            SelectClipRgn(di.hdcDraw, hRgnOld);
-        }
-
-        return S_OK;
-    }
-
+	HRESULT OnDraw(ATL_DRAWINFO& di);
 
     DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -211,20 +170,20 @@ public:
 
 	// IOleObjectImpl::SetClientSite()
 	STDMETHOD(SetClientSite)(_Inout_opt_ IOleClientSite *pClientSite);
-#if 0
+	
 	// IPersistPropertyBagImpl::Load
 	STDMETHOD(Load)(__RPC__in_opt IPropertyBag *pPropBag, __RPC__in_opt IErrorLog *pErrorLog);
 
 	// IOleInPlaceObject::SetObjectRects
 	STDMETHOD(SetObjectRects)(__RPC__in LPCRECT lprcPosRect, __RPC__in LPCRECT lprcClipRect);
-#endif
 	
 
 	// _RTCDisplay implementation
 	virtual HWND Handle();
+	virtual BOOL IsWindowless();
+	virtual HRESULT InvalidateWindowless(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase);
 	virtual void OnStartVideoRenderer();
 	virtual void OnStopVideoRenderer();
-	virtual void QuerySurfacePresenter(CComPtr<ISurfacePresenter> &spPtr, CComPtr<ID3D10Texture2D> &spText, int &backBuffWidth, int &backBuffHeight);
 
 	
 	HRESULT GetDispatch(CComPtr<IDispatch> &spDispatch);
@@ -232,19 +191,21 @@ public:
 
 	private:
 		HRESULT QueryWindow();
+		static LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	private:
 		_Buffer *m_pTempVideoBuff;
 		std::vector<CComPtr<IDispatch>>m_callbacks_onplay;
 		CComPtr<IViewObjectPresentSite> m_spPresentSite;
-		CComPtr<ISurfacePresenter> m_spSurfacePresenter;
-		CComPtr<ID3D10Texture2D> m_spText;
 		CComPtr<IHTMLLocation> m_spLocation;
 		CComPtr<IOleContainer> m_spContainer;
 		CComPtr<IHTMLDocument2> m_spDoc;
 		CComPtr<IHTMLWindow2> m_spWindow;
-		int m_nBackBuffWidth;
-		int m_nbackBuffHeight;
+		HWND m_hWindowlessHandle;
+		BOOL m_bVideoRendererStarted;
+
+		static HINSTANCE s_hInstance;
+		static ATOM s_WindowlessClass;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(WebRTC), CWebRTC)
