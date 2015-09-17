@@ -8,6 +8,7 @@
 #include "webrtc/modules/desktop_capture/window_capturer.h"
 #include "webrtc/modules/desktop_capture/desktop_region.h"
 #include "webrtc/modules/desktop_capture/desktop_frame.h"
+#include "webrtc/base/constructormagic.h"
 
 #if WE_UNDER_APPLE
 #import <ApplicationServices/ApplicationServices.h>
@@ -33,7 +34,7 @@ public:
 	}
 private:
 	char* buffer_;
-	DISALLOW_COPY_AND_ASSIGN(_SharedMemory);
+	RTC_DISALLOW_COPY_AND_ASSIGN(_SharedMemory);
 };
 
 class _ScreenVideoCapturer;
@@ -59,7 +60,7 @@ private:
 	mutable rtc::CriticalSection crit_;
 	bool finished_;
 
-	DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturerThread);
+	RTC_DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturerThread);
 };
 
 //
@@ -283,7 +284,7 @@ private:
 	int64 start_time_ns_;  // Time when the video capturer starts.
 	int64 last_frame_timestamp_ns_;  // Timestamp of last read frame.
 	uint32 start_read_time_ms_; // Timestamp we requested screenshot
-	DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturer);
+	RTC_DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturer);
 };
 
 //
