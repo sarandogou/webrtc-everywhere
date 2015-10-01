@@ -263,7 +263,7 @@ bool _MediaStreamTrackAudio::muted()
 //
 //	_MediaStreamTrackVideo
 //
-static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id);
+static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string _deviceId, std::string _windowId = "");
 
 _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoTrackInterface> track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
 	: _MediaStreamTrackBase(_MediaStreamTrackTypeVideo, track, constrains)
@@ -275,12 +275,16 @@ _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoT
 			__MediaConstraintsObj _constrainsObject(constrains ? constrains->optional() : nullPtr, constrains ? constrains->mandatory() : nullPtr);
 			rtc::scoped_refptr<_RTCMediaConstraints> _constrains = BuildConstraints(&_constrainsObject);
 			std::string sourceId;
+			std::string windowId; // for screenCast (when sourceId is equal to kDoubangoScreenshareSourceId)
 			if (_constrains) {
 				if (!_constrains->GetMandatory().FindFirst("sourceId", &sourceId)) {
 					_constrains->GetOptional().FindFirst("sourceId", &sourceId);
 				}
+				if (!_constrains->GetMandatory().FindFirst("windowId", &windowId)) {
+					_constrains->GetOptional().FindFirst("windowId", &windowId);
+				}
 			}
-			cricket::VideoCapturer* capturer = OpenVideoCaptureDevice(sourceId);
+			cricket::VideoCapturer* capturer = OpenVideoCaptureDevice(sourceId, windowId);
 			if (!capturer) {
 				WE_DEBUG_ERROR("Failed to open video capture device");
 				return;
@@ -320,7 +324,7 @@ public:
 };
 #endif /* WE_UNDER_APPLE */
 
-static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
+static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string _deviceId, std::string _windowId /*= ""*/) {
 	// Create device manager
 	rtc::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
 		cricket::DeviceManagerFactory::Create());
@@ -349,22 +353,33 @@ static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string id) {
 
 // To force ScreenCast
 #if 0
-	capturer = dev_manager->CreateScreenCapturer(cricket::ScreencastId(rtc::WindowId(0)));
-	if (capturer) {
-		return capturer;
-	}
+	_deviceId = kDoubangoScreenshareSourceId;
 #endif
 
-	if (!id.empty()) {
-		if (id == kDoubangoScreenshareSourceId) {
-			capturer = dev_manager->CreateScreenCapturer(cricket::ScreencastId(rtc::WindowId(0)));
+	if (!_deviceId.empty()) {
+		if (_deviceId == kDoubangoScreenshareSourceId) {
+			rtc::WindowId windowId;
+			if (_windowId.empty()) {
+#if WE_UNDER_APPLE
+				rtc::WindowId::WindowT windowId_ = kCGNullWindowID;
+#elif WE_UNDER_WINDOWS
+				rtc::WindowId::WindowT windowId_ = GetDesktopWindow();
+#else
+				rtc::WindowId::WindowT windowId_ = 0;
+#endif
+				windowId = rtc::WindowId(windowId_);
+			}
+			else {
+				windowId = rtc::WindowId::Cast(atoll(_windowId.c_str()));
+			}
+			capturer = dev_manager->CreateScreenCapturer(cricket::ScreencastId(windowId));
 			if (capturer) {
 				return capturer;
 			}
 		}
 
 		for (dev_it = devs.begin(); dev_it != devs.end(); ++dev_it) {
-			if ((*dev_it).id == id) {
+			if ((*dev_it).id == _deviceId) {
 				capturer = dev_manager->CreateVideoCapturer(*dev_it);
 				if (capturer) {
 					return capturer;

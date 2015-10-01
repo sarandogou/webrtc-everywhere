@@ -5,7 +5,7 @@
 #include "talk/media/base/videocapturer.h"
 #include "talk/media/webrtc/webrtcvideoframefactory.h"
 #include "webrtc/modules/desktop_capture/shared_memory.h"
-#include "webrtc/modules/desktop_capture/screen_capturer.h"
+#include "webrtc/modules/desktop_capture/window_capturer.h"
 #include "webrtc/modules/desktop_capture/desktop_region.h"
 #include "webrtc/modules/desktop_capture/desktop_frame.h"
 
@@ -17,6 +17,9 @@
 #if !defined(kDoubangoSharedMemoryId)
 #	define kDoubangoSharedMemoryId 85697421
 #endif /* kDoubangoSharedMemoryId */
+
+static const int64 kNumNanoSecsPerMilliSec = 1000000;
+static const int kDefaultScreencastFps = 5;
 
 
 class _SharedMemory : public webrtc::SharedMemory {
@@ -66,13 +69,16 @@ private:
 // Fake video capturer that allows the test to manually pump in frames.
 // https://chromium.googlesource.com/external/webrtc/trunk/talk/+/master/app/webrtc/objc/avfoundationvideocapturer.h
 // https://chromium.googlesource.com/external/webrtc/+/master/talk/app/webrtc/objc/avfoundationvideocapturer.mm#
-class _ScreenVideoCapturer : public cricket::VideoCapturer, public webrtc::ScreenCapturer::Callback {
+class _ScreenVideoCapturer : public cricket::VideoCapturer, public webrtc::DesktopCapturer::Callback {
 public:
 	_ScreenVideoCapturer()
 		: running_(false),
-		capture_(webrtc::ScreenCapturer::Create()),
+		capture_(webrtc::WindowCapturer::Create()),
 		capture_thread_(NULL),
 		startThread_(NULL),
+		start_time_ns_(0),
+		last_frame_timestamp_ns_(0),
+		start_read_time_ms_(0),
 		rotation_(webrtc::kVideoRotation_0) {
 
 #ifdef HAVE_WEBRTC_VIDEO
@@ -83,7 +89,6 @@ public:
 
 		// Default supported formats. Use ResetSupportedFormats to over write.
 		std::vector<cricket::VideoFormat> formats;
-		static const int kDefaultScreencastFps = 5;
 #if WE_UNDER_WINDOWS
 		static enum cricket::FourCC defaultFourCC = cricket::FOURCC_ARGB;
 		formats.push_back(cricket::VideoFormat(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
@@ -130,6 +135,7 @@ public:
 		return true;
 	}
 	bool CaptureFrame() {
+		start_read_time_ms_ = rtc::Time();
 		capture_->Capture(webrtc::DesktopRegion());
 		return IsRunning();
 	}
@@ -158,6 +164,8 @@ public:
 		// frames need to be sent to.
 		DCHECK(!startThread_);
 		startThread_ = rtc::Thread::Current();
+
+		start_time_ns_ = kNumNanoSecsPerMilliSec * static_cast<int64>(rtc::Time());
 
 		bool ret = capture_thread_->Start();
 		if (ret) {
@@ -203,6 +211,14 @@ public:
 		next_frame_.reset(next_frame);
 	}
 
+	bool GetWindowList(webrtc::WindowCapturer::WindowList* windows) {
+		return capture_->GetWindowList(windows);
+	}
+
+	bool SelectWindow(webrtc::WindowCapturer::WindowId id) {
+		return capture_->SelectWindow(id);
+	}
+
 	webrtc::VideoRotation GetRotation() { return rotation_; }
 
 	// webrtc::ScreenCapturer::Callback::CreateSharedMemory
@@ -235,6 +251,9 @@ public:
 			curr_frame_.fourcc = GetCaptureFormat()->fourcc;
 			curr_frame_.data_size = data_size;
 			curr_frame_.data = desktopFrame->data();
+			curr_frame_.time_stamp = kNumNanoSecsPerMilliSec *
+				static_cast<int64>(start_read_time_ms_);
+			curr_frame_.elapsed_time = curr_frame_.time_stamp - start_time_ns_;
 
 			if (startThread_->IsCurrent()) {
 				SignalFrameCaptured(this, &curr_frame_);
@@ -256,11 +275,14 @@ public:
 private:
 	bool running_;
 	webrtc::VideoRotation rotation_;
-	rtc::scoped_ptr<webrtc::ScreenCapturer> capture_;
+	rtc::scoped_ptr<webrtc::WindowCapturer> capture_;
 	_ScreenVideoCapturerThread* capture_thread_;
 	rtc::scoped_ptr<webrtc::DesktopFrame> next_frame_;
 	cricket::CapturedFrame curr_frame_;
 	rtc::Thread* startThread_;  // Set in Start(), unset in Stop().
+	int64 start_time_ns_;  // Time when the video capturer starts.
+	int64 last_frame_timestamp_ns_;  // Timestamp of last read frame.
+	uint32 start_read_time_ms_; // Timestamp we requested screenshot
 	DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturer);
 };
 
@@ -277,12 +299,14 @@ cricket::VideoCapturer* _ScreenVideoCapturerFactory::Create(const cricket::Scree
 		return NULL;
 	}
 	window_capturer_ = new _ScreenVideoCapturer;
+	window_capturer_->SelectWindow(webrtc::WindowId(window.window().id()));
 	window_capturer_->SignalDestroyed.connect(
 		this,
 		&_ScreenVideoCapturerFactory::OnWindowCapturerDestroyed);
 	window_capturer_->SignalStateChange.connect(
 		this,
 		&_ScreenVideoCapturerFactory::OnStateChange);
+
 	return window_capturer_;
 }
 
@@ -302,6 +326,17 @@ void _ScreenVideoCapturerFactory::OnWindowCapturerDestroyed(_ScreenVideoCapturer
 
 void _ScreenVideoCapturerFactory::OnStateChange(cricket::VideoCapturer*, cricket::CaptureState state) {
 	capture_state_ = state;
+}
+
+bool _ScreenVideoCapturerFactory::GetWindowList(webrtc::WindowCapturer::WindowList* windows)
+{
+	_ScreenVideoCapturer* capturer = new _ScreenVideoCapturer;
+	if (capturer) {
+		bool ok = capturer->GetWindowList(windows);
+		delete capturer;
+		return ok;
+	}
+	return false;
 }
 
 
