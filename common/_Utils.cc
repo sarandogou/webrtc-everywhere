@@ -70,7 +70,7 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
 #endif
 #endif
         
-#if WE_UNDER_MAC
+#if WE_UNDER_MAC && 0 // Must not enable: https://github.com/sarandogou/webrtc-everywhere/issues/42
         static rtc::MacCocoaSocketServer ss;
         static rtc::SocketServerScope ss_scope(&ss);
 #endif
