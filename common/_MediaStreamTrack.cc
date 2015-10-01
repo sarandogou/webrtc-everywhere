@@ -15,6 +15,8 @@
 
 #if WE_UNDER_WINDOWS
 #	include <Windows.h>
+#   elif WE_UNDER_APPLE
+#   import <ApplicationServices/ApplicationServices.h>
 #endif
 
 //

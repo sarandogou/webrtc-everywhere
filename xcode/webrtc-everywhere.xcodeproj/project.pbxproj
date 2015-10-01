@@ -259,6 +259,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EC2AEC171973552F00360EC6 /* ApplicationServices.framework in Frameworks */,
 				152833181B7C421600099EF2 /* SystemConfiguration.framework in Frameworks */,
 				152833161B7C41C100099EF2 /* GSS.framework in Frameworks */,
 				EC23B3B419738DA2000DFA4B /* GLUT.framework in Frameworks */,
@@ -272,7 +273,6 @@
 				EC2AEC1D197357D000360EC6 /* Security.framework in Frameworks */,
 				EC2AEC1A1973553A00360EC6 /* Quartz.framework in Frameworks */,
 				EC2AEC1B1973553A00360EC6 /* QuartzCore.framework in Frameworks */,
-				EC2AEC171973552F00360EC6 /* ApplicationServices.framework in Frameworks */,
 				EC2AEC14197354F600360EC6 /* AudioToolbox.framework in Frameworks */,
 				EC2AEC15197354F600360EC6 /* AudioUnit.framework in Frameworks */,
 				EC2AEC11197354A000360EC6 /* CoreAudio.framework in Frameworks */,
@@ -577,7 +577,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\nset -ex\n\ndir=\"$TEMP_FILES_DIR/disk\"\ndmg=\"$BUILT_PRODUCTS_DIR/$PROJECT_NAME-$MACOSX_DEPLOYMENT_TARGET.dmg\"\n\nrm -rf \"$dir\"\nmkdir \"$dir\"\ncp -Rfv \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \"$dir\"\nln -s \"${USER_LIBRARY_DIR}/Internet Plug-Ins\" \"$dir/Internet Plug-Ins\"\nrm -f \"$dmg\"\n\nhdiutil create -srcfolder \"$dir\" -volname \"$PRODUCT_NAME\" \"$dmg\"\nhdiutil internet-enable -yes \"$dmg\"\n\nrm -rf \"$dir\"";
+			shellScript = "# shell script goes here\nset -ex\n\ndir=\"$TEMP_FILES_DIR/disk\"\ndmg=\"$BUILT_PRODUCTS_DIR/$PROJECT_NAME-$MACOSX_DEPLOYMENT_TARGET.dmg\"\n\nif [ -a \\\"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\\\" ];\nthen\nrm -Rf \\\"${USER_LIBRARY_DIR}/Internet Plug-Ins/${FULL_PRODUCT_NAME}\\\"\nfi\n\nrm -rf \"$dir\"\nmkdir \"$dir\"\ncp -Rfv \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\" \"$dir\"\nln -s \"${USER_LIBRARY_DIR}/Internet Plug-Ins\" \"$dir/Internet Plug-Ins\"\nrm -f \"$dmg\"\n\nhdiutil create -srcfolder \"$dir\" -volname \"$PRODUCT_NAME\" \"$dmg\"\nhdiutil internet-enable -yes \"$dmg\"\n\nrm -rf \"$dir\"";
 		};
 		EC23B4091974F2A6000DFA4B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
