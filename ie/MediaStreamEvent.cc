@@ -48,6 +48,7 @@ STDMETHODIMP CMediaStreamEvent::get_stream(__out VARIANT* pVal)
 	CComObject<CMediaStream>* _stream;
 	HRESULT _hr = Utils::CreateInstanceWithRef(&_stream);
 	CHECK_HR_RETURN(_hr);
+	_stream->SetDispatcher(const_cast<_AsyncEventDispatcher*>(GetDispatcher()));
 	_stream->SetStream(m_Event->stream);
 	_hr = CComVariant(_stream).Detach(pVal);
 	SafeRelease(&_stream);

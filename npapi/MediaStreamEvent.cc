@@ -143,6 +143,7 @@ bool MediaStreamEvent::GetProperty(NPObject* obj, NPIdentifier propertyName, NPV
 				MediaStream* _stream;
 				NPError err = MediaStream::CreateInstanceWithRef(This->m_npp, &_stream);
 				if (err == NPERR_NO_ERROR) {
+					_stream->SetDispatcher(const_cast<_AsyncEventDispatcher*>(This->GetDispatcher()));
 					_stream->SetStream(This->m_Event->stream);
 					OBJECT_TO_NPVARIANT(_stream, *result);
 					ret_val = true;
