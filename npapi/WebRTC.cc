@@ -1,7 +1,6 @@
 /* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "../common/_Utils.h"
 #include "../common/_NavigatorUserMedia.h"
-#include "../common/_ScreenVideoCapturer.h"
 #include "../common/_Debug.h"
 #include "WebRTC.h"
 #include "MediaStream.h"
@@ -227,13 +226,13 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 		}
 	}
     else if (!strcmp(name, kFuncGetWindowList)) {
-        webrtc::WindowCapturer::WindowList windows;
-        NPError err = _ScreenVideoCapturerFactory::GetWindowList(&windows) ? NPERR_NO_ERROR : NPERR_NO_DATA;
+		_WindowList windows;
+        NPError err = GetWindowList(&windows) ? NPERR_NO_ERROR : NPERR_NO_DATA;
         if (err == NPERR_NO_ERROR) {
             std::string strWindows = "";
             char windowId[120];
             void* np_base64_ptr = NULL, *bmp_ptr = NULL;
-            size_t base64_size, bmp_size;
+            size_t base64_size = 0, bmp_size = 0;
             for (size_t i = 0; i < windows.size(); ++i) {
                 sprintf(windowId, "%ld", windows[i].id);
                 strWindows += std::string(windowId); // Concat(Id)

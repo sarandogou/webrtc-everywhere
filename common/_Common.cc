@@ -3,12 +3,14 @@
 #include "_Utils.h"
 #include "_Buffer.h"
 #include "_MediaStream.h"
+#include "_ScreenVideoCapturer.h"
 #include "_Debug.h"
 
 #include "webrtc/system_wrappers/interface/critical_section_wrapper.h"
 #include "talk/app/webrtc/portallocatorfactory.h"
 #include "webrtc/base/proxydetect.h"
 #include "webrtc/p2p/client/basicportallocator.h"
+
 
 #include <sys/stat.h>
 
@@ -152,6 +154,18 @@ WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory()
 	}
 	_fake_peer_connection_cs->Leave();
 #endif
+}
+
+WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList* windowList)
+{
+	webrtc::WindowCapturer::WindowList windowList_;
+	if (windowList && _ScreenVideoCapturerFactory::GetWindowList(&windowList_)) {
+		for (size_t i = 0; i < windowList_.size(); ++i) {
+			windowList->push_back(_Window(windowList_[i].id, windowList_[i].title));
+		}
+		return true;
+	}
+	return false;
 }
 
 WEBRTC_EVERYWHERE_API rtc::Thread* GetWorkerThread()
