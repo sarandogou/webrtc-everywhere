@@ -1,6 +1,7 @@
 /* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "../common/_Utils.h"
 #include "../common/_NavigatorUserMedia.h"
+#include "../common/_ScreenVideoCapturer.h"
 #include "../common/_Debug.h"
 #include "WebRTC.h"
 #include "MediaStream.h"
@@ -22,6 +23,7 @@
 #define kPropIsWebRtcPlugin					"isWebRtcPlugin"
 
 #define kFuncGetUserMedia					"getUserMedia"
+#define kFuncGetWindowList                  "getWindowList"
 #define kFuncCreateSessionDescription		"createSessionDescription"
 #define kFuncCreatePeerConnection			"createPeerConnection"
 #define kFuncCreateIceCandidate				"createIceCandidate"
@@ -115,6 +117,7 @@ bool WebRTC::HasMethod(NPObject* obj, NPIdentifier methodName)
 
     bool ret_val = 
 		!strcmp(name, kFuncGetUserMedia) ||
+        !strcmp(name, kFuncGetWindowList) ||
 		!strcmp(name, kFuncCreateSessionDescription) ||
 		!strcmp(name, kFuncCreatePeerConnection) ||
 		!strcmp(name, kFuncCreateIceCandidate) ||
@@ -223,6 +226,61 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 			);
 		}
 	}
+    else if (!strcmp(name, kFuncGetWindowList)) {
+        webrtc::WindowCapturer::WindowList windows;
+        NPError err = _ScreenVideoCapturerFactory::GetWindowList(&windows) ? NPERR_NO_ERROR : NPERR_NO_DATA;
+        if (err == NPERR_NO_ERROR) {
+            std::string strWindows = "";
+            char windowId[120];
+            void* np_base64_ptr = NULL, *bmp_ptr = NULL;
+            size_t base64_size, bmp_size;
+            for (size_t i = 0; i < windows.size(); ++i) {
+                sprintf(windowId, "%ld", windows[i].id);
+                strWindows += std::string(windowId); // Concat(Id)
+#if 0 // base64(title) ?
+                // convert the title to base64 to preserve UTF chars and make sure we won't have special chars (e.g. ';')
+                if (_Utils::ConvertToBase64(windows[i].title.c_str(), windows[i].title.length(), &np_base64_ptr, &base64_size, &Utils::MemAlloc) != WeError_Success) {
+                    goto bail;
+                }
+                strWindows += "xxy;;;xxy" + std::string((const char*)np_base64_ptr, base64_size); // Concat(Title64)
+                Utils::MemFree(&np_base64_ptr);
+#else
+                strWindows += "xxy;;;xxy" + windows[i].title;
+#endif /* if 0 */
+#if WE_UNDER_APPLE
+                CGImageRef imageRef = CGWindowListCreateImage(CGRectNull, kCGWindowListOptionIncludingWindow, (CGWindowID)windows[i].id, kCGWindowImageDefault);
+                if (imageRef) {
+                    if (CGImageGetBitsPerComponent(imageRef) == 8 && CGImageGetBitsPerPixel(imageRef) == 32 && CGColorSpaceGetModel(CGImageGetColorSpace(imageRef)) == kCGColorSpaceModelRGB) { // Make sure it's RGBA
+                        CFDataRef dataRef = CGDataProviderCopyData(CGImageGetDataProvider(imageRef));
+                        if (dataRef) {
+                            //size_t size0 = CGImageGetBytesPerRow(imageRef);
+                            //size_t size1 = CGImageGetWidth(imageRef);
+                            // Convert to BMP
+                            if (_Utils::ConvertToBMP(CFDataGetBytePtr(dataRef), CGImageGetWidth(imageRef), CGImageGetHeight(imageRef), &bmp_ptr, &bmp_size) == WeError_Success) {
+                                // Convert to Base64
+                                if (_Utils::ConvertToBase64(bmp_ptr, bmp_size, &np_base64_ptr, &base64_size, &Utils::MemAlloc) == WeError_Success) {
+                                    strWindows += "xxy;;;xxy" + std::string((const char*)np_base64_ptr, base64_size); // Concat(Screenshot64)
+                                }
+                                Utils::MemFree(&np_base64_ptr);
+                            }
+                            if (bmp_ptr) free(bmp_ptr), bmp_ptr = NULL;
+                            CFRelease(dataRef);
+                        }
+                    }
+                    
+                    CGImageRelease(imageRef);
+                }
+#else
+#endif /* WE_UNDER_APPLE */
+                strWindows += "xxz;;;xxz"; // Concat(EndOfLine)
+            } // for (
+            char* npStr = (char*)Utils::MemDup(strWindows.c_str(), strWindows.length());
+            if (npStr) {
+                STRINGZ_TO_NPVARIANT(npStr, *result);
+                ret_val = true;
+            }
+        }
+    }
     else if (!strcmp(name, kFuncCreateSessionDescription)) {
         if (argCount > 0) {
 			SessionDescription* sdp;
