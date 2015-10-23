@@ -205,6 +205,10 @@ LRESULT CALLBACK _Utils::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		{
 			return TRUE; // avoid background erasing.
 		}
+		case WM_WINDOWPOSCHANGING:
+			break;
+		case WM_WINDOWPOSCHANGED:
+			break;
 		case WM_PAINT:
 		{
 			_RTCDisplay* display = dynamic_cast<_RTCDisplay*>(reinterpret_cast<_RTCDisplay*>(GetWindowLongPtr(hWnd, GWLP_USERDATA)));

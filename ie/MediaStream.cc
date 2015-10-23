@@ -61,12 +61,17 @@ STDMETHODIMP CMediaStream::get_id(BSTR* pVal)
 
 STDMETHODIMP CMediaStream::getAudioTracks(__out VARIANT* Tracks)
 {
-	return getTracks(FALSE/*video*/, Tracks);
+	return getTracks(_TrackTypeAudio, Tracks);
 }
 
 STDMETHODIMP CMediaStream::getVideoTracks(__out VARIANT* Tracks)
 {
-	return getTracks(TRUE/*video*/, Tracks);
+	return getTracks(_TrackTypeVideo, Tracks);
+}
+
+STDMETHODIMP CMediaStream::getTracks(__out VARIANT* Tracks)
+{
+	return getTracks(_TrackTypeAll, Tracks);
 }
 
 STDMETHODIMP CMediaStream::getTrackById(__in BSTR trackId, __out VARIANT* MediaStreamTrack)
@@ -246,7 +251,7 @@ STDMETHODIMP CMediaStream::stop()
 	return S_OK;
 }
 
-HRESULT CMediaStream::getTracks(BOOL video, VARIANT* Tracks)
+HRESULT CMediaStream::getTracks(_TrackType type, VARIANT* Tracks)
 {
 	HRESULT hr = S_OK;
 	if (!m_Stream) {
@@ -262,20 +267,26 @@ HRESULT CMediaStream::getTracks(BOOL video, VARIANT* Tracks)
 	CHECK_HR_RETURN(hr = pluginInstance->GetDispatch(spDispatch));
 
 	std::vector<CComVariant> vect;
-	std::shared_ptr<_Sequence<_MediaStreamTrack> > tracks = video ? m_Stream->getVideoTracks() : m_Stream->getAudioTracks();
-	if (tracks) {
-		for (size_t i = 0; i < tracks->values.size(); ++i) {
-			if (!tracks->values[i]) {
-				continue;
-			}
-			CComObject<CMediaStreamTrack>* _track;
-			hr = Utils::CreateInstanceWithRef(&_track);
-			if (SUCCEEDED(hr)) {
-				_track->SetDispatcher(pluginInstance);
-				_track->SetTrack(tracks->values[i]);
-				vect.push_back(CComVariant(_track));
-				SafeRelease(&_track);
-			}
+	std::shared_ptr<_Sequence<_MediaStreamTrack> > _tracks;
+	cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > tracks(new _Sequence<_MediaStreamTrack>());
+	if ((type & _TrackTypeAudio) == _TrackTypeAudio && (_tracks = m_Stream->getAudioTracks()) && _tracks.get()) {
+		tracks->AddSeq(_tracks.get());
+	}
+	if ((type & _TrackTypeVideo) == _TrackTypeVideo && (_tracks = m_Stream->getVideoTracks()) && _tracks.get()) {
+		tracks->AddSeq(_tracks.get());
+	}
+	
+	for (size_t i = 0; i < tracks->values.size(); ++i) {
+		if (!tracks->values[i]) {
+			continue;
+		}
+		CComObject<CMediaStreamTrack>* _track;
+		hr = Utils::CreateInstanceWithRef(&_track);
+		if (SUCCEEDED(hr)) {
+			_track->SetDispatcher(pluginInstance);
+			_track->SetTrack(tracks->values[i]);
+			vect.push_back(CComVariant(_track));
+			SafeRelease(&_track);
 		}
 	}
 

@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sat Aug 15 01:58:57 2015
+/* at Fri Oct 23 01:07:25 2015
  */
 /* Compiler settings for webrtceverywhere.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -426,6 +426,9 @@ EXTERN_C const IID IID_IWebRTC;
             /* [optional][in] */ VARIANT successCallback,
             /* [optional][in] */ VARIANT errorCallback) = 0;
         
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE getWindowList( 
+            /* [retval][out] */ BSTR *winList) = 0;
+        
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE createDisplay( 
             /* [retval][out] */ IDispatch **ppDisplay) = 0;
         
@@ -542,6 +545,10 @@ EXTERN_C const IID IID_IWebRTC;
             /* [optional][in] */ VARIANT successCallback,
             /* [optional][in] */ VARIANT errorCallback);
         
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *getWindowList )( 
+            IWebRTC * This,
+            /* [retval][out] */ BSTR *winList);
+        
         /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *createDisplay )( 
             IWebRTC * This,
             /* [retval][out] */ IDispatch **ppDisplay);
@@ -645,6 +652,9 @@ EXTERN_C const IID IID_IWebRTC;
 
 #define IWebRTC_getUserMedia(This,constraints,successCallback,errorCallback)	\
     ( (This)->lpVtbl -> getUserMedia(This,constraints,successCallback,errorCallback) ) 
+
+#define IWebRTC_getWindowList(This,winList)	\
+    ( (This)->lpVtbl -> getWindowList(This,winList) ) 
 
 #define IWebRTC_createDisplay(This,ppDisplay)	\
     ( (This)->lpVtbl -> createDisplay(This,ppDisplay) ) 
@@ -1497,6 +1507,9 @@ EXTERN_C const IID IID_IMediaStream;
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE getVideoTracks( 
             /* [retval][out] */ VARIANT *Tracks) = 0;
         
+        virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE getTracks( 
+            /* [retval][out] */ VARIANT *Tracks) = 0;
+        
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE getTrackById( 
             /* [in] */ BSTR trackId,
             /* [retval][out] */ VARIANT *MediaStreamTrack) = 0;
@@ -1603,6 +1616,10 @@ EXTERN_C const IID IID_IMediaStream;
             IMediaStream * This,
             /* [retval][out] */ VARIANT *Tracks);
         
+        /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *getTracks )( 
+            IMediaStream * This,
+            /* [retval][out] */ VARIANT *Tracks);
+        
         /* [helpstring][id] */ HRESULT ( STDMETHODCALLTYPE *getTrackById )( 
             IMediaStream * This,
             /* [in] */ BSTR trackId,
@@ -1695,6 +1712,9 @@ EXTERN_C const IID IID_IMediaStream;
 
 #define IMediaStream_getVideoTracks(This,Tracks)	\
     ( (This)->lpVtbl -> getVideoTracks(This,Tracks) ) 
+
+#define IMediaStream_getTracks(This,Tracks)	\
+    ( (This)->lpVtbl -> getTracks(This,Tracks) ) 
 
 #define IMediaStream_getTrackById(This,trackId,MediaStreamTrack)	\
     ( (This)->lpVtbl -> getTrackById(This,trackId,MediaStreamTrack) ) 

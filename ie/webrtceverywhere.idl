@@ -19,13 +19,14 @@ import "ocidl.idl";
 interface IWebRTC : IDispatch{
 	[propget, id(1), helpstring("property versionName")] HRESULT versionName([out, retval] BSTR* pVal);
 	[id(2), helpstring("method getUserMedia")] HRESULT getUserMedia([in, optional] VARIANT constraints, [in, optional]VARIANT successCallback, [in, optional]VARIANT errorCallback);
+	[id(3), helpstring("method getWindowList")] HRESULT getWindowList([out, retval] BSTR* winList);
 	
-	[id(3), helpstring("method createDisplay")] HRESULT createDisplay([out, retval] IDispatch** ppDisplay);
-	[id(4), helpstring("method createSessionDescription")] HRESULT createSessionDescription([in] VARIANT RTCSessionDescriptionInit, [out, retval] IDispatch** ppSdp);
-	[id(5), helpstring("method createDictOptions")] HRESULT createDictOptions([out, retval] IDispatch** ppDictOptions);
-	[id(6), helpstring("method createPeerConnection")] HRESULT createPeerConnection([in, optional] VARIANT RTCConfiguration, [in, optional]VARIANT MediaConstraints, [out,retval] IDispatch** ppPeerConnection);
-	[id(7), helpstring("method createIceCandidate")] HRESULT createIceCandidate([in] VARIANT RTCIceCandidateInit, [out, retval] IDispatch** ppIceCandidate);
-	[id(8), helpstring("method createMediaStreamTrack")] HRESULT createMediaStreamTrack([out, retval] IDispatch** ppMediaStreamTrack);
+	[id(4), helpstring("method createDisplay")] HRESULT createDisplay([out, retval] IDispatch** ppDisplay);
+	[id(5), helpstring("method createSessionDescription")] HRESULT createSessionDescription([in] VARIANT RTCSessionDescriptionInit, [out, retval] IDispatch** ppSdp);
+	[id(6), helpstring("method createDictOptions")] HRESULT createDictOptions([out, retval] IDispatch** ppDictOptions);
+	[id(7), helpstring("method createPeerConnection")] HRESULT createPeerConnection([in, optional] VARIANT RTCConfiguration, [in, optional]VARIANT MediaConstraints, [out,retval] IDispatch** ppPeerConnection);
+	[id(8), helpstring("method createIceCandidate")] HRESULT createIceCandidate([in] VARIANT RTCIceCandidateInit, [out, retval] IDispatch** ppIceCandidate);
+	[id(9), helpstring("method createMediaStreamTrack")] HRESULT createMediaStreamTrack([out, retval] IDispatch** ppMediaStreamTrack);
 	
 	[id(40), helpstring("method bindEventListener")] HRESULT bindEventListener([in] BSTR type, [in, optional]VARIANT listenerCallback, [in, optional]VARIANT useCapture);
 	[id(41), helpstring("method getSources")] HRESULT getSources([in, optional]VARIANT successCallback);
@@ -119,18 +120,19 @@ interface IMediaStream : IDispatch{
 	[propget, id(1), helpstring("property id")] HRESULT id([out, retval] BSTR* pVal);
 	[id(2), helpstring("method getAudioTracks")] HRESULT getAudioTracks([out, retval] VARIANT* Tracks);
 	[id(3), helpstring("method getVideoTracks")] HRESULT getVideoTracks([out, retval] VARIANT* Tracks);
-	[id(4), helpstring("method getTrackById")] HRESULT getTrackById([in] BSTR trackId, [out, retval] VARIANT* MediaStreamTrack);
-	[id(5), helpstring("method addTrack")] HRESULT addTrack([in] VARIANT MediaStreamTrack);
-	[id(6), helpstring("method removeTrack")] HRESULT removeTrack([in] VARIANT MediaStreamTrack);
-	[id(7), helpstring("method clone")] HRESULT clone([out, retval] VARIANT* MediaStream);
-	[propget, id(8), helpstring("property ended")] HRESULT ended([out, retval] VARIANT_BOOL* pVal);
-	[propget, id(9), helpstring("property onended")] HRESULT onended([out, retval] VARIANT* pVal);
-	[propput, id(9), helpstring("property onended")] HRESULT onended([in] VARIANT newVal);
-	[propget, id(10), helpstring("property onaddtrack")] HRESULT onaddtrack([out, retval] VARIANT* pVal);
-	[propput, id(10), helpstring("property onaddtrack")] HRESULT onaddtrack([in] VARIANT newVal);
-	[propget, id(11), helpstring("property onremovetrack")] HRESULT onremovetrack([out, retval] VARIANT* pVal);
-	[propput, id(11), helpstring("property onremovetrack")] HRESULT onremovetrack([in] VARIANT newVal);
-	[id(12), helpstring("method stop")] HRESULT stop(); // not part of the standard but used by Chrome
+	[id(4), helpstring("method getTracks")] HRESULT getTracks([out, retval] VARIANT* Tracks);
+	[id(5), helpstring("method getTrackById")] HRESULT getTrackById([in] BSTR trackId, [out, retval] VARIANT* MediaStreamTrack);
+	[id(6), helpstring("method addTrack")] HRESULT addTrack([in] VARIANT MediaStreamTrack);
+	[id(7), helpstring("method removeTrack")] HRESULT removeTrack([in] VARIANT MediaStreamTrack);
+	[id(8), helpstring("method clone")] HRESULT clone([out, retval] VARIANT* MediaStream);
+	[propget, id(9), helpstring("property ended")] HRESULT ended([out, retval] VARIANT_BOOL* pVal);
+	[propget, id(10), helpstring("property onended")] HRESULT onended([out, retval] VARIANT* pVal);
+	[propput, id(10), helpstring("property onended")] HRESULT onended([in] VARIANT newVal);
+	[propget, id(11), helpstring("property onaddtrack")] HRESULT onaddtrack([out, retval] VARIANT* pVal);
+	[propput, id(11), helpstring("property onaddtrack")] HRESULT onaddtrack([in] VARIANT newVal);
+	[propget, id(12), helpstring("property onremovetrack")] HRESULT onremovetrack([out, retval] VARIANT* pVal);
+	[propput, id(12), helpstring("property onremovetrack")] HRESULT onremovetrack([in] VARIANT newVal);
+	[id(13), helpstring("method stop")] HRESULT stop(); // not part of the standard but used by Chrome
 };
 [
 	object,

@@ -52,6 +52,7 @@ public:
 	STDMETHOD(get_id)(__out BSTR* pVal);
 	STDMETHOD(getAudioTracks)(__out VARIANT* Tracks);
 	STDMETHOD(getVideoTracks)(__out VARIANT* Tracks);
+	STDMETHOD(getTracks)(__out VARIANT* Tracks);
 	STDMETHOD(getTrackById)(__in BSTR trackId, __out VARIANT* MediaStreamTrack);
 	STDMETHOD(addTrack)(__in VARIANT MediaStreamTrack);
 	STDMETHOD(removeTrack)(__in VARIANT MediaStreamTrack);
@@ -66,7 +67,7 @@ public:
 	STDMETHOD(stop)();
 
 private:
-	HRESULT getTracks(BOOL video, VARIANT* Tracks);
+	HRESULT getTracks(_TrackType type, VARIANT* Tracks);
 
 	// callbacks
 	void onended();

@@ -115,6 +115,15 @@ typedef enum _ArrayType
 }
 _ArrayType;
 
+typedef enum __TrackType {
+	_TrackTypeNone = 0x00,
+	_TrackTypeAudio = (0x01 << 0),
+	_TrackTypeVideo = (0x01 << 1),
+	_TrackTypeAudioVideo = _TrackTypeAudio | _TrackTypeVideo,
+	_TrackTypeAll = 0xFF
+}
+_TrackType;
+
 typedef struct __TrustedWebsite {
 	std::string scheme;
 	std::string host;
@@ -353,6 +362,13 @@ struct _Sequence {
 	}
 	void Add(cpp11::shared_ptr<T> v) {
 		values.push_back(v);
+	}
+	void AddSeq(_Sequence<T>* seq) {
+		if (seq) {
+			for (size_t i = 0; i < seq->values.size(); ++i) {
+				values.push_back(seq->values[i]);
+			}
+		}
 	}
 	~_Sequence() {
 		Clear();

@@ -127,7 +127,7 @@ STDMETHODIMP CWebRTC::SetClientSite(_Inout_opt_ IOleClientSite *pClientSite)
 // IPersistPropertyBagImpl::Load
 STDMETHODIMP CWebRTC::Load(__RPC__in_opt IPropertyBag *pPropBag, __RPC__in_opt IErrorLog *pErrorLog)
 {
-#if 0 // TODO(dmi) ignore the flag for now until everything is double checked
+#if 1 // TODO(dmi) ignore the flag for now until everything is double checked
 	CComVariant var;
 	HRESULT hr = pPropBag->Read(L"windowless", &var, pErrorLog);
 	if (SUCCEEDED(hr) && var.vt == VT_BSTR) {
@@ -390,6 +390,134 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 		);
 
 		return hr;
+}
+
+STDMETHODIMP CWebRTC::getWindowList(__out BSTR* winList)
+{
+	HRESULT hr = S_OK;
+	*winList = NULL;
+	HDC hSrcDC = NULL, hMemDC = NULL;
+	HBITMAP hBitmap = NULL, hOldBitmap = NULL;
+	RECT rcSrc = {0, 0, 0, 0};
+	LONG width = 0, height = 0;
+	BITMAPINFO bitmapInfo = {0};
+	void* pvBits = NULL;
+	HWND hWnd = NULL;
+	std::string strWindows = "";
+	char windowId[120] = {0};
+	void *np_base64_ptr = NULL, *bmp_ptr = NULL;
+	size_t base64_size = 0, bmp_size = 0;
+	_WindowList windows;
+
+	CHECK_HR_BAIL((hr = GetWindowList(&windows) ? S_OK : E_FAIL));
+	
+	for (size_t i = 0; i < windows.size(); ++i) {
+		hWnd = reinterpret_cast<HWND>(windows[i].id);
+		sprintf(windowId, "%ld", hWnd);
+		strWindows += std::string(windowId); // Concat(Id)
+		strWindows += "xxy;;;xxy" + windows[i].title;
+		
+		hSrcDC = ::GetDC(hWnd);
+		if (!hSrcDC) {
+			CHECK_HR_BAIL(hr = E_FAIL);
+		}
+		hMemDC = CreateCompatibleDC(hSrcDC);
+		if (!hMemDC) {
+			CHECK_HR_BAIL(hr = E_FAIL);
+		}
+
+		// get points of rectangle to grab
+		if (::GetWindowRect(hWnd, &rcSrc) != TRUE) {
+			CHECK_HR_BAIL(hr = E_FAIL);
+		}
+		width = rcSrc.right - rcSrc.left;
+		height = rcSrc.bottom - rcSrc.top;
+
+		ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
+		bitmapInfo.bmiHeader.biSize = (DWORD)sizeof(BITMAPINFOHEADER);
+		bitmapInfo.bmiHeader.biWidth = width;
+		bitmapInfo.bmiHeader.biHeight = height;
+		bitmapInfo.bmiHeader.biPlanes = 1;
+		bitmapInfo.bmiHeader.biBitCount = 32;
+		bitmapInfo.bmiHeader.biCompression = BI_RGB;
+		bitmapInfo.bmiHeader.biSizeImage = width * height * (bitmapInfo.bmiHeader.biBitCount >> 3);
+
+		hBitmap = CreateCompatibleBitmap(hSrcDC, width, height);
+		if (!hBitmap) {
+			CHECK_HR_BAIL(hr = E_FAIL);
+		}
+		// Alloc memory
+		if (!(pvBits = VirtualAlloc(NULL, bitmapInfo.bmiHeader.biSizeImage, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE))) {
+			CHECK_HR_BAIL(hr = E_OUTOFMEMORY);
+		}
+		
+		// select new bitmap into memory DC
+		hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBitmap);
+
+		// bitblt screen DC to memory DC
+		BitBlt(hMemDC, 0, 0, width, height, hSrcDC, 0, 0, SRCCOPY);
+
+		// select old bitmap back into memory DC and get handle to
+		// bitmap of the screen   
+		hBitmap = (HBITMAP)SelectObject(hMemDC, hOldBitmap);
+
+		// Copy the bitmap data into the provided BYTE buffer
+		GetDIBits(hSrcDC, hBitmap, 0, height, pvBits, &bitmapInfo, DIB_RGB_COLORS);
+
+		// Convert to BMP
+		if (_Utils::ConvertToBMP(pvBits, width, height, &bmp_ptr, &bmp_size) == WeError_Success) {
+			// Convert to Base64
+			if (_Utils::ConvertToBase64(bmp_ptr, bmp_size, &np_base64_ptr, &base64_size) == WeError_Success) {
+				strWindows += "xxy;;;xxy" + std::string((const char*)np_base64_ptr, base64_size); // Concat(Screenshot64)
+			}
+			if (np_base64_ptr) free(&np_base64_ptr), np_base64_ptr = NULL;
+			if (bmp_ptr) free(bmp_ptr), bmp_ptr = NULL;
+		}
+		else {
+			CHECK_HR_BAIL(hr = E_FAIL);
+		}
+
+		// Cleanup
+		if (hSrcDC) {
+			::ReleaseDC(hWnd, hSrcDC);
+			hSrcDC = NULL;
+		}
+		if (hMemDC) {
+			::DeleteDC(hMemDC);
+			hMemDC = NULL;
+		}
+		if (hBitmap) {
+			::DeleteObject(hBitmap);
+			hBitmap = NULL;
+		}
+		if (pvBits) {
+			VirtualFree(pvBits, 0, MEM_RELEASE);
+			pvBits = NULL;
+		}
+		strWindows += "xxz;;;xxz"; // Concat(EndOfLine)
+	} // for (
+	
+	// Transfer result to BSTR output
+	CHECK_HR_BAIL(hr = Utils::CopyAnsiString(strWindows, winList));
+
+bail:
+	if (hSrcDC) {
+		::ReleaseDC(hWnd, hSrcDC);
+		hSrcDC = NULL;
+	}
+	if (hMemDC) {
+		::DeleteDC(hMemDC);
+		hMemDC = NULL;
+	}
+	if (hBitmap) {
+		::DeleteObject(hBitmap);
+		hBitmap = NULL;
+	}
+	if (pvBits) {
+		VirtualFree(pvBits, 0, MEM_RELEASE);
+		pvBits = NULL;
+	}
+	return hr;
 }
 
 STDMETHODIMP CWebRTC::createDictOptions(IDispatch** ppDictOptions)
@@ -675,7 +803,7 @@ LRESULT CALLBACK CWebRTC::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	if (uMsg == WM_INVALIDATE_WINDOLESS) {
 		CWebRTC* This = dynamic_cast<CWebRTC*>(reinterpret_cast<CWebRTC*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA)));
-		This->m_spInPlaceSite->InvalidateRect(NULL, TRUE); // TODO(dmi): read wParam and lParam to get params for InvalidateRect
+		This->m_spInPlaceSite->InvalidateRect(NULL, FALSE); // TODO(dmi): read wParam and lParam to get params for InvalidateRect
 		return 1;
 	}
 	return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
