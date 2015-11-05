@@ -19,6 +19,7 @@ extern const char* kPluginVersion;
 #define kPropOnaddtrack							"onaddtrack"
 #define kPropOnremovetrack						"onremovetrack"
 
+#define kFuncGetTracks                          "getTracks"
 #define kFuncGetAudioTracks						"getAudioTracks"
 #define kFuncGetVideoTracks						"getVideoTracks"
 #define kFuncGetTrackById						"getTrackById"
@@ -96,7 +97,8 @@ bool MediaStream::HasMethod(NPObject* obj, NPIdentifier methodName)
 {
 	char* name = BrowserFuncs->utf8fromidentifier(methodName);
 
-	bool ret_val = !strcmp(name, kFuncGetAudioTracks) ||
+	bool ret_val = !strcmp(name, kFuncGetTracks) ||
+        !strcmp(name, kFuncGetAudioTracks) ||
 		!strcmp(name, kFuncGetVideoTracks) ||
 		!strcmp(name, kFuncGetTrackById) ||
 		!strcmp(name, kFuncAddTrack) ||
@@ -125,11 +127,14 @@ bool MediaStream::Invoke(NPObject* obj, NPIdentifier methodName,
 		return ret_val;
 	}
 
-	if (!strcmp(name, kFuncGetAudioTracks)) {
-		ret_val = (This->getTracks(false, result) == NPERR_NO_ERROR);
+    if (!strcmp(name, kFuncGetTracks)) {
+        ret_val = (This->getTracks(_TrackTypeAll, result) == NPERR_NO_ERROR);
+    }
+	else if (!strcmp(name, kFuncGetAudioTracks)) {
+		ret_val = (This->getTracks(_TrackTypeAudio, result) == NPERR_NO_ERROR);
 	}
 	else if (!strcmp(name, kFuncGetVideoTracks)) {
-		ret_val = (This->getTracks(true, result) == NPERR_NO_ERROR);
+		ret_val = (This->getTracks(_TrackTypeVideo, result) == NPERR_NO_ERROR);
 	}
 	else if (!strcmp(name, kFuncGetTrackById)) {
 		if (This->m_Stream && argCount > 0) {
@@ -347,7 +352,7 @@ void MediaStream::onremovetrack()
 	}
 }
 
-NPError MediaStream::getTracks(bool video, NPVariant* Tracks)
+NPError MediaStream::getTracks(_TrackType type, NPVariant* Tracks)
 {
 	if (!m_Stream) {
 		CHECK_NPERR_RETURN(NPERR_GENERIC_ERROR);
@@ -359,27 +364,34 @@ NPError MediaStream::getTracks(bool video, NPVariant* Tracks)
 
 	NPError err;
 	std::vector<NPVariant> vect;
-	cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > tracks = video ? m_Stream->getVideoTracks() : m_Stream->getAudioTracks();
-	if (tracks) {
-		for (size_t i = 0; i < tracks->values.size(); ++i) {
-			if (!tracks->values[i]) {
-				continue;
-			}
-			MediaStreamTrack* _track;
-			err = MediaStreamTrack::CreateInstanceWithRef(m_npp, &_track);
-			if (err == NPERR_NO_ERROR) {
-				_track->SetDispatcher(dispatcher);
-				_track->SetTrack(tracks->values[i]);
-
-				NPVariant var;
-				OBJECT_TO_NPVARIANT(_track, var);
-				BrowserFuncs->retainobject(var.value.objectValue); // will be release by "NPVecClear()"
-
-				vect.push_back(var);
-				MediaStreamTrack::ReleaseInstance(&_track);
-			}
-		}
-	}
+    cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > _tracks;
+    cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > tracks(new _Sequence<_MediaStreamTrack>());
+    if ((type & _TrackTypeAudio) == _TrackTypeAudio && (_tracks = m_Stream->getAudioTracks()) && _tracks.get()) {
+        tracks->AddSeq(_tracks.get());
+    }
+    if ((type & _TrackTypeVideo) == _TrackTypeVideo && (_tracks = m_Stream->getVideoTracks()) && _tracks.get()) {
+        tracks->AddSeq(_tracks.get());
+    }
+	
+    for (size_t i = 0; i < tracks->values.size(); ++i) {
+        if (!tracks->values[i]) {
+            continue;
+        }
+        MediaStreamTrack* _track;
+        err = MediaStreamTrack::CreateInstanceWithRef(m_npp, &_track);
+        if (err == NPERR_NO_ERROR) {
+            _track->SetDispatcher(dispatcher);
+            _track->SetTrack(tracks->values[i]);
+            
+            NPVariant var;
+            OBJECT_TO_NPVARIANT(_track, var);
+            BrowserFuncs->retainobject(var.value.objectValue); // will be release by "NPVecClear()"
+            
+            vect.push_back(var);
+            MediaStreamTrack::ReleaseInstance(&_track);
+        }
+    }
+	
 
 	NPObject* arrayObj = NULL;
 	err = Utils::CreateJsArray(m_npp, vect, &arrayObj);

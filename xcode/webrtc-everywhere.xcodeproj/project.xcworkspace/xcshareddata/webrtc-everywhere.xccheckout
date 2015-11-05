@@ -7,7 +7,7 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>2F87B7EF-2A2D-4976-8AD0-89ECB9FFF740</string>
 	<key>IDESourceControlProjectName</key>
-	<string>webrtc-everywhere</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>70B3A2C8ADAA4E37012293F15ABDC2FE552E5D0A</key>
@@ -16,7 +16,7 @@
 		<string>https://chromium.googlesource.com/external/webrtc.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>xcode/webrtc-everywhere.xcodeproj</string>
+	<string>xcode/webrtc-everywhere.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>70B3A2C8ADAA4E37012293F15ABDC2FE552E5D0A</key>

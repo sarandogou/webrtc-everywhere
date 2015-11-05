@@ -45,7 +45,7 @@ public:
 	cpp11::shared_ptr<_MediaStream> GetStream();
 
 private:
-	NPError getTracks(bool video, NPVariant* Tracks);
+	NPError getTracks(_TrackType type, NPVariant* Tracks);
 
 	// callbacks
 	void onended();
