@@ -413,7 +413,7 @@ STDMETHODIMP CWebRTC::getWindowList(__out BSTR* winList)
 	
 	for (size_t i = 0; i < windows.size(); ++i) {
 		hWnd = reinterpret_cast<HWND>(windows[i].id);
-		sprintf(windowId, "%ld", hWnd);
+		sprintf(windowId, "%ld", reinterpret_cast<long>(hWnd));
 		strWindows += std::string(windowId); // Concat(Id)
 		strWindows += "xxy;;;xxy" + windows[i].title;
 		

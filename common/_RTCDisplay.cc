@@ -111,10 +111,11 @@ _VideoRenderer::~_VideoRenderer()
 #if WE_UNDER_WINDOWS
 void _VideoRenderer::SetHwnd(HWND hwnd, LONG_PTR lpUsrData)
 {
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+	_AutoLock<_VideoRendererResources> lock1(resources_.get());
 
-	m_Hwnd = hwnd;
-	m_lpUsrData = lpUsrData;
+	resources_->m_Hwnd = hwnd;
+	resources_->m_lpUsrData = lpUsrData;
 	if (hwnd)
 	{
 		SetWindowLongPtr(hwnd, GWLP_USERDATA, lpUsrData);
@@ -347,7 +348,7 @@ bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 		::DeleteObject(brush);
 
 		StretchDIBits(dc_mem, rcDest.left, rcDest.top, Width(rcDest), Height(rcDest),
-			rcSrc.left, rcSrc.top, Width(rcSrc), Height(rcSrc), image, &m_bmi, DIB_RGB_COLORS, SRCCOPY);
+			rcSrc.left, rcSrc.top, Width(rcSrc), Height(rcSrc), image, &resources_->m_bmi, DIB_RGB_COLORS, SRCCOPY);
 
 		BitBlt(ps.hdc, 0, 0, logical_area.x, logical_area.y, dc_mem, 0, 0, SRCCOPY);
 
@@ -409,7 +410,7 @@ void _VideoRenderer::SetFnQueryHwnd(cpp11::function<HWND()> fnQueryHwnd)
 	_AutoLock<_VideoRenderer> lock0(this);
     _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
-	m_fnQueryHwnd = fnQueryHwnd;
+	resources_->m_fnQueryHwnd = fnQueryHwnd;
 }
 
 void _VideoRenderer::SetFnIsWindowless(cpp11::function<BOOL()> fnIsWindowless)
@@ -417,7 +418,7 @@ void _VideoRenderer::SetFnIsWindowless(cpp11::function<BOOL()> fnIsWindowless)
 	_AutoLock<_VideoRenderer> lock0(this);
     _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
-	m_fnIsWindowless = fnIsWindowless;
+	resources_->m_fnIsWindowless = fnIsWindowless;
 }
 
 void _VideoRenderer::SetFnInvalidateWindowless(cpp11::function<HRESULT(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase)> fnInvalidateWindowless)
@@ -425,7 +426,7 @@ void _VideoRenderer::SetFnInvalidateWindowless(cpp11::function<HRESULT(/* [uniqu
 	_AutoLock<_VideoRenderer> lock0(this);
     _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
-	m_fnInvalidateWindowless = fnInvalidateWindowless;
+	resources_->m_fnInvalidateWindowless = fnInvalidateWindowless;
 }
 
 #endif /* WE_UNDER_WINDOWS */
@@ -440,11 +441,11 @@ void _VideoRenderer::SetSize(int width, int height)
 	resources_->m_height = height;
 
 #if WE_UNDER_WINDOWS
-	m_bmi.bmiHeader.biWidth = width;
-	m_bmi.bmiHeader.biHeight = -height;
-	m_bmi.bmiHeader.biSizeImage = width * height *
+	resources_->m_bmi.bmiHeader.biWidth = width;
+	resources_->m_bmi.bmiHeader.biHeight = -height;
+	resources_->m_bmi.bmiHeader.biSizeImage = width * height *
 		(resources_->m_bmi.bmiHeader.biBitCount >> 3);
-	m_image.reset(new uint8[m_bmi.bmiHeader.biSizeImage]);
+	resources_->m_image.reset(new uint8[resources_->m_bmi.bmiHeader.biSizeImage]);
 	if (resources_->m_Hwnd) {
 	}
 #elif WE_UNDER_APPLE
@@ -499,20 +500,20 @@ void _VideoRenderer::RenderFrame(const cricket::VideoFrame* frame)
 
 #if WE_UNDER_WINDOWS
 	frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB,
-		m_image.get(),
-		m_bmi.bmiHeader.biSizeImage,
-		m_bmi.bmiHeader.biWidth *
-		m_bmi.bmiHeader.biBitCount / 8);
+		resources_->m_image.get(),
+		resources_->m_bmi.bmiHeader.biSizeImage,
+		resources_->m_bmi.bmiHeader.biWidth *
+		resources_->m_bmi.bmiHeader.biBitCount / 8);
 
 	if (resources_->m_fnIsWindowless && resources_->m_fnIsWindowless()) {
 		// windowless
 		if (resources_->m_fnInvalidateWindowless) {
-			m_fnInvalidateWindowless(NULL, TRUE);
+			resources_->m_fnInvalidateWindowless(NULL, TRUE);
 		}
 	}
 	else {
 		// windowed
-		if (!m_Hwnd && resources_->m_fnQueryHwnd) {
+		if (!resources_->m_Hwnd && resources_->m_fnQueryHwnd) {
 			SetHwnd(resources_->m_fnQueryHwnd(), resources_->m_lpUsrData);
 		}
 		if (resources_->m_Hwnd) {
