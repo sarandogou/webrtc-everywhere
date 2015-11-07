@@ -218,7 +218,7 @@ void _MediaStream::stop()
 		if (_tracks[i]){
 			for (size_t j = 0; j < _tracks[i]->values.size(); ++j) {
 				if (_tracks[i]->values[j]){
-					removeTrack(_tracks[i]->values[j].get());
+					_tracks[i]->values[j].get()->stop();
 				}
 			}
 		}

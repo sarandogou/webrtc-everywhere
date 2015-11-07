@@ -11,90 +11,101 @@
 #include <Windows.h>
 #endif
 
+///
+/// _VideoRenderer
+///
+
+_VideoRendererResources::_VideoRendererResources(int width, int height, cpp11::function<void()> fnOnStartVideoRenderer, webrtc::VideoTrackInterface* track_to_render)
+: m_fnOnStartVideoRenderer(fnOnStartVideoRenderer)
+#if WE_UNDER_WINDOWS
+, m_Hwnd(NULL)
+, m_lpUsrData(NULL)
+#elif WE_UNDER_APPLE
+, m_layer(NULL)
+, m_context(NULL)
+, m_context_buff(NULL)
+, m_context_buff_size(0)
+, m_group(dispatch_group_create())
+
+#endif
+, m_cs(NULL)
+, m_width(width)
+, m_height(height)
+{
+    m_rendered_track = track_to_render;
+    m_cs = webrtc::CriticalSectionWrapper::CreateCriticalSection();
+#if WE_UNDER_WINDOWS
+    ZeroMemory(&m_bmi, sizeof(m_bmi));
+    m_bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    m_bmi.bmiHeader.biPlanes = 1;
+    m_bmi.bmiHeader.biBitCount = 32;
+    m_bmi.bmiHeader.biCompression = BI_RGB;
+    m_bmi.bmiHeader.biWidth = width;
+    m_bmi.bmiHeader.biHeight = -height;
+    m_bmi.bmiHeader.biSizeImage = width * height *
+    (m_bmi.bmiHeader.biBitCount >> 3);
+#elif WE_UNDER_APPLE
+#endif
+}
+_VideoRendererResources::~_VideoRendererResources()
+{
+    m_image.reset();
+    m_rendered_track = NULL;
+    
+    {
+        
+#if WE_UNDER_WINDOWS
+        if (m_Hwnd) {
+            InvalidateRect(m_Hwnd, NULL, TRUE);
+        }
+#elif WE_UNDER_APPLE
+        if (m_layer) {
+            m_layer.contents = NULL;
+            [m_layer release], m_layer = NULL;
+        }
+        if (m_context) {
+            CGContextRelease(m_context);
+            m_context = NULL;
+        }
+        if (m_context_buff) {
+            free(m_context_buff), m_context_buff = NULL;
+        }
+        m_context_buff_size = 0;
+        dispatch_release(m_group);
+#endif
+    } // ~lock
+    
+    
+    if (m_cs) {
+        delete m_cs;
+        m_cs = NULL;
+    }
+}
+
 
 //
 //	_VideoRenderer
 //
 _VideoRenderer::_VideoRenderer(int width, int height, cpp11::function<void()> fnOnStartVideoRenderer, webrtc::VideoTrackInterface* track_to_render)
-    : m_fnOnStartVideoRenderer(fnOnStartVideoRenderer)
-#if WE_UNDER_WINDOWS
-    , m_Hwnd(NULL)
-	, m_lpUsrData(NULL)
-#elif WE_UNDER_APPLE
-    , m_layer(NULL)
-    , m_context(NULL)
-    , m_context_buff(NULL)
-    , m_context_buff_size(0)
-    , m_group(dispatch_group_create())
+    : m_cs(NULL)
+    , resources_(new _VideoRendererResources(width, height, fnOnStartVideoRenderer, track_to_render))
 
-#endif
-    , m_cs(NULL)
-	, m_width(width)
-	, m_height(height)
 {
-	m_rendered_track = track_to_render;
     m_cs = webrtc::CriticalSectionWrapper::CreateCriticalSection();
-#if WE_UNDER_WINDOWS
-	ZeroMemory(&m_bmi, sizeof(m_bmi));
-	m_bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	m_bmi.bmiHeader.biPlanes = 1;
-	m_bmi.bmiHeader.biBitCount = 32;
-	m_bmi.bmiHeader.biCompression = BI_RGB;
-	m_bmi.bmiHeader.biWidth = width;
-	m_bmi.bmiHeader.biHeight = -height;
-	m_bmi.bmiHeader.biSizeImage = width * height *
-		(m_bmi.bmiHeader.biBitCount >> 3);
-#elif WE_UNDER_APPLE
-#endif
-	m_rendered_track->AddRenderer(this);
+	resources_->m_rendered_track->AddRenderer(this);
 }
 
 _VideoRenderer::~_VideoRenderer()
 {
-    {
-        _AutoLock<_VideoRenderer> lock(this);
-        if (m_rendered_track) {
-            m_rendered_track->RemoveRenderer(this);
-        }
-        m_image.reset();
+    if (resources_->m_rendered_track) {
+        resources_->m_rendered_track->RemoveRenderer(this);
     }
-#if WE_UNDER_APPLE
-    {
-        _AutoLock<_VideoRenderer> lock(this);
-        // wait until async video rendering finish
-        dispatch_group_wait(m_group, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.6 * NSEC_PER_SEC)));
-        //dispatch_group_wait(m_group, DISPATCH_TIME_FOREVER);
-    }
-#endif
 
-	{
-        _AutoLock<_VideoRenderer> lock(this);
-		m_rendered_track = NULL;
-
-#if WE_UNDER_WINDOWS
-		if (m_Hwnd) {
-			InvalidateRect(m_Hwnd, NULL, TRUE);
-		}
-#elif WE_UNDER_APPLE
-		if (m_layer) {
-			m_layer.contents = NULL;
-			[m_layer release], m_layer = NULL;
-		}
-		if (m_context) {
-			CGContextRelease(m_context);
-			m_context = NULL;
-		}
-		if (m_context_buff) {
-			free(m_context_buff), m_context_buff = NULL;
-		}
-		m_context_buff_size = 0;
-		dispatch_release(m_group);
-#endif
-	} // ~lock
-    
     if (m_cs) {
         delete m_cs;
+        m_cs = NULL;
     }
+    resources_ = nullPtr;
 }
 
 #if WE_UNDER_WINDOWS
@@ -112,7 +123,7 @@ void _VideoRenderer::SetHwnd(HWND hwnd, LONG_PTR lpUsrData)
 
 HWND _VideoRenderer::GetHwnd()
 {
-	return m_Hwnd;
+	return resources_->m_Hwnd;
 }
 
 static inline LONG Width(const RECT& r)
@@ -220,22 +231,24 @@ static inline RECT LetterBoxRect(const RECT& rcSrc, const RECT& rcDst)
 #elif WE_UNDER_APPLE
 void _VideoRenderer::SetLayer(CALayer *layer)
 {
-    _AutoLock<_VideoRenderer> lock(this);
+    _AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
     
-    if (m_layer) {
-        m_layer.contents = NULL;
-        [m_layer release], m_layer = NULL;
+    if (resources_->m_layer) {
+        resources_->m_layer.contents = NULL;
+        [resources_->m_layer release], resources_->m_layer = NULL;
     }
     if (layer) {
-        m_layer = [layer retain];
+        resources_->m_layer = [layer retain];
     }
 }
 
 CALayer *_VideoRenderer::GetLayer()
 {
     _AutoLock<_VideoRenderer> lock(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
     
-    return m_layer;
+    return resources_->m_layer;
 }
 #endif
 
@@ -243,16 +256,17 @@ CALayer *_VideoRenderer::GetLayer()
 // Requires valid m_Hwnd
 bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 {
-    _AutoLock<_VideoRenderer> lock(this);
+    _AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
 #if WE_UNDER_WINDOWS
-    const uint8* image = m_image.get();
+    const uint8* image = resources_->m_image.get();
 	ATL_DRAWINFO* drawInfo  = reinterpret_cast<ATL_DRAWINFO*>(layer);
-	if ((m_Hwnd || drawInfo) && image) {
+	if ((resources_->m_Hwnd || drawInfo) && image) {
 		PAINTSTRUCT ps;
 		HDC hdc;
-		if (m_Hwnd) {
-			if (!(hdc = ::BeginPaint(m_Hwnd, &ps))) {
+		if (resources_->m_Hwnd) {
+			if (!(hdc = ::BeginPaint(resources_->m_Hwnd, &ps))) {
 				return false;
 			}
 		}
@@ -262,9 +276,9 @@ bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 		}
 
 		RECT rc;
-		if (m_Hwnd) {
-			if (!::GetClientRect(m_Hwnd, &rc)) {
-				::EndPaint(m_Hwnd, &ps);
+		if (resources_->m_Hwnd) {
+			if (!::GetClientRect(resources_->m_Hwnd, &rc)) {
+				::EndPaint(resources_->m_Hwnd, &ps);
 				return false;
 			}
 		}
@@ -273,8 +287,8 @@ bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 		}
 
 #if WE_USE_AUTORESIZE // Flickering when resizing (in windowless mode only: https://github.com/sarandogou/webrtc-everywhere/issues/44)
-		int width = m_bmi.bmiHeader.biWidth;
-		int height = abs(m_bmi.bmiHeader.biHeight);
+		int width = resources_->m_bmi.bmiHeader.biWidth;
+		int height = abs(resources_->m_bmi.bmiHeader.biHeight);
 
 		HDC dc_mem = ::CreateCompatibleDC(ps.hdc);
 		::SetStretchBltMode(dc_mem, HALFTONE);
@@ -313,7 +327,7 @@ bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 		::DeleteDC(dc_mem);
 #else /* !WE_USE_AUTORESIZE */
 		static const WERatio pixelAR = { 1, 1 };
-		RECT rcSrc = { 0, 0, m_bmi.bmiHeader.biWidth, abs(m_bmi.bmiHeader.biHeight) };
+		RECT rcSrc = { 0, 0, resources_->m_bmi.bmiHeader.biWidth, abs(resources_->m_bmi.bmiHeader.biHeight) };
 		rcSrc = CorrectAspectRatio(rcSrc, pixelAR);
 		const RECT rcDest = LetterBoxRect(rcSrc, rc);
 
@@ -343,8 +357,8 @@ bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 		::DeleteDC(dc_mem);
 #endif /* WE_USE_AUTORESIZE */
 		
-		if (m_Hwnd) {
-			::EndPaint(m_Hwnd, &ps);
+		if (resources_->m_Hwnd) {
+			::EndPaint(resources_->m_Hwnd, &ps);
 		}
 
 		return true;
@@ -358,16 +372,18 @@ bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 
 int _VideoRenderer::GetVideoWidth()
 {
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
-	return m_width;
+	return resources_->m_width;
 }
 
 int _VideoRenderer::GetVideoHeight()
 {
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
-	return m_height;
+	return resources_->m_height;
 }
 
 
@@ -375,9 +391,10 @@ int _VideoRenderer::GetVideoHeight()
 size_t _VideoRenderer::CopyFromFrame(void* bufferPtr, size_t bufferSize)
 {
 	if (bufferPtr && bufferSize) {
-		_AutoLock<_VideoRenderer> lock(this);
-		size_t sizeToCopy = std::min((int)bufferSize, (m_width * m_height * 4));
-		const uint8* image = m_image.get();
+		_AutoLock<_VideoRenderer> lock0(this);
+        _AutoLock<_VideoRendererResources> lock1(resources_.get());
+		size_t sizeToCopy = std::min((int)bufferSize, (resources_->m_width * resources_->m_height * 4));
+		const uint8* image = resources_->m_image.get();
 		if (image) {
 			memcpy(bufferPtr, image, sizeToCopy);
 			return sizeToCopy;
@@ -389,21 +406,24 @@ size_t _VideoRenderer::CopyFromFrame(void* bufferPtr, size_t bufferSize)
 #if WE_UNDER_WINDOWS
 void _VideoRenderer::SetFnQueryHwnd(cpp11::function<HWND()> fnQueryHwnd)
 {
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
 	m_fnQueryHwnd = fnQueryHwnd;
 }
 
 void _VideoRenderer::SetFnIsWindowless(cpp11::function<BOOL()> fnIsWindowless)
 {
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
 	m_fnIsWindowless = fnIsWindowless;
 }
 
 void _VideoRenderer::SetFnInvalidateWindowless(cpp11::function<HRESULT(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase)> fnInvalidateWindowless)
 {
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
 	m_fnInvalidateWindowless = fnInvalidateWindowless;
 }
@@ -413,49 +433,50 @@ void _VideoRenderer::SetFnInvalidateWindowless(cpp11::function<HRESULT(/* [uniqu
 // VideoRendererInterface implementation
 void _VideoRenderer::SetSize(int width, int height)
 {
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
     
-    m_width = width;
-	m_height = height;
+    resources_->m_width = width;
+	resources_->m_height = height;
 
 #if WE_UNDER_WINDOWS
 	m_bmi.bmiHeader.biWidth = width;
 	m_bmi.bmiHeader.biHeight = -height;
 	m_bmi.bmiHeader.biSizeImage = width * height *
-		(m_bmi.bmiHeader.biBitCount >> 3);
+		(resources_->m_bmi.bmiHeader.biBitCount >> 3);
 	m_image.reset(new uint8[m_bmi.bmiHeader.biSizeImage]);
-	if (m_Hwnd) {
+	if (resources_->m_Hwnd) {
 	}
 #elif WE_UNDER_APPLE
-    if (m_context) {
-        CGContextRelease(m_context);
-        m_context = NULL;
+    if (resources_->m_context) {
+        CGContextRelease(resources_->m_context);
+        resources_->m_context = NULL;
     }
-    m_context_buff_size = (m_width * m_height) << 2;
-    m_context_buff = realloc(m_context_buff, m_context_buff_size);
-    if (!m_context_buff) {
-        WE_DEBUG_ERROR("failed to allocate buffer with size = %d", m_context_buff_size);
-        m_context_buff_size = 0;
+    resources_->m_context_buff_size = (resources_->m_width * resources_->m_height) << 2;
+    resources_->m_context_buff = realloc(resources_->m_context_buff, resources_->m_context_buff_size);
+    if (!resources_->m_context_buff) {
+        WE_DEBUG_ERROR("failed to allocate buffer with size = %d", resources_->m_context_buff_size);
+        resources_->m_context_buff_size = 0;
         return;
     }
     
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    m_context = CGBitmapContextCreate(m_context_buff, m_width, m_height, 8, m_width * 4, colorSpace,
+    resources_->m_context = CGBitmapContextCreate(resources_->m_context_buff, resources_->m_width, resources_->m_height, 8, resources_->m_width * 4, colorSpace,
 											   kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
     CGColorSpaceRelease(colorSpace);
-    if (!m_context) {
+    if (!resources_->m_context) {
         WE_DEBUG_ERROR("failed to create RGB32 context");
         return; // return and do not signal "video started" event
     }
     else {
-        m_image.reset(new uint8[m_context_buff_size]);
-        CGContextSetInterpolationQuality(m_context, kCGInterpolationMedium);
-        CGContextSetShouldAntialias(m_context, true);
+        resources_->m_image.reset(new uint8[resources_->m_context_buff_size]);
+        CGContextSetInterpolationQuality(resources_->m_context, kCGInterpolationMedium);
+        CGContextSetShouldAntialias(resources_->m_context, true);
     }
 #endif
     
-	if (m_fnOnStartVideoRenderer) {
-		m_fnOnStartVideoRenderer();
+	if (resources_->m_fnOnStartVideoRenderer) {
+		resources_->m_fnOnStartVideoRenderer();
 	}
 }
 
@@ -466,11 +487,12 @@ void _VideoRenderer::RenderFrame(const cricket::VideoFrame* frame)
 		return;
 	}
 	
-	_AutoLock<_VideoRenderer> lock(this);
+	_AutoLock<_VideoRenderer> lock0(this);
+    _AutoLock<_VideoRendererResources> lock1(resources_.get());
 
-	if (!m_image.get() || m_width != frame->GetWidth() || m_height != frame->GetHeight()) {
+	if (!resources_->m_image.get() || resources_->m_width != frame->GetWidth() || resources_->m_height != frame->GetHeight()) {
 		SetSize((int)frame->GetWidth(), (int)frame->GetHeight());
-		if (!m_image.get()) {
+		if (!resources_->m_image.get()) {
 			return;
 		}
     }
@@ -482,36 +504,39 @@ void _VideoRenderer::RenderFrame(const cricket::VideoFrame* frame)
 		m_bmi.bmiHeader.biWidth *
 		m_bmi.bmiHeader.biBitCount / 8);
 
-	if (m_fnIsWindowless && m_fnIsWindowless()) {
+	if (resources_->m_fnIsWindowless && resources_->m_fnIsWindowless()) {
 		// windowless
-		if (m_fnInvalidateWindowless) {
+		if (resources_->m_fnInvalidateWindowless) {
 			m_fnInvalidateWindowless(NULL, TRUE);
 		}
 	}
 	else {
 		// windowed
-		if (!m_Hwnd && m_fnQueryHwnd) {
-			SetHwnd(m_fnQueryHwnd(), m_lpUsrData);
+		if (!m_Hwnd && resources_->m_fnQueryHwnd) {
+			SetHwnd(resources_->m_fnQueryHwnd(), resources_->m_lpUsrData);
 		}
-		if (m_Hwnd) {
-			InvalidateRect(m_Hwnd, NULL, TRUE);
+		if (resources_->m_Hwnd) {
+			InvalidateRect(resources_->m_Hwnd, NULL, TRUE);
 		}
 	}
 #elif WE_UNDER_APPLE
-    if (m_context_buff && m_context && m_layer) {
-        frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, m_image.get(), m_context_buff_size, m_width * 4);
-        memcpy(m_context_buff, m_image.get(), m_context_buff_size);
+    __block cpp11::shared_ptr<_VideoRendererResources> rcopy = resources_;
+    if (rcopy->m_context_buff && rcopy->m_context && rcopy->m_layer) {
+        frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, rcopy->m_image.get(), rcopy->m_context_buff_size, rcopy->m_width * 4);
+        memcpy(rcopy->m_context_buff, rcopy->m_image.get(), rcopy->m_context_buff_size);
         
-        dispatch_group_enter(m_group);
-        dispatch_group_async(m_group, dispatch_get_main_queue(), ^{
-            _AutoLock<_VideoRenderer> lock(this);
-            if (m_context_buff && m_context && m_layer) {
-                CGImageRef image = CGBitmapContextCreateImage(m_context);
-                m_layer.contentsGravity = kCAGravityResizeAspect;
-                m_layer.contents = (id)image;
+        dispatch_group_enter(rcopy->m_group);
+        dispatch_group_async(rcopy->m_group, dispatch_get_main_queue(), ^{
+            rcopy->Enter();
+            if (rcopy->m_context_buff && rcopy->m_context && rcopy->m_layer) {
+                CGImageRef image = CGBitmapContextCreateImage(rcopy->m_context);
+                rcopy->m_layer.contentsGravity = kCAGravityResizeAspect;
+                rcopy->m_layer.contents = (id)image;
                 CGImageRelease(image);
             }
-            dispatch_group_leave(m_group);
+            dispatch_group_leave(rcopy->m_group);
+            rcopy->Leave();
+            rcopy = nullPtr;
         });
     }
 

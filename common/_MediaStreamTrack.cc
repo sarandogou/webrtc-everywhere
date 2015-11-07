@@ -209,21 +209,35 @@ void _MediaStreamTrackBase::applyConstraints(const _MediaTrackConstraints* const
 cpp11::shared_ptr<_MediaStreamTrack> _MediaStreamTrackBase::clone()
 {
 	// http://www.w3.org/TR/mediacapture-streams/#widl-MediaStreamTrack-clone-MediaStreamTrack
-	// FIXME: not implemented yet
-	WE_DEBUG_ERROR("Not implemented yet");
 
-	return nullPtr;
+    if (m_eType == _MediaStreamTrackTypeVideo) {
+        return cpp11::shared_ptr<_MediaStreamTrack>(new _MediaStreamTrackVideo(dynamic_cast<_MediaStreamTrackVideo*>(this)->track()));
+    }
+    else if (m_eType == _MediaStreamTrackTypeAudio) {
+        return cpp11::shared_ptr<_MediaStreamTrack>(new _MediaStreamTrackAudio(dynamic_cast<_MediaStreamTrackAudio*>(this)->track()));
+    }
+    return nullPtr;
 }
 
 void _MediaStreamTrackBase::stop()
 {
-	if (_track()) {
-
-	}
-
-	// http://www.w3.org/TR/mediacapture-streams/#widl-MediaStreamTrack-stop-void
-	// FIXME: not implemented yet
-	WE_DEBUG_ERROR("Not implemented yet");
+    if (_track()) {
+        enabledSet(false);
+        _track()->set_state(webrtc::MediaStreamTrackInterface::kEnded);
+        
+        if (m_eType == _MediaStreamTrackTypeVideo) {
+            rtc::scoped_refptr<webrtc::VideoSourceInterface> videoSrc = dynamic_cast<_MediaStreamTrackVideo*>(this)->track() ? dynamic_cast<_MediaStreamTrackVideo*>(this)->track()->GetSource() : NULL;
+            if (videoSrc) {
+                videoSrc->Stop();
+            }
+        }
+        else if (m_eType == _MediaStreamTrackTypeAudio) {
+            rtc::scoped_refptr<webrtc::AudioSourceInterface> audioSrc = dynamic_cast<_MediaStreamTrackAudio*>(this)->track() ? dynamic_cast<_MediaStreamTrackAudio*>(this)->track()->GetSource() : NULL;
+            if (audioSrc) {
+                
+            }
+        }
+    }
 }
 
 //

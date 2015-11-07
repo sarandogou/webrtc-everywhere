@@ -163,7 +163,7 @@ bool MediaStreamTrack::Invoke(NPObject* obj, NPIdentifier methodName,
 			ret_val = false;
 		}
 	}
-	else if (!!strcmp(name, kFuncStates)) {
+	else if (!strcmp(name, kFuncStates)) {
 		if (This->m_Track) {
 			MediaSourceStates* _states;
 			NPError err = MediaSourceStates::CreateInstanceWithRef(This->m_npp, &_states);
@@ -175,27 +175,41 @@ bool MediaStreamTrack::Invoke(NPObject* obj, NPIdentifier methodName,
 			}
 		}
 	}
-	else if (!!strcmp(name, kFuncCapabilities)) {
+	else if (!strcmp(name, kFuncCapabilities)) {
 		if (This->m_Track) {
 			// TODO: not implemented yet
 			NULL_TO_NPVARIANT(*result);
 			ret_val = false;
 		}
 	}
-	else if (!!strcmp(name, kFuncApplyConstraints)) {
+	else if (!strcmp(name, kFuncApplyConstraints)) {
 		if (This->m_Track) {
 			// TODO: not implemented yet
 			NULL_TO_NPVARIANT(*result);
 			ret_val = false;
 		}
 	}
-	else if (!!strcmp(name, kFuncClone)) {
+	else if (!strcmp(name, kFuncClone)) {
 		if (This->m_Track) {
-			// TODO: not implemented yet
-			NULL_TO_NPVARIANT(*result);
-			ret_val = false;
+            cpp11::shared_ptr<_MediaStreamTrack>clone =  This->m_Track->clone();
+            if (clone) {
+                MediaStreamTrack* track;
+                NPError err = MediaStreamTrack::CreateInstanceWithRef(This->m_npp, &track);
+                if (err == NPERR_NO_ERROR) {
+                    track->SetTrack(clone);
+                    track->SetDispatcher(const_cast<_AsyncEventDispatcher*>(This->GetDispatcher()));
+                    OBJECT_TO_NPVARIANT(track, *result);
+                    ret_val = true;
+                }
+            }
 		}
 	}
+    else if (!strcmp(name, kFuncStop)) {
+        if (This->m_Track) {
+            This->m_Track->stop();
+            ret_val = true;
+        }
+    }
 
 	BrowserFuncs->memfree(name);
 	return ret_val;

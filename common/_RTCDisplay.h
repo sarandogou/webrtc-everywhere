@@ -18,6 +18,42 @@
 #import <QuartzCore/CIContext.h>
 #endif
 
+class _VideoRendererResources
+{
+    friend class _VideoRenderer;
+public:
+    _VideoRendererResources(int width, int height, cpp11::function<void()> fnOnStartVideoRenderer, webrtc::VideoTrackInterface* track_to_render);
+    virtual ~_VideoRendererResources();
+    void Enter() { m_cs->Enter(); }
+    void Leave() { m_cs->Leave(); }
+    
+private:
+    enum {
+        SET_SIZE,
+        RENDER_FRAME,
+    };
+#if WE_UNDER_WINDOWS
+    HWND m_Hwnd;
+    LONG_PTR m_lpUsrData;
+    BITMAPINFO m_bmi;
+    cpp11::function<HWND()> m_fnQueryHwnd;
+    cpp11::function<BOOL()> m_fnIsWindowless;
+    cpp11::function<HRESULT(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase)> m_fnInvalidateWindowless;
+#elif WE_UNDER_APPLE
+    CALayer *m_layer;
+    CGContextRef m_context;
+    void* m_context_buff;
+    int m_context_buff_size;
+    dispatch_group_t m_group;
+#endif
+    int m_width;
+    int m_height;
+    cpp11::function<void()> m_fnOnStartVideoRenderer;
+    webrtc::CriticalSectionWrapper *m_cs;
+    rtc::scoped_ptr<uint8[]> m_image;
+    rtc::scoped_refptr<webrtc::VideoTrackInterface> m_rendered_track;
+};
+
 class _VideoRenderer : public webrtc::VideoRendererInterface
 {
 public:
@@ -47,33 +83,12 @@ public:
 	// VideoRendererInterface implementation
 	virtual void SetSize(int width, int height);
 	virtual void RenderFrame(const cricket::VideoFrame* frame);
+    
+    virtual cpp11::shared_ptr<_VideoRendererResources> resources() { return resources_; }
 
 private:
-	enum {
-		SET_SIZE,
-		RENDER_FRAME,
-	};
-
-#if WE_UNDER_WINDOWS
-	HWND m_Hwnd;
-	LONG_PTR m_lpUsrData;
-	BITMAPINFO m_bmi;
-	cpp11::function<HWND()> m_fnQueryHwnd;
-	cpp11::function<BOOL()> m_fnIsWindowless;
-	cpp11::function<HRESULT(/* [unique][in] */ __RPC__in_opt LPCRECT pRect, /* [in] */ BOOL fErase)> m_fnInvalidateWindowless;
-#elif WE_UNDER_APPLE
-    CALayer *m_layer;
-    CGContextRef m_context;
-    void* m_context_buff;
-    int m_context_buff_size;
-    dispatch_group_t m_group;
-#endif
-    int m_width;
-	int m_height;
-	cpp11::function<void()> m_fnOnStartVideoRenderer;
     webrtc::CriticalSectionWrapper *m_cs;
-	rtc::scoped_ptr<uint8[]> m_image;
-	rtc::scoped_refptr<webrtc::VideoTrackInterface> m_rendered_track;
+    cpp11::shared_ptr<_VideoRendererResources> resources_;
 };
 
 class WEBRTC_EVERYWHERE_API _RTCDisplay

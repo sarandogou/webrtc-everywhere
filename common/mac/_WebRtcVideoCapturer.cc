@@ -150,7 +150,11 @@ namespace cricket {
     
     WebRtcVideoCapturer::~WebRtcVideoCapturer() {
         if (module_) {
-            module_->Release();
+            // module_ is a QT resource and must be released on the main thread
+            dispatch_async(dispatch_get_main_queue(), ^{
+                module_->Release();
+                module_ = NULL;
+            });
         }
         dispatch_release(group_);
     }
