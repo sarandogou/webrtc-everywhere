@@ -1,5 +1,6 @@
- webrtc/base/win32window.cc | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ webrtc/base/win32window.cc                               | 14 +++++++++++---
+ webrtc/modules/video_capture/windows/video_capture_ds.cc |  3 ++-
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/webrtc/base/win32window.cc b/webrtc/base/win32window.cc
 index 4d41014..715f181 100644
@@ -30,3 +31,17 @@ index 4d41014..715f181 100644
    return (NULL != wnd_);
  }
  
+diff --git a/webrtc/modules/video_capture/windows/video_capture_ds.cc b/webrtc/modules/video_capture/windows/video_capture_ds.cc
+index 2d66055..0bbb7dc 100644
+--- a/webrtc/modules/video_capture/windows/video_capture_ds.cc
++++ b/webrtc/modules/video_capture/windows/video_capture_ds.cc
+@@ -178,7 +178,8 @@ int32_t VideoCaptureDS::StopCapture()
+ {
+     CriticalSectionScoped cs(&_apiCs);
+ 
+-    HRESULT hr = _mediaControl->Pause();
++	// TODO(dmi) https://code.google.com/p/webrtc/issues/detail?id=1649
++	HRESULT hr = _mediaControl->Stop()/*_mediaControl->Pause()*/;
+     if (FAILED(hr))
+     {
+         WEBRTC_TRACE(webrtc::kTraceError, webrtc::kTraceVideoCapture, _id,
