@@ -1,7 +1,7 @@
-**webrtc-everywhere** is an open source project (with **business-friendly** <a href="#license">license</a>) to add support for WebRTC features to Safari (Windows and MAC OSX) and Internet Explorer (Windows).
+**webrtc-everywhere** is an open source project (with **business-friendly** <a href="#license">license</a>) to add support for WebRTC features to Safari (Windows and OS X) and Internet Explorer (Windows).
 
 # Downloads
- - <a href="https://doubango.org/webrtc/webrtc-everywhere-10.6.dmg" target="_blank">MAC OSX</a> 
+ - <a href="https://doubango.org/webrtc/webrtc-everywhere-10.6.dmg" target="_blank">OS X</a> 
  - <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
 
 # Online samples 
@@ -29,7 +29,7 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
 
 
 # Using our plugin in your own project
- - Download and install the plugin for <a href="https://doubango.org/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> or <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
+ - Download and install the plugin for <a href="https://doubango.org/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">OS X</a> or <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
  - Include <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> in your code.
  - Change the code you're using to attach a stream to a &lt;audio/&gt; or &lt;video /&gt; HTML5 element: <br />
  from:
@@ -60,7 +60,7 @@ Sample code to select your screen as media source:
  ```
  - For Windows you'll need to apply [this patch](/webrtc_win.patch)
 
- - **OSX x86_64**<br />
+ - **OS X x86_64**<br />
  ```
  python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=mac
  ninja -C out/Debug
@@ -70,7 +70,7 @@ Sample code to select your screen as media source:
  mv out/Release out/Release_x64
  ```
  
- - **OSX i386**<br />
+ - **OS X i386**<br />
  ```
  python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=mac
  ninja -C out/Debug
@@ -96,7 +96,7 @@ Sample code to select your screen as media source:
  
 <br />
 <br />
-To build the source code you'll need Visual Studio 2013+ (Windows) or Xcode (MAC OSX):
+To build the source code you'll need Visual Studio 2013+ (Windows) or Xcode (OS X):
   - Visual Studio solution: **webrtc-everywhere/webrtc-everywhere.sln**
   - Xcode project: **webrtc-everywhere/xcode/webrtc-everywhere.xcodeproj**
 
@@ -105,7 +105,7 @@ To build the source code you'll need Visual Studio 2013+ (Windows) or Xcode (MAC
  - The source code: **GPLv3**. Please contact us for alternative license options.
 
 # Known issues
- - On Safari/OSX, if you're getting *TypeError: undefined is not a function (evaluating 'getPlugin()...*:
+ - On Safari/OS X, if you're getting *TypeError: undefined is not a function (evaluating 'getPlugin()...*:
  	- Change the security settings to manually enable the plugin: [http://support.apple.com/en-us/HT202819](http://support.apple.com/en-us/HT202819)
 
 # Getting help
@@ -113,8 +113,8 @@ The best way to get help is via our <a href="https://groups.google.com/forum/#!f
 
 # Release notes
  - **2.0.0**
-  - Adds support for Screenshare on OSX and Windows
-  - Adds support for OSX X86_64
+  - Adds support for Screenshare on OS X and Windows
+  - Adds support for OS X X86_64
   - Fix issue [#1](../../issues/1), [#16](../../issues/16), [#26](../../issues/26), [#28](../../issues/28), [#29](../../issues/29), [#31](../../issues/31) and [#32](../../issues/32)
 
  - **1.3.1**
