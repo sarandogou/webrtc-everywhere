@@ -407,7 +407,8 @@ namespace cricket {
     }
     
     bool WebRtcVideoCapturer::IsRunning() {
-        return (module_ != NULL && module_->CaptureStarted());
+        // TODO(dmi): added "start_thread_ && async_invoker_ &&" in the "if" because the stop function asynchronously calls "mdl->StopCapture()" which means IsRunning() could return true after Stop()
+        return (start_thread_ && async_invoker_ && module_ && module_->CaptureStarted());
     }
     
     bool WebRtcVideoCapturer::GetPreferredFourccs(
