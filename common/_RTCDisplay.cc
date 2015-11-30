@@ -333,29 +333,41 @@ bool _VideoRenderer::PaintFrame(intptr_t layer /*= 0*/)
 		const RECT rcDest = LetterBoxRect(rcSrc, rc);
 
 		HDC dc_mem = ::CreateCompatibleDC(ps.hdc);
-		::SetStretchBltMode(dc_mem, HALFTONE);
+		if (dc_mem) {
+			::SetStretchBltMode(dc_mem, HALFTONE);
 
-		// Create offscreen bmp memory
-		HBITMAP bmp_mem = ::CreateCompatibleBitmap(ps.hdc, rc.right, rc.bottom);
-		HGDIOBJ bmp_old = ::SelectObject(dc_mem, bmp_mem);
+			// Create offscreen bmp memory
+			HBITMAP bmp_mem = ::CreateCompatibleBitmap(ps.hdc, rc.right, rc.bottom);
+			HGDIOBJ bmp_old = ::SelectObject(dc_mem, bmp_mem);
+			if (bmp_mem && bmp_old) {
+				POINT logical_area = { rc.right, rc.bottom };
+				DPtoLP(ps.hdc, &logical_area, 1);
 
-		POINT logical_area = { rc.right, rc.bottom };
-		DPtoLP(ps.hdc, &logical_area, 1);
+				HBRUSH brush = ::CreateSolidBrush(RGB(0, 0, 0));
+				if (brush) {
+					RECT logical_rect = { 0, 0, logical_area.x, logical_area.y };
+					::FillRect(dc_mem, &logical_rect, brush);
+					::DeleteObject(brush);
+				}
 
-		HBRUSH brush = ::CreateSolidBrush(RGB(0, 0, 0));
-		RECT logical_rect = { 0, 0, logical_area.x, logical_area.y };
-		::FillRect(dc_mem, &logical_rect, brush);
-		::DeleteObject(brush);
+				StretchDIBits(dc_mem, rcDest.left, rcDest.top, Width(rcDest), Height(rcDest),
+					rcSrc.left, rcSrc.top, Width(rcSrc), Height(rcSrc), image, &resources_->m_bmi, DIB_RGB_COLORS, SRCCOPY);
 
-		StretchDIBits(dc_mem, rcDest.left, rcDest.top, Width(rcDest), Height(rcDest),
-			rcSrc.left, rcSrc.top, Width(rcSrc), Height(rcSrc), image, &resources_->m_bmi, DIB_RGB_COLORS, SRCCOPY);
+				BitBlt(ps.hdc, 0, 0, logical_area.x, logical_area.y, dc_mem, 0, 0, SRCCOPY);
+			}
 
-		BitBlt(ps.hdc, 0, 0, logical_area.x, logical_area.y, dc_mem, 0, 0, SRCCOPY);
-
-		// Cleanup.
-		::SelectObject(dc_mem, bmp_old);
-		::DeleteObject(bmp_mem);
-		::DeleteDC(dc_mem);
+			// Cleanup.
+			if (bmp_old) {
+				::SelectObject(dc_mem, bmp_old);
+			}
+			if (bmp_mem) {
+				::DeleteObject(bmp_mem);
+			}
+			::DeleteDC(dc_mem);
+		}
+		else {
+			LOG(LS_ERROR) << "CreateCompatibleDC failed";
+		}
 #endif /* WE_USE_AUTORESIZE */
 		
 		if (resources_->m_Hwnd) {

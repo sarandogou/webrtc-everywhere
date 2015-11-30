@@ -263,7 +263,9 @@ public:
 			}
 		}
 	next:
-		SetNextFrame(desktopFrame);
+		if (desktopFrame) {
+			SetNextFrame(desktopFrame);
+		}
 	}
 
 	// Used to signal frame capture on the thread that capturer was started on.

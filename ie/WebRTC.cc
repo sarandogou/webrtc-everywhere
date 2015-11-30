@@ -283,6 +283,9 @@ HRESULT CWebRTC::OnDraw(ATL_DRAWINFO& di)
 	if (bSelectOldRgn) {
 		SelectClipRgn(di.hdcDraw, hRgnOld);
 	}
+	if (hRgnNew) {
+		DeleteObject(hRgnNew);
+	}
 	return S_OK;
 }
 
@@ -803,7 +806,10 @@ LRESULT CALLBACK CWebRTC::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	if (uMsg == WM_INVALIDATE_WINDOLESS) {
 		CWebRTC* This = dynamic_cast<CWebRTC*>(reinterpret_cast<CWebRTC*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA)));
-		This->m_spInPlaceSite->InvalidateRect(NULL, FALSE); // TODO(dmi): read wParam and lParam to get params for InvalidateRect
+		HRESULT hr = This->m_spInPlaceSite->InvalidateRect(NULL, FALSE); // TODO(dmi): read wParam and lParam to get params for InvalidateRect
+		if (FAILED(hr)) {
+
+		}
 		return 1;
 	}
 	return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
