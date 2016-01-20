@@ -33,7 +33,7 @@ public:
 	}
 private:
 	char* buffer_;
-	DISALLOW_COPY_AND_ASSIGN(_SharedMemory);
+	RTC_DISALLOW_COPY_AND_ASSIGN(_SharedMemory);
 };
 
 class _ScreenVideoCapturer;
@@ -59,7 +59,7 @@ private:
 	mutable rtc::CriticalSection crit_;
 	bool finished_;
 
-	DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturerThread);
+	RTC_DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturerThread);
 };
 
 //
@@ -162,7 +162,7 @@ public:
 
 		// Keep track of which thread capture started on. This is the thread that
 		// frames need to be sent to.
-		DCHECK(!startThread_);
+		RTC_DCHECK(!startThread_);
 		startThread_ = rtc::Thread::Current();
 
 		start_time_ns_ = kNumNanoSecsPerMilliSec * static_cast<int64>(rtc::Time());
@@ -270,7 +270,7 @@ public:
 
 	// Used to signal frame capture on the thread that capturer was started on.
 	void SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame) {
-		DCHECK(startThread_->IsCurrent());
+		RTC_DCHECK(startThread_->IsCurrent());
 		SignalFrameCaptured(this, frame);
 	}
 
@@ -285,7 +285,7 @@ private:
 	int64 start_time_ns_;  // Time when the video capturer starts.
 	int64 last_frame_timestamp_ns_;  // Timestamp of last read frame.
 	uint32 start_read_time_ms_; // Timestamp we requested screenshot
-	DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturer);
+	RTC_DISALLOW_COPY_AND_ASSIGN(_ScreenVideoCapturer);
 };
 
 //
