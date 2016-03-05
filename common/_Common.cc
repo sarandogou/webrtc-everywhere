@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_Common.h"
 #include "_Utils.h"
 #include "_Buffer.h"
@@ -156,16 +156,38 @@ WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory()
 #endif
 }
 
-WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList* windowList)
+WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList** windowList)
 {
+	// "windowList" must be allocate and freeded by the DLL to avoid DLL crossing issue
+	if (!windowList) {
+		WE_DEBUG_ERROR("Invalid parameter");
+		return false;
+	}
+	if (!*windowList) {
+		*windowList = new _WindowList();
+		if (!*windowList) {
+			WE_DEBUG_ERROR("OutOfMemory");
+			return false;
+		}
+	}
+	(*windowList)->clear();
 	webrtc::WindowCapturer::WindowList windowList_;
 	if (windowList && _ScreenVideoCapturerFactory::GetWindowList(&windowList_)) {
 		for (size_t i = 0; i < windowList_.size(); ++i) {
-			windowList->push_back(_Window(windowList_[i].id, windowList_[i].title));
+			(*windowList)->push_back(_Window(windowList_[i].id, windowList_[i].title));
 		}
 		return true;
 	}
 	return false;
+}
+
+bool ReleaseWindowList(_WindowList** windowList)
+{
+	if (windowList && *windowList) {
+		delete *windowList;
+		*windowList = NULL;
+	}
+	return true;
 }
 
 WEBRTC_EVERYWHERE_API rtc::Thread* GetWorkerThread()

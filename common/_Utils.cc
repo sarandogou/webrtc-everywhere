@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_Utils.h"
 #include "_RTCDisplay.h"
 #include "_AsyncEvent.h"
@@ -830,8 +830,11 @@ WeError _Utils::ConvertToBMP(const void* _rgb32_ptr, size_t width, size_t height
 	}
 
 #if 0
-	//FILE* file = fopen("C:\\Projects\\webrtc-everywhere\\screenshot.png", "wb");
+#	if WE_UNDER_WINDOWS
+	FILE* file = fopen("C:\\Projects\\webrtc-everywhere\\screenshot.png", "wb");
+#	else
     FILE* file = fopen("/Users/mamadou/Library/Application Support/webrtc-everywhere/screenshot.png", "wb");
+#	endif
 	if (file) {
 		fwrite(*bmp_pptr, 1, *bmp_size_ptr, file);
 		fclose(file);
@@ -946,6 +949,14 @@ void _Utils::SetUserAgent(const char* userAgent)
 {
 	if (userAgent) {
 		s_UserAgent = userAgent;
+	}
+}
+
+void _Utils::StdMemFree(void** mem)
+{
+	if (mem && *mem) {
+		free(*mem);
+		*mem = NULL;
 	}
 }
 

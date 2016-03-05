@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#mediastreamtrack
 #ifndef _WEBRTC_EVERYWHERE_COMMON_MEDIASTREAMTRACK_H_
 #define _WEBRTC_EVERYWHERE_COMMON_MEDIASTREAMTRACK_H_
@@ -63,6 +63,7 @@ public:
 	virtual cpp11::shared_ptr<_MediaStreamTrack> clone() = 0; // MediaStreamTrack clone ();
 	virtual void stop() = 0; // void stop ();
 	
+	virtual int micLevel() { return -1; } // Not part of WebRTC std. For audio only. See rfc6464.
 
 protected:
 #if _MSC_VER
@@ -120,6 +121,23 @@ protected:
 	
 };
 
+#if WE_RMS
+//
+//	_AudioRMS (see rfc6464)
+//
+class _AudioRMS : public webrtc::AudioRMSInterface {
+public:
+	_AudioRMS() : m_rms(0) {}
+	virtual ~_AudioRMS() {  }
+	virtual void RMS(int rms) {
+		m_rms = rms; // This function locks the audio sender which means we ***must not*** perform any time-consuming work
+	}
+	WE_INLINE int rms() { return m_rms; }
+private:
+	int m_rms;
+};
+#endif
+
 //
 //	_MediaStreamTrackAudio
 //
@@ -138,9 +156,13 @@ public:
 
 	// "_MediaStreamTrack" interface implementation
 	virtual bool muted();
+	virtual int micLevel();
 
 private:
-	rtc::scoped_refptr<webrtc::AudioTrackInterface> m_track;
+	rtc::scoped_refptr<webrtc::AudioTrackInterface > m_track;
+#if WE_RMS
+	rtc::scoped_refptr<_AudioRMS > m_RMS;
+#endif
 };
 
 //

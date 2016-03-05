@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#mediastreamtrack
 #include "_MediaStreamTrack.h"
 #include "_ScreenVideoCapturer.h"
@@ -240,6 +240,8 @@ void _MediaStreamTrackBase::stop()
     }
 }
 
+
+
 //
 //	_MediaStreamTrackAudio
 //
@@ -256,12 +258,28 @@ _MediaStreamTrackAudio::_MediaStreamTrackAudio(rtc::scoped_refptr<webrtc::AudioT
 			m_track = peer_connection_factory->CreateAudioTrack(m_label, peer_connection_factory->CreateAudioSource(BuildConstraints(&_constrainsObject)));
 		}
 	}
+#if WE_RMS
+	if (!m_RMS) {
+		m_RMS = new rtc::RefCountedObject<_AudioRMS>();
+	}
+	if (m_track && m_RMS) {
+		m_track->AddRMS(m_RMS);
+	}
+#endif
 	InitLocalVarsToAvoidDanglingPointerIssue();
 }
 
 _MediaStreamTrackAudio::~_MediaStreamTrackAudio()
 {
+	if (m_track) {
+#if WE_RMS
+		m_track->RemoveRMS(m_RMS);
+#endif
+	}
 	m_track = NULL;
+#if WE_RMS
+	m_RMS = NULL;
+#endif
 
 	WE_DEBUG_INFO("_MediaStreamTrackAudio::~_MediaStreamTrackAudio");
 }
@@ -274,6 +292,16 @@ bool _MediaStreamTrackAudio::muted()
 		return !enabled();
 	}
 	return true;
+}
+
+int _MediaStreamTrackAudio::micLevel()
+{
+#if WE_RMS
+	if (m_RMS) {
+		return m_RMS->rms();
+	}
+#endif
+	return _MediaStreamTrack::micLevel(); // default value from base class
 }
 
 //

@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_COMMON_COMMON_H_
 #define _WEBRTC_EVERYWHERE_COMMON_COMMON_H_
 
@@ -38,6 +38,11 @@ typedef struct __FTIME {
 	unsigned long dwHighDateTime;
 } _FTIME;
 #endif
+
+// Window preview for screen sharing
+// Default size (e.g. 4096 x N) would produce OutOfMemory issues
+static const int kWindowPreviewWidth = 640;
+static const int kWindowPreviewHeight = 480;
 
 static const char kAudioLabel[] = "audio_label";
 static const char kVideoLabel[] = "video_label";
@@ -613,7 +618,8 @@ extern WEBRTC_EVERYWHERE_API rtc::Thread* GetWorkerThread();
 extern WEBRTC_EVERYWHERE_API rtc::scoped_refptr<webrtc::PortAllocatorFactoryInterface> GetPortAllocatorFactory();
 extern WEBRTC_EVERYWHERE_API void TakeFakePeerConnectionFactory();
 extern WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory();
-extern WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList* windowList);
+extern WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList** windowList);
+extern WEBRTC_EVERYWHERE_API bool ReleaseWindowList(_WindowList** windowList);
 extern rtc::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _MediaConstraintsObj* constraints = NULL);
 extern webrtc::MediaStreamInterface* BuildMediaStream(const _MediaStream* stream);
 

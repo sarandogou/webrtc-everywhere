@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 
 // http://www.w3.org/TR/mediacapture-streams/#idl-def-MediaStreamTrack
 
@@ -274,6 +274,15 @@ STDMETHODIMP CMediaStreamTrack::put_onoverconstrained(__in VARIANT newVal)
 		CHECK_HR_RETURN(E_POINTER);
 	}
 	m_callback_onoverconstrained = Utils::VariantToDispatch(newVal);
+	return S_OK;
+}
+
+STDMETHODIMP CMediaStreamTrack::get_micLevel(__out VARIANT* pVal)
+{
+	if (!m_Track) {
+		CHECK_HR_RETURN(E_POINTER);
+	}
+	*pVal = CComVariant(m_Track->micLevel());
 	return S_OK;
 }
 

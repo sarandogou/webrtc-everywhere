@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "../common/_Utils.h"
 #include "../common/_NavigatorUserMedia.h"
 #include "../common/_Debug.h"
@@ -226,25 +226,26 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 		}
 	}
     else if (!strcmp(name, kFuncGetWindowList)) {
-		_WindowList windows;
+		_WindowList* windows = NULL;
         NPError err = GetWindowList(&windows) ? NPERR_NO_ERROR : NPERR_NO_DATA;
         if (err == NPERR_NO_ERROR) {
             std::string strWindows = "";
             char windowId[120];
             void* np_base64_ptr = NULL, *bmp_ptr = NULL;
             size_t base64_size = 0, bmp_size = 0;
-            for (size_t i = 0; i < windows.size(); ++i) {
-                sprintf(windowId, "%ld", windows[i].id);
+            for (size_t i = 0; i < windows->size(); ++i) {
+                sprintf(windowId, "%ld", (*windows)[i].id);
                 strWindows += std::string(windowId); // Concat(Id)
 #if 0 // base64(title) ?
                 // convert the title to base64 to preserve UTF chars and make sure we won't have special chars (e.g. ';')
-                if (_Utils::ConvertToBase64(windows[i].title.c_str(), windows[i].title.length(), &np_base64_ptr, &base64_size, &Utils::MemAlloc) != WeError_Success) {
+				if (_Utils::ConvertToBase64((*windows)[i].title.c_str(), (*windows)[i].title.length(), &np_base64_ptr, &base64_size, &Utils::MemAlloc) != WeError_Success) {
+					ReleaseWindowList(&windows);
                     goto bail;
                 }
                 strWindows += "xxy;;;xxy" + std::string((const char*)np_base64_ptr, base64_size); // Concat(Title64)
                 Utils::MemFree(&np_base64_ptr);
 #else
-                strWindows += "xxy;;;xxy" + windows[i].title;
+				strWindows += "xxy;;;xxy" + (*windows)[i].title;
 #endif /* if 0 */
 #if WE_UNDER_APPLE
                 CGImageRef imageRef = CGWindowListCreateImage(CGRectNull, kCGWindowListOptionIncludingWindow, (CGWindowID)windows[i].id, kCGWindowImageDefault);
@@ -262,7 +263,7 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
                                 }
                                 Utils::MemFree(&np_base64_ptr);
                             }
-                            if (bmp_ptr) free(bmp_ptr), bmp_ptr = NULL;
+							_Utils::StdMemFree(&bmp_ptr);
                             CFRelease(dataRef);
                         }
                     }
@@ -279,6 +280,7 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
                 ret_val = true;
             }
         }
+		ReleaseWindowList(&windows);
     }
     else if (!strcmp(name, kFuncCreateSessionDescription)) {
         if (argCount > 0) {

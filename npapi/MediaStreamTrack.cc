@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "../common/_Utils.h"
 #include "../common/_Buffer.h"
 #include "../common/_Debug.h"
@@ -26,6 +26,7 @@ extern const char* kPluginVersion;
 #define kPropOnstarted								"onstarted"
 #define kPropOnended								"onended"
 #define kPropOnoverconstrained						"onoverconstrained"
+#define kPropMicLevel								"micLevel"
 
 #define kFuncGetSourceInfos							"getSourceInfos"
 #define kFuncConstraints							"constraints"
@@ -232,7 +233,8 @@ bool MediaStreamTrack::HasProperty(NPObject* obj, NPIdentifier propertyName)
 		!strcmp(name, kPropReadyState) ||
 		!strcmp(name, kPropOnstarted) ||
 		!strcmp(name, kPropOnended) ||
-		!strcmp(name, kPropOnoverconstrained)
+		!strcmp(name, kPropOnoverconstrained) ||
+		!strcmp(name, kPropMicLevel)
 		;
 
 	BrowserFuncs->memfree(name);
@@ -396,6 +398,12 @@ bool MediaStreamTrack::GetProperty(NPObject* obj, NPIdentifier propertyName, NPV
 	}
 	else if (!strcmp(name, kPropOnoverconstrained)) {
 		ret_val = (Utils::NPObjectToVariantAndRetain(This->m_callback_onoverconstrained, result) == NPERR_NO_ERROR);
+	}
+	else if (!strcmp(name, kPropMicLevel)) {
+		if (This->m_Track) {
+			INT32_TO_NPVARIANT(This->m_Track->micLevel(), *result);
+			ret_val = true;
+		}
 	}
 
 	BrowserFuncs->memfree(name);

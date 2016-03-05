@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 
 // http://www.w3.org/wiki/HTML/Elements/video
 #include "stdafx.h"
@@ -397,34 +397,42 @@ STDMETHODIMP CWebRTC::getUserMedia(VARIANT constraints, VARIANT successCallback,
 
 STDMETHODIMP CWebRTC::getWindowList(__out BSTR* winList)
 {
-	HRESULT hr = S_OK;
 	*winList = NULL;
+
+	HRESULT hr = S_OK;
 	HDC hSrcDC = NULL, hMemDC = NULL;
 	HBITMAP hBitmap = NULL, hOldBitmap = NULL;
-	RECT rcSrc = {0, 0, 0, 0};
-	LONG width = 0, height = 0;
-	BITMAPINFO bitmapInfo = {0};
-	void* pvBits = NULL;
+	LONG width, height;
+	BITMAPINFOHEADER bi;
+	DWORD dwBmpSize;
+	void *pvBits0 = NULL, *pvBits1 = NULL;
 	HWND hWnd = NULL;
 	std::string strWindows = "";
 	char windowId[120] = {0};
 	void *np_base64_ptr = NULL, *bmp_ptr = NULL;
 	size_t base64_size = 0, bmp_size = 0;
-	_WindowList windows;
-
-	CHECK_HR_BAIL((hr = GetWindowList(&windows) ? S_OK : E_FAIL));
+	_WindowList* windows = NULL;
+	HBRUSH hBrush = NULL;
+	RECT rcSrc;
 	
-	for (size_t i = 0; i < windows.size(); ++i) {
-		hWnd = reinterpret_cast<HWND>(windows[i].id);
+	CHECK_HR_BAIL((hr = ::GetWindowList(&windows) ? S_OK : E_FAIL));
+
+	hBrush = ::CreateSolidBrush(RGB(0, 0, 0));
+	if (!hBrush) {
+		CHECK_HR_BAIL(hr = E_OUTOFMEMORY);		
+	}
+	
+	for (size_t i = 0; i < (*windows).size(); ++i) {
+		hWnd = reinterpret_cast<HWND>((*windows)[i].id);
 		sprintf(windowId, "%ld", reinterpret_cast<long>(hWnd));
 		strWindows += std::string(windowId); // Concat(Id)
-		strWindows += "xxy;;;xxy" + windows[i].title;
+		strWindows += "xxy;;;xxy" + (*windows)[i].title;
 		
 		hSrcDC = ::GetDC(hWnd);
 		if (!hSrcDC) {
 			CHECK_HR_BAIL(hr = E_FAIL);
 		}
-		hMemDC = CreateCompatibleDC(hSrcDC);
+		hMemDC = ::CreateCompatibleDC(hSrcDC);
 		if (!hMemDC) {
 			CHECK_HR_BAIL(hr = E_FAIL);
 		}
@@ -436,45 +444,101 @@ STDMETHODIMP CWebRTC::getWindowList(__out BSTR* winList)
 		width = rcSrc.right - rcSrc.left;
 		height = rcSrc.bottom - rcSrc.top;
 
-		ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
-		bitmapInfo.bmiHeader.biSize = (DWORD)sizeof(BITMAPINFOHEADER);
-		bitmapInfo.bmiHeader.biWidth = width;
-		bitmapInfo.bmiHeader.biHeight = height;
-		bitmapInfo.bmiHeader.biPlanes = 1;
-		bitmapInfo.bmiHeader.biBitCount = 32;
-		bitmapInfo.bmiHeader.biCompression = BI_RGB;
-		bitmapInfo.bmiHeader.biSizeImage = width * height * (bitmapInfo.bmiHeader.biBitCount >> 3);
-
-		hBitmap = CreateCompatibleBitmap(hSrcDC, width, height);
+		hBitmap = ::CreateCompatibleBitmap(hSrcDC, width, height);
 		if (!hBitmap) {
 			CHECK_HR_BAIL(hr = E_FAIL);
 		}
-		// Alloc memory
-		if (!(pvBits = VirtualAlloc(NULL, bitmapInfo.bmiHeader.biSizeImage, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE))) {
-			CHECK_HR_BAIL(hr = E_OUTOFMEMORY);
-		}
-		
+
 		// select new bitmap into memory DC
-		hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBitmap);
+		hOldBitmap = (HBITMAP)::SelectObject(hMemDC, hBitmap);
 
 		// bitblt screen DC to memory DC
-		BitBlt(hMemDC, 0, 0, width, height, hSrcDC, 0, 0, SRCCOPY);
+		::BitBlt(hMemDC, 0, 0, width, height, hSrcDC, 0, 0, SRCCOPY);		
+
+		bi.biSize = sizeof(BITMAPINFOHEADER);
+		bi.biWidth = width;
+		bi.biHeight = -height;
+		bi.biPlanes = 1;
+		bi.biBitCount = 32;
+		bi.biCompression = BI_RGB;
+		bi.biSizeImage = 0;
+		bi.biXPelsPerMeter = 0;
+		bi.biYPelsPerMeter = 0;
+		bi.biClrUsed = 0;
+		bi.biClrImportant = 0;
+		dwBmpSize = ((width * bi.biBitCount + 31) / 32) * 4 * height;
+		if (!(pvBits0 = ::VirtualAlloc(NULL, dwBmpSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE))) {
+			CHECK_HR_BAIL(hr = E_OUTOFMEMORY);
+		}
 
 		// select old bitmap back into memory DC and get handle to
 		// bitmap of the screen   
-		hBitmap = (HBITMAP)SelectObject(hMemDC, hOldBitmap);
+		hBitmap = (HBITMAP)::SelectObject(hMemDC, hOldBitmap);
 
 		// Copy the bitmap data into the provided BYTE buffer
-		GetDIBits(hSrcDC, hBitmap, 0, height, pvBits, &bitmapInfo, DIB_RGB_COLORS);
+		::GetDIBits(hSrcDC, hBitmap, 0, height, pvBits0, (BITMAPINFO *)&bi, DIB_RGB_COLORS);
+		
+		///////////////////////////////////////////////////////////////////////////////////////
+
+		// Delete Objects and draw preview
+		::DeleteDC(hMemDC), hMemDC = NULL;
+		::DeleteObject(hBitmap), hBitmap = NULL;
+
+		static const WERatio pixelAR = { 1, 1 };
+		const RECT _rcDest = { 0, 0, kWindowPreviewWidth, kWindowPreviewHeight };
+		rcSrc = ::CorrectAspectRatio(rcSrc, pixelAR);
+		const RECT rcDest = ::LetterBoxRect(rcSrc, _rcDest);
+			
+		hMemDC = ::CreateCompatibleDC(hSrcDC);
+		if (!hMemDC) {
+			CHECK_HR_BAIL(hr = E_FAIL);
+		}
+		hBitmap = ::CreateCompatibleBitmap(hSrcDC, kWindowPreviewWidth, kWindowPreviewHeight);
+		if (!hBitmap) {
+			CHECK_HR_BAIL(hr = E_FAIL);
+		}
+		hOldBitmap = (HBITMAP)::SelectObject(hMemDC, hBitmap);
+		
+		::FillRect(hMemDC, &_rcDest, hBrush);
+		::SetStretchBltMode(hMemDC, HALFTONE);
+		::StretchDIBits(
+			hMemDC,
+			rcDest.left, rcDest.top, ::Width(rcDest), ::Height(rcDest),
+			rcSrc.left, rcSrc.top, ::Width(rcSrc), ::Height(rcSrc),
+			pvBits0,
+			(BITMAPINFO *)&bi,
+			DIB_RGB_COLORS,
+			SRCCOPY);
+
+		hBitmap = (HBITMAP)::SelectObject(hMemDC, hOldBitmap);
+
+		bi.biSize = sizeof(BITMAPINFOHEADER);
+		bi.biWidth = kWindowPreviewWidth;
+		bi.biHeight = -kWindowPreviewHeight;
+		bi.biPlanes = 1;
+		bi.biBitCount = 32;
+		bi.biCompression = BI_RGB;
+		bi.biSizeImage = 0;
+		bi.biXPelsPerMeter = 0;
+		bi.biYPelsPerMeter = 0;
+		bi.biClrUsed = 0;
+		bi.biClrImportant = 0;
+		dwBmpSize = ((kWindowPreviewWidth * bi.biBitCount + 31) / 32) * 4 * kWindowPreviewHeight;
+		if (!(pvBits1 = ::VirtualAlloc(NULL, dwBmpSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE))) {
+			CHECK_HR_BAIL(hr = E_OUTOFMEMORY);
+		}
+
+		::GetDIBits(hMemDC, hBitmap, 0, kWindowPreviewHeight, pvBits1, (BITMAPINFO *)&bi, DIB_RGB_COLORS);
 
 		// Convert to BMP
-		if (_Utils::ConvertToBMP(pvBits, width, height, &bmp_ptr, &bmp_size) == WeError_Success) {
+		if (_Utils::ConvertToBMP(pvBits1, kWindowPreviewWidth, kWindowPreviewHeight, &bmp_ptr, &bmp_size) == WeError_Success) {
 			// Convert to Base64
 			if (_Utils::ConvertToBase64(bmp_ptr, bmp_size, &np_base64_ptr, &base64_size) == WeError_Success) {
 				strWindows += "xxy;;;xxy" + std::string((const char*)np_base64_ptr, base64_size); // Concat(Screenshot64)
 			}
-			if (np_base64_ptr) free(&np_base64_ptr), np_base64_ptr = NULL;
-			if (bmp_ptr) free(bmp_ptr), bmp_ptr = NULL;
+			// np_base64_ptr and bmp_ptr were allocated by the DLL, let the DLL free them to avoid DLL-crossing issue
+			_Utils::StdMemFree(&np_base64_ptr);
+			_Utils::StdMemFree(&bmp_ptr);
 		}
 		else {
 			CHECK_HR_BAIL(hr = E_FAIL);
@@ -482,20 +546,19 @@ STDMETHODIMP CWebRTC::getWindowList(__out BSTR* winList)
 
 		// Cleanup
 		if (hSrcDC) {
-			::ReleaseDC(hWnd, hSrcDC);
-			hSrcDC = NULL;
+			::ReleaseDC(hWnd, hSrcDC), hSrcDC = NULL;
 		}
 		if (hMemDC) {
-			::DeleteDC(hMemDC);
-			hMemDC = NULL;
+			::DeleteDC(hMemDC), hMemDC = NULL;
 		}
 		if (hBitmap) {
-			::DeleteObject(hBitmap);
-			hBitmap = NULL;
+			::DeleteObject(hBitmap), hBitmap = NULL;
 		}
-		if (pvBits) {
-			VirtualFree(pvBits, 0, MEM_RELEASE);
-			pvBits = NULL;
+		if (pvBits0) {
+			::VirtualFree(pvBits0, 0, MEM_RELEASE), pvBits0 = NULL;
+		}
+		if (pvBits1) {
+			::VirtualFree(pvBits1, 0, MEM_RELEASE), pvBits1 = NULL;
 		}
 		strWindows += "xxz;;;xxz"; // Concat(EndOfLine)
 	} // for (
@@ -504,22 +567,26 @@ STDMETHODIMP CWebRTC::getWindowList(__out BSTR* winList)
 	CHECK_HR_BAIL(hr = Utils::CopyAnsiString(strWindows, winList));
 
 bail:
+	strWindows.clear();
 	if (hSrcDC) {
-		::ReleaseDC(hWnd, hSrcDC);
-		hSrcDC = NULL;
+		::ReleaseDC(hWnd, hSrcDC), hSrcDC = NULL;
 	}
 	if (hMemDC) {
-		::DeleteDC(hMemDC);
-		hMemDC = NULL;
+		::DeleteDC(hMemDC), hMemDC = NULL;
 	}
 	if (hBitmap) {
-		::DeleteObject(hBitmap);
-		hBitmap = NULL;
+		::DeleteObject(hBitmap), hBitmap = NULL;
 	}
-	if (pvBits) {
-		VirtualFree(pvBits, 0, MEM_RELEASE);
-		pvBits = NULL;
+	if (pvBits0) {
+		::VirtualFree(pvBits0, 0, MEM_RELEASE), pvBits0 = NULL;
 	}
+	if (pvBits1) {
+		::VirtualFree(pvBits1, 0, MEM_RELEASE), pvBits1 = NULL;
+	}
+	if (hBrush) {
+		::DeleteObject(hBrush), hBrush = NULL;
+	}
+	::ReleaseWindowList(&windows);
 	return hr;
 }
 

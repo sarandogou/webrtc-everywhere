@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#idl-def-MediaStreamConstraints
 #ifndef _WEBRTC_EVERYWHERE_COMMON_MEDIATRACKCONSTRAINT_H_
 #define _WEBRTC_EVERYWHERE_COMMON_MEDIATRACKCONSTRAINT_H_

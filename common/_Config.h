@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_CONFIG_H_
 #define _WEBRTC_EVERYWHERE_CONFIG_H_
 
@@ -15,10 +15,10 @@
 #	define kPluginVersionMajor 2
 #endif
 #if !defined(kPluginVersionMinor)
-#	define kPluginVersionMinor 2
+#	define kPluginVersionMinor 3
 #endif
 #if !defined(kPluginVersionMicro)
-#	define kPluginVersionMicro 4
+#	define kPluginVersionMicro 0
 #endif
 #if !defined(kPluginVersionString)
 #	define kPluginVersionString WE_STRING(WE_CAT(kPluginVersionMajor, .)) WE_STRING(WE_CAT(kPluginVersionMinor, .)) WE_STRING(kPluginVersionMicro)
@@ -102,6 +102,14 @@ WeError;
 		*(ppObj) = NULL; \
 	}
 
+#if WE_UNDER_WINDOWS
+#	define _WINSOCKAPI_
+#	if !defined (NOMINMAX)
+#		define NOMINMAX
+#	endif
+#	include <windows.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -112,6 +120,9 @@ WeError;
 #include <iostream>
 #include <string>
 #include <assert.h>
+
+#include <algorithm>
+#include <limits>
 
 // C++11
 #include <functional>

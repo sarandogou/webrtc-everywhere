@@ -178,8 +178,9 @@ interface IMediaStreamTrack : IDispatch{
 	[id(17), helpstring("method applyConstraints")] HRESULT applyConstraints([in] VARIANT MediaTrackConstraints);
 	[propget, id(18), helpstring("property onoverconstrained")] HRESULT onoverconstrained([out, retval] VARIANT* pVal);
 	[propput, id(18), helpstring("property onoverconstrained")] HRESULT onoverconstrained([in] VARIANT newVal);
-	[id(19), helpstring("method clone")] HRESULT clone([out, retval] VARIANT* MediaStreamTrack);
-	[id(20), helpstring("method stop")] HRESULT stop();	
+	[propget, id(19), helpstring("property micLevel")] HRESULT micLevel([out, retval] VARIANT* pVal);
+	[id(20), helpstring("method clone")] HRESULT clone([out, retval] VARIANT* MediaStreamTrack);
+	[id(21), helpstring("method stop")] HRESULT stop();	
 };
 [
 	object,

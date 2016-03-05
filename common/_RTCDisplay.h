@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #ifndef _WEBRTC_EVERYWHERE_COMMON_RTCDISPLAY_H_
 #define _WEBRTC_EVERYWHERE_COMMON_RTCDISPLAY_H_
 
@@ -139,5 +139,111 @@ private:
 #pragma warning(pop)
 #endif
 };
+
+#if WE_UNDER_WINDOWS
+
+static inline LONG Width(const RECT& r)
+{
+	return r.right - r.left;
+}
+
+static inline LONG Height(const RECT& r)
+{
+	return r.bottom - r.top;
+}
+
+typedef struct _WERatio {
+	DWORD Numerator;
+	DWORD Denominator;
+} WERatio;
+
+//-----------------------------------------------------------------------------
+// CorrectAspectRatio
+//
+// Converts a rectangle from the source's pixel aspect ratio (PAR) to 1:1 PAR.
+// Returns the corrected rectangle.
+//
+// For example, a 720 x 486 rect with a PAR of 9:10, when converted to 1x1 PAR,
+// is stretched to 720 x 540.
+// Copyright (C) Microsoft
+//-----------------------------------------------------------------------------
+
+static inline RECT CorrectAspectRatio(const RECT& src, const WERatio& srcPAR)
+{
+	// Start with a rectangle the same size as src, but offset to the origin (0,0).
+	RECT rc = { 0, 0, src.right - src.left, src.bottom - src.top };
+
+	if ((srcPAR.Numerator != 1) || (srcPAR.Denominator != 1))
+	{
+		// Correct for the source's PAR.
+
+		if (srcPAR.Numerator > srcPAR.Denominator)
+		{
+			// The source has "wide" pixels, so stretch the width.
+			rc.right = MulDiv(rc.right, srcPAR.Numerator, srcPAR.Denominator);
+		}
+		else if (srcPAR.Numerator < srcPAR.Denominator)
+		{
+			// The source has "tall" pixels, so stretch the height.
+			rc.bottom = MulDiv(rc.bottom, srcPAR.Denominator, srcPAR.Numerator);
+		}
+		// else: PAR is 1:1, which is a no-op.
+	}
+	return rc;
+}
+
+//-------------------------------------------------------------------
+// LetterBoxDstRect
+//
+// Takes a src rectangle and constructs the largest possible
+// destination rectangle within the specifed destination rectangle
+// such thatthe video maintains its current shape.
+//
+// This function assumes that pels are the same shape within both the
+// source and destination rectangles.
+// Copyright (C) Microsoft
+//-------------------------------------------------------------------
+
+static inline RECT LetterBoxRect(const RECT& rcSrc, const RECT& rcDst)
+{
+	// figure out src/dest scale ratios
+	int iSrcWidth = Width(rcSrc);
+	int iSrcHeight = Height(rcSrc);
+
+	int iDstWidth = Width(rcDst);
+	int iDstHeight = Height(rcDst);
+
+	int iDstLBWidth;
+	int iDstLBHeight;
+
+	if (MulDiv(iSrcWidth, iDstHeight, iSrcHeight) <= iDstWidth) {
+
+		// Column letter boxing ("pillar box")
+
+		iDstLBWidth = MulDiv(iDstHeight, iSrcWidth, iSrcHeight);
+		iDstLBHeight = iDstHeight;
+	}
+	else {
+
+		// Row letter boxing.
+
+		iDstLBWidth = iDstWidth;
+		iDstLBHeight = MulDiv(iDstWidth, iSrcHeight, iSrcWidth);
+	}
+
+
+	// Create a centered rectangle within the current destination rect
+
+	RECT rc;
+
+	LONG left = rcDst.left + ((iDstWidth - iDstLBWidth) >> 1);
+	LONG top = rcDst.top + ((iDstHeight - iDstLBHeight) >> 1);
+
+	SetRect(&rc, left, top, left + iDstLBWidth, top + iDstLBHeight);
+
+	return rc;
+}
+
+#endif
 
 #endif /* _WEBRTC_EVERYWHERE_COMMON_RTCDISPLAY_H_ */

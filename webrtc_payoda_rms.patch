@@ -1,0 +1,830 @@
+ talk/app/webrtc/audiotrack.cc                      | 13 ++++++++++--
+ talk/app/webrtc/audiotrack.h                       |  9 +++++++++
+ talk/app/webrtc/mediastreamhandler.cc              |  5 +++++
+ talk/app/webrtc/mediastreaminterface.h             |  9 +++++++++
+ talk/app/webrtc/mediastreamprovider.h              |  6 ++++++
+ talk/app/webrtc/mediastreamtrackproxy.h            |  6 ++++++
+ talk/app/webrtc/statscollector_unittest.cc         |  4 ++++
+ talk/app/webrtc/webrtcsession.cc                   | 23 ++++++++++++++++++++++
+ talk/app/webrtc/webrtcsession.h                    |  7 +++++++
+ talk/media/base/mediaengine.h                      |  9 +++++++++
+ talk/media/webrtc/webrtcmediaengine.cc             | 11 +++++++++++
+ talk/media/webrtc/webrtcvoiceengine.cc             | 21 ++++++++++++++++++++
+ talk/media/webrtc/webrtcvoiceengine.h              |  7 +++++++
+ talk/session/media/channel.cc                      | 20 +++++++++++++++++++
+ talk/session/media/channel.h                       |  9 +++++++++
+ talk/session/media/channelmanager_unittest.cc      |  1 +
+ webrtc/base/win32window.cc                         | 14 ++++++++++---
+ .../neteq/neteq_network_stats_unittest.cc          |  3 ++-
+ webrtc/modules/audio_processing/rms_level.cc       |  6 ++++--
+ webrtc/modules/audio_processing/rms_level.h        |  2 +-
+ webrtc/modules/interface/module_common_types.h     |  9 +++++++++
+ .../video_capture/windows/video_capture_ds.cc      |  3 ++-
+ webrtc/voice_engine/channel.cc                     | 11 +++++++++--
+ webrtc/voice_engine/channel.h                      |  3 +++
+ webrtc/voice_engine/include/voe_external_media.h   |  5 +++++
+ webrtc/voice_engine/shared_data.cc                 |  3 ++-
+ webrtc/voice_engine/shared_data.h                  |  8 ++++++++
+ webrtc/voice_engine/transmit_mixer.cc              |  6 ++++--
+ webrtc/voice_engine/transmit_mixer.h               |  3 +++
+ webrtc/voice_engine/voe_base_impl.cc               |  7 +++++++
+ webrtc/voice_engine/voice_engine_impl.cc           | 11 +++++++++++
+ webrtc/voice_engine/voice_engine_impl.h            |  6 ++++++
+ 32 files changed, 245 insertions(+), 15 deletions(-)
+
+diff --git a/talk/app/webrtc/audiotrack.cc b/talk/app/webrtc/audiotrack.cc
+index b0c9129..647a2c0 100644
+--- a/talk/app/webrtc/audiotrack.cc
++++ b/talk/app/webrtc/audiotrack.cc
+@@ -34,11 +34,20 @@ namespace webrtc {
+ static const char kAudioTrackKind[] = "audio";
+ 
+ AudioTrack::AudioTrack(const std::string& label,
+-                       AudioSourceInterface* audio_source)
+-    : MediaStreamTrack<AudioTrackInterface>(label),
++	AudioSourceInterface* audio_source)
++	: MediaStreamTrack<AudioTrackInterface>(label),
++	rms_(NULL),
+       audio_source_(audio_source) {
+ }
+ 
++// TODO(dmi): Added by Doubango Telecom
++void AudioTrack::AddRMS(AudioRMSInterface* rms) {
++	rms_ = rms;
++}
++void AudioTrack::RemoveRMS(AudioRMSInterface* rms) {
++	rms_ = NULL;
++}
++
+ std::string AudioTrack::kind() const {
+   return kAudioTrackKind;
+ }
+diff --git a/talk/app/webrtc/audiotrack.h b/talk/app/webrtc/audiotrack.h
+index 750f272..718e89a 100644
+--- a/talk/app/webrtc/audiotrack.h
++++ b/talk/app/webrtc/audiotrack.h
+@@ -36,6 +36,8 @@
+ 
+ namespace webrtc {
+ 
++	class AudioRMSInterface;
++
+ class AudioTrack : public MediaStreamTrack<AudioTrackInterface> {
+  public:
+   static rtc::scoped_refptr<AudioTrack> Create(
+@@ -45,6 +47,12 @@ class AudioTrack : public MediaStreamTrack<AudioTrackInterface> {
+   AudioSourceInterface* GetSource() const override {
+     return audio_source_.get();
+   }
++
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(AudioRMSInterface* rms)override;
++  virtual void RemoveRMS(AudioRMSInterface* rms)override;
++  virtual AudioRMSInterface* GetRMS()const override { return rms_; }
++
+   // TODO(xians): Implement these methods.
+   void AddSink(AudioTrackSinkInterface* sink) override {}
+   void RemoveSink(AudioTrackSinkInterface* sink) override {}
+@@ -62,6 +70,7 @@ class AudioTrack : public MediaStreamTrack<AudioTrackInterface> {
+ 
+  private:
+   rtc::scoped_refptr<AudioSourceInterface> audio_source_;
++  rtc::scoped_refptr<AudioRMSInterface> rms_;
+ };
+ 
+ }  // namespace webrtc
+diff --git a/talk/app/webrtc/mediastreamhandler.cc b/talk/app/webrtc/mediastreamhandler.cc
+index f68699d..1b7fec2 100644
+--- a/talk/app/webrtc/mediastreamhandler.cc
++++ b/talk/app/webrtc/mediastreamhandler.cc
+@@ -92,6 +92,8 @@ LocalAudioTrackHandler::LocalAudioTrackHandler(
+       sink_adapter_(new LocalAudioSinkAdapter()) {
+   OnEnabledChanged();
+   track->AddSink(sink_adapter_.get());
++  // TODO(dmi): added by Doubango Telecom
++  provider_->AddRMS(audio_track_->GetRMS());
+ }
+ 
+ LocalAudioTrackHandler::~LocalAudioTrackHandler() {
+@@ -116,6 +118,9 @@ void LocalAudioTrackHandler::OnEnabledChanged() {
+         audio_track_->GetSource())->options();
+   }
+ 
++  // TODO(dmi): added by Doubango Telecom
++  provider_->AddRMS(audio_track_->GetRMS());
++
+   // Use the renderer if the audio track has one, otherwise use the sink
+   // adapter owned by this class.
+   cricket::AudioRenderer* renderer = audio_track_->GetRenderer() ?
+diff --git a/talk/app/webrtc/mediastreaminterface.h b/talk/app/webrtc/mediastreaminterface.h
+index 4de0648..d69ee7a 100644
+--- a/talk/app/webrtc/mediastreaminterface.h
++++ b/talk/app/webrtc/mediastreaminterface.h
+@@ -40,6 +40,7 @@
+ #include "webrtc/base/basictypes.h"
+ #include "webrtc/base/refcount.h"
+ #include "webrtc/base/scoped_ref_ptr.h"
++#include "webrtc/modules/interface/module_common_types.h"
+ 
+ namespace cricket {
+ 
+@@ -175,6 +176,9 @@ class AudioSourceInterface : public MediaSourceInterface {
+   // Sets the volume to the source. |volume| is in  the range of [0, 10].
+   virtual void SetVolume(double volume) {}
+ 
++  // TODO(dmi): Added by Doubango Telecom
++  virtual bool GetSignalLevel(int* level) { return false; }
++
+   // Registers/unregisters observer to the audio source.
+   virtual void RegisterAudioObserver(AudioObserver* observer) {}
+   virtual void UnregisterAudioObserver(AudioObserver* observer) {}
+@@ -229,6 +233,11 @@ class AudioTrackInterface : public MediaStreamTrackInterface {
+   virtual void AddSink(AudioTrackSinkInterface* sink) = 0;
+   virtual void RemoveSink(AudioTrackSinkInterface* sink) = 0;
+ 
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(AudioRMSInterface* rms) {};
++  virtual void RemoveRMS(AudioRMSInterface* rms) {};
++  virtual AudioRMSInterface* GetRMS()const { return NULL; };
++
+   // Get the signal level from the audio track.
+   // Return true on success, otherwise false.
+   // TODO(xians): Change the interface to int GetSignalLevel() and pure virtual
+diff --git a/talk/app/webrtc/mediastreamprovider.h b/talk/app/webrtc/mediastreamprovider.h
+index e903fda..e006539 100644
+--- a/talk/app/webrtc/mediastreamprovider.h
++++ b/talk/app/webrtc/mediastreamprovider.h
+@@ -39,6 +39,7 @@ struct VideoOptions;
+ }  // namespace cricket
+ 
+ namespace webrtc {
++	class AudioRMSInterface;
+ 
+ // This interface is called by AudioTrackHandler classes in mediastreamhandler.h
+ // to change the settings of an audio track connected to certain PeerConnection.
+@@ -57,6 +58,11 @@ class AudioProviderInterface {
+   // |volume| is in the range of [0, 10].
+   virtual void SetAudioPlayoutVolume(uint32 ssrc, double volume) = 0;
+ 
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(AudioRMSInterface* rms) {};
++  virtual void RemoveRMS(AudioRMSInterface* rms) {};
++  virtual AudioRMSInterface* GetRMS()const { return NULL; };
++
+  protected:
+   virtual ~AudioProviderInterface() {}
+ };
+diff --git a/talk/app/webrtc/mediastreamtrackproxy.h b/talk/app/webrtc/mediastreamtrackproxy.h
+index d97ba3c..2bd7452 100644
+--- a/talk/app/webrtc/mediastreamtrackproxy.h
++++ b/talk/app/webrtc/mediastreamtrackproxy.h
+@@ -45,6 +45,12 @@ BEGIN_PROXY_MAP(AudioTrack)
+   PROXY_METHOD1(void, AddSink, AudioTrackSinkInterface*)
+   PROXY_METHOD1(void, RemoveSink, AudioTrackSinkInterface*)
+   PROXY_METHOD1(bool, GetSignalLevel, int*)
++
++  // TODO(dmi): Added by Doubango Telecom
++  PROXY_METHOD1(void, AddRMS, AudioRMSInterface*)
++  PROXY_METHOD1(void, RemoveRMS, AudioRMSInterface*)
++  PROXY_CONSTMETHOD0(AudioRMSInterface*, GetRMS)
++
+   PROXY_METHOD0(rtc::scoped_refptr<AudioProcessorInterface>,
+                 GetAudioProcessor)
+   PROXY_METHOD0(cricket::AudioRenderer*, GetRenderer)
+diff --git a/talk/app/webrtc/statscollector_unittest.cc b/talk/app/webrtc/statscollector_unittest.cc
+index ab9181f..e36e7c4 100644
+--- a/talk/app/webrtc/statscollector_unittest.cc
++++ b/talk/app/webrtc/statscollector_unittest.cc
+@@ -137,6 +137,10 @@ class FakeAudioTrack
+     *level = 1;
+     return true;
+   }
++  // TODO(dmi): added by Doubango Telecom
++  void AddRMS(AudioRMSInterface* rms)override {}
++  void RemoveRMS(AudioRMSInterface* rms)override {}
++  virtual AudioRMSInterface* GetRMS()const override { return NULL; }
+   rtc::scoped_refptr<webrtc::AudioProcessorInterface> GetAudioProcessor()
+       override {
+     return processor_;
+diff --git a/talk/app/webrtc/webrtcsession.cc b/talk/app/webrtc/webrtcsession.cc
+index b6a178c..0af3c77 100644
+--- a/talk/app/webrtc/webrtcsession.cc
++++ b/talk/app/webrtc/webrtcsession.cc
+@@ -495,6 +495,7 @@ WebRtcSession::WebRtcSession(
+       dtls_enabled_(false),
+       data_channel_type_(cricket::DCT_NONE),
+       ice_restart_latch_(new IceRestartAnswerLatch),
++	  rms_(NULL),
+       metrics_observer_(NULL) {
+ }
+ 
+@@ -507,6 +508,7 @@ WebRtcSession::~WebRtcSession() {
+     channel_manager_->DestroyVideoChannel(video_channel_.release());
+   }
+   if (voice_channel_) {
++	voice_channel_->RemoveRMS(rms_);
+     SignalVoiceChannelDestroyed();
+     channel_manager_->DestroyVoiceChannel(voice_channel_.release(), nullptr);
+   }
+@@ -517,6 +519,7 @@ WebRtcSession::~WebRtcSession() {
+   for (size_t i = 0; i < saved_candidates_.size(); ++i) {
+     delete saved_candidates_[i];
+   }
++  rms_ = NULL;
+   delete identity();
+ }
+ 
+@@ -1159,6 +1162,26 @@ void WebRtcSession::SetVideoSend(uint32 ssrc, bool enable,
+     video_channel_->SetChannelOptions(*options);
+ }
+ 
++// TODO(dmi): Added by Doubango Telecom
++void WebRtcSession::AddRMS(AudioRMSInterface* rms) {
++	ASSERT(signaling_thread()->IsCurrent());
++	rms_ = rms;
++	if (!voice_channel_) {
++		LOG(LS_ERROR) << "AddRMS: No audio channel exists.";
++		return;
++	}
++	voice_channel_->AddRMS(rms_);
++}
++void WebRtcSession::RemoveRMS(AudioRMSInterface* rms) {
++	rms_ = NULL;
++	if (voice_channel_) {
++		voice_channel_->RemoveRMS(rms);
++	}
++}
++AudioRMSInterface* WebRtcSession::GetRMS()const {
++	return rms_;
++}
++
+ bool WebRtcSession::CanInsertDtmf(const std::string& track_id) {
+   ASSERT(signaling_thread()->IsCurrent());
+   if (!voice_channel_) {
+diff --git a/talk/app/webrtc/webrtcsession.h b/talk/app/webrtc/webrtcsession.h
+index 30ebc1e..56c376c 100644
+--- a/talk/app/webrtc/webrtcsession.h
++++ b/talk/app/webrtc/webrtcsession.h
+@@ -204,6 +204,10 @@ class WebRtcSession : public cricket::BaseSession,
+                     const cricket::AudioOptions& options,
+                     cricket::AudioRenderer* renderer) override;
+   void SetAudioPlayoutVolume(uint32 ssrc, double volume) override;
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(AudioRMSInterface* rms)override;
++  virtual void RemoveRMS(AudioRMSInterface* rms)override;
++  virtual AudioRMSInterface* GetRMS()const override;
+ 
+   // Implements VideoMediaProviderInterface.
+   bool SetCaptureDevice(uint32 ssrc, cricket::VideoCapturer* camera) override;
+@@ -411,6 +415,9 @@ class WebRtcSession : public cricket::BaseSession,
+   // Declares the RTCP mux policy for the WebRTCSession.
+   PeerConnectionInterface::RtcpMuxPolicy rtcp_mux_policy_;
+ 
++  // TODO(dmi): Doubango Telcom
++  rtc::scoped_refptr<AudioRMSInterface> rms_;
++
+   DISALLOW_COPY_AND_ASSIGN(WebRtcSession);
+ };
+ }  // namespace webrtc
+diff --git a/talk/media/base/mediaengine.h b/talk/media/base/mediaengine.h
+index 501333f..0f693c7 100644
+--- a/talk/media/base/mediaengine.h
++++ b/talk/media/base/mediaengine.h
+@@ -52,6 +52,10 @@
+ #define DISABLE_MEDIA_ENGINE_FACTORY
+ #endif
+ 
++namespace webrtc {
++	class AudioRMSInterface;
++}
++
+ namespace cricket {
+ 
+ class VideoCapturer;
+@@ -137,6 +141,11 @@ class MediaEngineInterface {
+   virtual bool UnregisterVoiceProcessor(uint32 ssrc,
+                                         VoiceProcessor* video_processor,
+                                         MediaProcessorDirection direction) = 0;
++
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(webrtc::AudioRMSInterface* rms) {}
++  virtual void RemoveRMS(webrtc::AudioRMSInterface* rms) {}
++  virtual webrtc::AudioRMSInterface* GetRMS()const { return NULL; }
+ };
+ 
+ 
+diff --git a/talk/media/webrtc/webrtcmediaengine.cc b/talk/media/webrtc/webrtcmediaengine.cc
+index cf6a5cf..9081acd 100644
+--- a/talk/media/webrtc/webrtcmediaengine.cc
++++ b/talk/media/webrtc/webrtcmediaengine.cc
+@@ -41,6 +41,17 @@ class WebRtcMediaEngine2
+     video_.SetExternalDecoderFactory(decoder_factory);
+     video_.SetExternalEncoderFactory(encoder_factory);
+   }
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(webrtc::AudioRMSInterface* rms) {
++	  voice_.AddRMS(rms);
++  }
++  virtual void RemoveRMS(webrtc::AudioRMSInterface* rms) {
++	  voice_.RemoveRMS(rms);
++  }
++  virtual webrtc::AudioRMSInterface* GetRMS()const {
++	  return voice_.GetRMS();
++  }
++private:
+ };
+ 
+ }  // namespace cricket
+diff --git a/talk/media/webrtc/webrtcvoiceengine.cc b/talk/media/webrtc/webrtcvoiceengine.cc
+index e288e70..bfcb280 100644
+--- a/talk/media/webrtc/webrtcvoiceengine.cc
++++ b/talk/media/webrtc/webrtcvoiceengine.cc
+@@ -1617,6 +1617,27 @@ int WebRtcVoiceEngine::CreateMediaVoiceChannel() {
+   return CreateVoiceChannel(voe_wrapper_.get());
+ }
+ 
++// TODO(dmi): Doubango Telecom
++void WebRtcVoiceEngine::AddRMS(webrtc::AudioRMSInterface* rms) {
++	ASSERT(voe_wrapper_ != NULL);
++	if (voe_wrapper_) {
++		voe_wrapper_->media()->AddRMS(rms);
++	}
++}
++void WebRtcVoiceEngine::RemoveRMS(webrtc::AudioRMSInterface* rms) {
++	ASSERT(voe_wrapper_ != NULL);
++	if (voe_wrapper_) {
++		voe_wrapper_->media()->RemoveRMS(rms);
++	}
++}
++webrtc::AudioRMSInterface* WebRtcVoiceEngine::GetRMS()const {
++	ASSERT(voe_wrapper_ != NULL);
++	if (voe_wrapper_) {
++		return voe_wrapper_->media()->GetRMS();
++	}
++	return NULL;
++}
++
+ class WebRtcVoiceMediaChannel::WebRtcVoiceChannelRenderer
+     : public AudioRenderer::Sink {
+  public:
+diff --git a/talk/media/webrtc/webrtcvoiceengine.h b/talk/media/webrtc/webrtcvoiceengine.h
+index c8e7980..465f11b 100644
+--- a/talk/media/webrtc/webrtcvoiceengine.h
++++ b/talk/media/webrtc/webrtcvoiceengine.h
+@@ -49,6 +49,7 @@
+ 
+ namespace webrtc {
+ class VideoEngine;
++class AudioRMSInterface;
+ }
+ 
+ namespace cricket {
+@@ -159,6 +160,12 @@ class WebRtcVoiceEngine
+   // Create a VoiceEngine Channel.
+   int CreateMediaVoiceChannel();
+ 
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(webrtc::AudioRMSInterface* rms);
++  virtual void RemoveRMS(webrtc::AudioRMSInterface* rms);
++  virtual webrtc::AudioRMSInterface* GetRMS()const;
++
++
+  private:
+   typedef std::vector<WebRtcVoiceMediaChannel *> ChannelList;
+   typedef sigslot::
+diff --git a/talk/session/media/channel.cc b/talk/session/media/channel.cc
+index 8de8d37..b8b4ee7 100644
+--- a/talk/session/media/channel.cc
++++ b/talk/session/media/channel.cc
+@@ -1587,6 +1587,26 @@ bool VoiceChannel::SetChannelOptions(const AudioOptions& options) {
+                              media_channel(), options));
+ }
+ 
++// TODO(dmi): Added by Doubango Telecom
++void VoiceChannel::AddRMS(webrtc::AudioRMSInterface* rms) {
++	ASSERT(media_engine_ != NULL);
++	if (media_engine_) {
++		media_engine_->AddRMS(rms);
++	}
++}
++void VoiceChannel::RemoveRMS(webrtc::AudioRMSInterface* rms) {
++	ASSERT(media_engine_ != NULL);
++	if (media_engine_) {
++		media_engine_->RemoveRMS(rms);
++	}
++}
++webrtc::AudioRMSInterface* VoiceChannel::GetRMS()const {
++	if (media_engine_) {
++		return media_engine_->GetRMS();
++	}
++	return NULL;
++}
++
+ void VoiceChannel::OnMessage(rtc::Message *pmsg) {
+   switch (pmsg->message_id) {
+     case MSG_EARLYMEDIATIMEOUT:
+diff --git a/talk/session/media/channel.h b/talk/session/media/channel.h
+index 5f51c07..6f1d36e 100644
+--- a/talk/session/media/channel.h
++++ b/talk/session/media/channel.h
+@@ -49,6 +49,10 @@
+ #include "webrtc/base/sigslot.h"
+ #include "webrtc/base/window.h"
+ 
++namespace webrtc {
++	class AudioRMSInterface;
++}
++
+ namespace cricket {
+ 
+ struct CryptoParams;
+@@ -402,6 +406,11 @@ class VoiceChannel : public BaseChannel {
+   // Configuration and setting.
+   bool SetChannelOptions(const AudioOptions& options);
+ 
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(webrtc::AudioRMSInterface* rms);
++  virtual void RemoveRMS(webrtc::AudioRMSInterface* rms);
++  virtual webrtc::AudioRMSInterface* GetRMS()const;
++
+  private:
+   // overrides from BaseChannel
+   virtual void OnChannelRead(TransportChannel* channel,
+diff --git a/talk/session/media/channelmanager_unittest.cc b/talk/session/media/channelmanager_unittest.cc
+index 1ffdaf2..e0fb43d 100644
+--- a/talk/session/media/channelmanager_unittest.cc
++++ b/talk/session/media/channelmanager_unittest.cc
+@@ -1,3 +1,4 @@
++
+ /*
+  * libjingle
+  * Copyright 2008 Google Inc.
+diff --git a/webrtc/base/win32window.cc b/webrtc/base/win32window.cc
+index 4d41014..715f181 100644
+--- a/webrtc/base/win32window.cc
++++ b/webrtc/base/win32window.cc
+@@ -53,13 +53,21 @@ bool Win32Window::Create(HWND parent, const wchar_t* title, DWORD style,
+     wcex.lpfnWndProc = &Win32Window::WndProc;
+     wcex.lpszClassName = kWindowBaseClassName;
+     window_class_ = ::RegisterClassEx(&wcex);
+-    if (!window_class_) {
+-      LOG_GLE(LS_ERROR) << "RegisterClassEx failed";
+-      return false;
++	if (!window_class_) {
++		if (GetLastError() == ERROR_CLASS_ALREADY_EXISTS) {
++			LOG_GLE(LS_WARNING) << "RegisterClassEx failed: ERROR_CLASS_ALREADY_EXISTS";
++		}
++		else {
++			LOG_GLE(LS_ERROR) << "RegisterClassEx failed";
++			return false;
++		}
+     }
+   }
+   wnd_ = ::CreateWindowEx(exstyle, kWindowBaseClassName, title, style,
+                           x, y, cx, cy, parent, NULL, instance_, this);
++  if (wnd_ && !window_class_) {
++	  window_class_ = GetClassWord(wnd_, GCW_ATOM);
++  }
+   return (NULL != wnd_);
+ }
+ 
+diff --git a/webrtc/modules/audio_coding/neteq/neteq_network_stats_unittest.cc b/webrtc/modules/audio_coding/neteq/neteq_network_stats_unittest.cc
+index e1a0f69..808c8d1 100644
+--- a/webrtc/modules/audio_coding/neteq/neteq_network_stats_unittest.cc
++++ b/webrtc/modules/audio_coding/neteq/neteq_network_stats_unittest.cc
+@@ -7,7 +7,7 @@
+  *  in the file PATENTS.  All contributing project authors may
+  *  be found in the AUTHORS file in the root of the source tree.
+  */
+-
++#if 0 // TODO(dmi)
+ #include "testing/gmock/include/gmock/gmock.h"
+ #include "webrtc/base/scoped_ptr.h"
+ #include "webrtc/modules/audio_coding/neteq/audio_decoder_impl.h"
+@@ -299,3 +299,4 @@ TEST(NetEqNetworkStatsTest, NoiseExpansionTest) {
+ 
+ 
+ 
++#endif
+\ No newline at end of file
+diff --git a/webrtc/modules/audio_processing/rms_level.cc b/webrtc/modules/audio_processing/rms_level.cc
+index 14136bf..41514fb 100644
+--- a/webrtc/modules/audio_processing/rms_level.cc
++++ b/webrtc/modules/audio_processing/rms_level.cc
+@@ -39,7 +39,7 @@ void RMSLevel::ProcessMuted(int length) {
+   sample_count_ += length;
+ }
+ 
+-int RMSLevel::RMS() {
++int RMSLevel::RMS(bool reset /*= true*/) {
+   if (sample_count_ == 0 || sum_square_ == 0) {
+     Reset();
+     return kMinLevel;
+@@ -54,7 +54,9 @@ int RMSLevel::RMS() {
+     rms = -kMinLevel;
+ 
+   rms = -rms;
+-  Reset();
++  if (reset) {
++	  Reset();
++  }
+   return static_cast<int>(rms + 0.5);
+ }
+ 
+diff --git a/webrtc/modules/audio_processing/rms_level.h b/webrtc/modules/audio_processing/rms_level.h
+index 055d271..410a9cf 100644
+--- a/webrtc/modules/audio_processing/rms_level.h
++++ b/webrtc/modules/audio_processing/rms_level.h
+@@ -44,7 +44,7 @@ class RMSLevel {
+   // Computes the RMS level over all data passed to Process() since the last
+   // call to RMS(). The returned value is positive but should be interpreted as
+   // negative as per the RFC. It is constrained to [0, 127].
+-  int RMS();
++  int RMS(bool reset = true);
+ 
+  private:
+   float sum_square_;
+diff --git a/webrtc/modules/interface/module_common_types.h b/webrtc/modules/interface/module_common_types.h
+index 02ce03f..caa7cfd 100644
+--- a/webrtc/modules/interface/module_common_types.h
++++ b/webrtc/modules/interface/module_common_types.h
+@@ -17,6 +17,7 @@
+ #include <algorithm>
+ #include <limits>
+ 
++#include "webrtc/base/refcount.h" // TODO(dmi)
+ #include "webrtc/base/constructormagic.h"
+ #include "webrtc/common_types.h"
+ #include "webrtc/common_video/rotation.h"
+@@ -764,6 +765,14 @@ inline uint32_t LatestTimestamp(uint32_t timestamp1, uint32_t timestamp2) {
+   return IsNewerTimestamp(timestamp1, timestamp2) ? timestamp1 : timestamp2;
+ }
+ 
++// TODO(dmi): added by Doubango Telcom to implement volume level indicator
++class AudioRMSInterface : public rtc::RefCountInterface{
++public:
++	virtual void RMS(int rms) = 0;
++protected:
++	virtual ~AudioRMSInterface() {}
++};
++
+ }  // namespace webrtc
+ 
+ #endif  // MODULE_COMMON_TYPES_H
+diff --git a/webrtc/modules/video_capture/windows/video_capture_ds.cc b/webrtc/modules/video_capture/windows/video_capture_ds.cc
+index 2d66055..0bbb7dc 100644
+--- a/webrtc/modules/video_capture/windows/video_capture_ds.cc
++++ b/webrtc/modules/video_capture/windows/video_capture_ds.cc
+@@ -178,7 +178,8 @@ int32_t VideoCaptureDS::StopCapture()
+ {
+     CriticalSectionScoped cs(&_apiCs);
+ 
+-    HRESULT hr = _mediaControl->Pause();
++	// TODO(dmi) https://code.google.com/p/webrtc/issues/detail?id=1649
++	HRESULT hr = _mediaControl->Stop()/*_mediaControl->Pause()*/;
+     if (FAILED(hr))
+     {
+         WEBRTC_TRACE(webrtc::kTraceError, webrtc::kTraceVideoCapture, _id,
+diff --git a/webrtc/voice_engine/channel.cc b/webrtc/voice_engine/channel.cc
+index 8992425..275d72e 100644
+--- a/webrtc/voice_engine/channel.cc
++++ b/webrtc/voice_engine/channel.cc
+@@ -161,7 +161,7 @@ Channel::SendData(FrameType frameType,
+         // Store current audio level in the RTP/RTCP module.
+         // The level will be used in combination with voice-activity state
+         // (frameType) to add an RTP header extension
+-        _rtpRtcpModule->SetAudioLevel(rms_level_.RMS());
++		_rtpRtcpModule->SetAudioLevel(rms_level_.RMS());
+     }
+ 
+     // Push data from ACM to RTP/RTCP-module to deliver audio frame for
+@@ -1087,6 +1087,12 @@ Channel::UpdateLocalTimeStamp()
+     return 0;
+ }
+ 
++// TODO(dmi): added by Doubango Telecom
++int 
++Channel::RMS() {
++	return rms_level_.RMS(false/*Do not reset, let it done by the RTCP module*/);
++}
++
+ int32_t
+ Channel::StartPlayout()
+ {
+@@ -3397,7 +3403,8 @@ Channel::PrepareEncodeAndSend(int mixingFrequency)
+ 
+     InsertInbandDtmfTone();
+ 
+-    if (_includeAudioLevelIndication) {
++	// TODO(dmi): compute rms even if audio level indication not activated
++    /*if (_includeAudioLevelIndication)*/ {
+       int length = _audioFrame.samples_per_channel_ * _audioFrame.num_channels_;
+       if (is_muted) {
+         rms_level_.ProcessMuted(length);
+diff --git a/webrtc/voice_engine/channel.h b/webrtc/voice_engine/channel.h
+index 398087e..e7a7da9 100644
+--- a/webrtc/voice_engine/channel.h
++++ b/webrtc/voice_engine/channel.h
+@@ -185,6 +185,9 @@ public:
+ 
+     // API methods
+ 
++	// TODO(dmi): added by Doubango Telecom
++	int RMS();
++
+     // VoEBase
+     int32_t StartPlayout();
+     int32_t StopPlayout();
+diff --git a/webrtc/voice_engine/include/voe_external_media.h b/webrtc/voice_engine/include/voe_external_media.h
+index 6185540..f52ebf7 100644
+--- a/webrtc/voice_engine/include/voe_external_media.h
++++ b/webrtc/voice_engine/include/voe_external_media.h
+@@ -16,6 +16,7 @@ namespace webrtc {
+ 
+ class VoiceEngine;
+ class AudioFrame;
++class AudioRMSInterface;
+ 
+ class WEBRTC_DLLEXPORT VoEMediaProcess {
+  public:
+@@ -75,6 +76,10 @@ class WEBRTC_DLLEXPORT VoEExternalMedia {
+   // Sets the state of external mixing. Cannot be changed during playback.
+   virtual int SetExternalMixing(int channel, bool enable) = 0;
+ 
++  virtual void AddRMS(webrtc::AudioRMSInterface* rms) {  };
++  virtual void RemoveRMS(webrtc::AudioRMSInterface* rms) {  };
++  virtual webrtc::AudioRMSInterface* GetRMS()const { return NULL; };
++
+  protected:
+   VoEExternalMedia() {}
+   virtual ~VoEExternalMedia() {}
+diff --git a/webrtc/voice_engine/shared_data.cc b/webrtc/voice_engine/shared_data.cc
+index ad00e03..74014fa 100644
+--- a/webrtc/voice_engine/shared_data.cc
++++ b/webrtc/voice_engine/shared_data.cc
+@@ -31,7 +31,8 @@ SharedData::SharedData(const Config& config) :
+     _audioDevicePtr(NULL),
+     _moduleProcessThreadPtr(ProcessThread::Create()),
+     _externalRecording(false),
+-    _externalPlayout(false)
++    _externalPlayout(false),
++	_rms(NULL)
+ {
+     Trace::CreateTrace();
+     if (OutputMixer::Create(_outputMixerPtr, _gInstanceCounter) == 0)
+diff --git a/webrtc/voice_engine/shared_data.h b/webrtc/voice_engine/shared_data.h
+index 3ab1d45..f080fef 100644
+--- a/webrtc/voice_engine/shared_data.h
++++ b/webrtc/voice_engine/shared_data.h
+@@ -12,6 +12,7 @@
+ #define WEBRTC_VOICE_ENGINE_SHARED_DATA_H
+ 
+ #include "webrtc/base/scoped_ptr.h"
++#include "webrtc/base/scoped_ref_ptr.h"
+ #include "webrtc/modules/audio_device/include/audio_device.h"
+ #include "webrtc/modules/audio_processing/include/audio_processing.h"
+ #include "webrtc/modules/utility/interface/process_thread.h"
+@@ -24,6 +25,7 @@ class ProcessThread;
+ namespace webrtc {
+ class Config;
+ class CriticalSectionWrapper;
++class AudioRMSInterface;
+ 
+ namespace voe {
+ 
+@@ -56,6 +58,11 @@ public:
+       _audioDeviceLayer = layer;
+     }
+ 
++	// TODO(dmi): Added by Doubango Telecom
++	virtual void AddRMS(webrtc::AudioRMSInterface* rms) { _rms = rms; }
++	virtual void RemoveRMS(webrtc::AudioRMSInterface* rms) { _rms = NULL; }
++	virtual webrtc::AudioRMSInterface* GetRMS()const { return _rms; }
++
+     int NumOfSendingChannels();
+     int NumOfPlayingChannels();
+ 
+@@ -75,6 +82,7 @@ protected:
+     TransmitMixer* _transmitMixerPtr;
+     rtc::scoped_ptr<AudioProcessing> audioproc_;
+     rtc::scoped_ptr<ProcessThread> _moduleProcessThreadPtr;
++	rtc::scoped_refptr<AudioRMSInterface> _rms;
+ 
+     bool _externalRecording;
+     bool _externalPlayout;
+diff --git a/webrtc/voice_engine/transmit_mixer.cc b/webrtc/voice_engine/transmit_mixer.cc
+index edd77b8..2f0bd9b 100644
+--- a/webrtc/voice_engine/transmit_mixer.cc
++++ b/webrtc/voice_engine/transmit_mixer.cc
+@@ -202,7 +202,8 @@ TransmitMixer::TransmitMixer(uint32_t instanceId) :
+     _mute(false),
+     _remainingMuteMicTimeMs(0),
+     stereo_codec_(false),
+-    swap_stereo_channels_(false)
++    swap_stereo_channels_(false),
++	rms_(0)
+ {
+     WEBRTC_TRACE(kTraceMemory, kTraceVoice, VoEId(_instanceId, -1),
+                  "TransmitMixer::TransmitMixer() - ctor");
+@@ -409,7 +410,7 @@ TransmitMixer::DemuxAndMix()
+ {
+     WEBRTC_TRACE(kTraceStream, kTraceVoice, VoEId(_instanceId, -1),
+                  "TransmitMixer::DemuxAndMix()");
+-
++	rms_ = 0;
+     for (ChannelManager::Iterator it(_channelManagerPtr); it.IsValid();
+          it.Increment())
+     {
+@@ -419,6 +420,7 @@ TransmitMixer::DemuxAndMix()
+             // Demultiplex makes a copy of its input.
+             channelPtr->Demultiplex(_audioFrame);
+             channelPtr->PrepareEncodeAndSend(_audioFrame.sample_rate_hz_);
++			rms_ += channelPtr->RMS();
+         }
+     }
+     return 0;
+diff --git a/webrtc/voice_engine/transmit_mixer.h b/webrtc/voice_engine/transmit_mixer.h
+index 919de13..7af83e7 100644
+--- a/webrtc/voice_engine/transmit_mixer.h
++++ b/webrtc/voice_engine/transmit_mixer.h
+@@ -165,6 +165,8 @@ public:
+   void EnableStereoChannelSwapping(bool enable);
+   bool IsStereoChannelSwappingEnabled();
+ 
++  int RMS()const { return rms_; } // TODO(dmi): added by Doubango Telecom
++
+ private:
+     TransmitMixer(uint32_t instanceId);
+ 
+@@ -230,6 +232,7 @@ private:
+     bool stereo_codec_;
+     bool swap_stereo_channels_;
+     rtc::scoped_ptr<int16_t[]> mono_buffer_;
++	int rms_;
+ };
+ 
+ }  // namespace voe
+diff --git a/webrtc/voice_engine/voe_base_impl.cc b/webrtc/voice_engine/voe_base_impl.cc
+index 7bfaddc..df4f999 100644
+--- a/webrtc/voice_engine/voe_base_impl.cc
++++ b/webrtc/voice_engine/voe_base_impl.cc
+@@ -799,6 +799,13 @@ int VoEBaseImpl::ProcessRecordedDataWithAPM(
+                                              number_of_voe_channels);
+   }
+ 
++  // TODO(dmi): Doubango RMS info
++  rtc::scoped_refptr<webrtc::AudioRMSInterface> rms = shared_->GetRMS();
++  if (rms) {
++	  // transmit_mixer RMS value computed in DemuxAndMix()
++	  rms->RMS(shared_->transmit_mixer()->RMS());
++  }
++
+   // Scale from VoE to ADM level range.
+   uint32_t new_voe_mic_level = shared_->transmit_mixer()->CaptureLevel();
+   if (new_voe_mic_level != voe_mic_level) {
+diff --git a/webrtc/voice_engine/voice_engine_impl.cc b/webrtc/voice_engine/voice_engine_impl.cc
+index f7f363d..33c2077 100644
+--- a/webrtc/voice_engine/voice_engine_impl.cc
++++ b/webrtc/voice_engine/voice_engine_impl.cc
+@@ -57,6 +57,17 @@ int VoiceEngineImpl::AddRef() {
+   return ++_ref_count;
+ }
+ 
++// TODO(dmi): Added by Doubango Telecom
++void VoiceEngineImpl::AddRMS(webrtc::AudioRMSInterface* rms) {
++	SharedData::AddRMS(rms); // call base class function
++}
++void VoiceEngineImpl::RemoveRMS(webrtc::AudioRMSInterface* rms) {
++	SharedData::RemoveRMS(rms); // call base class function
++}
++webrtc::AudioRMSInterface* VoiceEngineImpl::GetRMS()const {
++	return SharedData::GetRMS(); // call base class function
++}
++
+ // This implements the Release() method for all the inherited interfaces.
+ int VoiceEngineImpl::Release() {
+   int new_ref = --_ref_count;
+diff --git a/webrtc/voice_engine/voice_engine_impl.h b/webrtc/voice_engine/voice_engine_impl.h
+index 07f29c3..9299438 100644
+--- a/webrtc/voice_engine/voice_engine_impl.h
++++ b/webrtc/voice_engine/voice_engine_impl.h
+@@ -48,6 +48,7 @@
+ #endif
+ 
+ namespace webrtc {
++	class AudioRMSInterface;
+ 
+ class VoiceEngineImpl : public voe::SharedData,  // Must be the first base class
+                         public VoiceEngine,
+@@ -128,6 +129,11 @@ class VoiceEngineImpl : public voe::SharedData,  // Must be the first base class
+   // This implements the Release() method for all the inherited interfaces.
+   int Release() override;
+ 
++  // TODO(dmi): Added by Doubango Telecom
++  virtual void AddRMS(webrtc::AudioRMSInterface* rms);
++  virtual void RemoveRMS(webrtc::AudioRMSInterface* rms);
++  virtual webrtc::AudioRMSInterface* GetRMS()const;
++
+  private:
+   Atomic32 _ref_count;
+   rtc::scoped_ptr<const Config> own_config_;

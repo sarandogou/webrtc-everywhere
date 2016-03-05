@@ -1,4 +1,4 @@
-/* Copyright(C) 2014-2015 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
+/* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 // http://www.w3.org/TR/mediacapture-streams/#idl-def-MediaStreamTrack
 
 #pragma once
@@ -79,6 +79,7 @@ public:
 	STDMETHOD(applyConstraints)(__in VARIANT MediaTrackConstraints);
 	STDMETHOD(get_onoverconstrained)(__out VARIANT* pVal);
 	STDMETHOD(put_onoverconstrained)(__in VARIANT newVal);
+	STDMETHOD(get_micLevel)(__out VARIANT* pVal);
 	STDMETHOD(clone)(__out VARIANT* MediaStreamTrack);
 	STDMETHOD(stop)();
 

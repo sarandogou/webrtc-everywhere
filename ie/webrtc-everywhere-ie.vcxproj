@@ -103,7 +103,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;..\thirdparties\win32\include;..\..\webrtc-checkout\src;..\..\webrtc-checkout\src\third_party;..\..\webrtc-checkout\src\third_party\webrtc;..\..\webrtc-checkout\src\webrtc;..\..\webrtc-checkout\src\third_party\wtl\include;..\..\webrtc-checkout\src\third_party\jsoncpp\overrides\include;..\..\webrtc-checkout\src\third_party\jsoncpp\source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;_DEBUG;_USRDLL;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;_DEBUG;_USRDLL;WEBRTC_WIN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -144,7 +144,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;..\thirdparties\win32\include;..\..\webrtc-checkout\src;..\..\webrtc-checkout\src\third_party;..\..\webrtc-checkout\src\third_party\webrtc;..\..\webrtc-checkout\src\webrtc;..\..\webrtc-checkout\src\third_party\wtl\include;..\..\webrtc-checkout\src\third_party\jsoncpp\overrides\include;..\..\webrtc-checkout\src\third_party\jsoncpp\source\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;_DEBUG;_USRDLL;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;_DEBUG;_USRDLL;WEBRTC_WIN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -184,7 +184,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;NDEBUG;_USRDLL;WEBRTC_WIN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0501;_WINDOWS;NDEBUG;_USRDLL;WEBRTC_WIN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
@@ -225,7 +225,7 @@
     </Midl>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;NDEBUG;_USRDLL;WEBRTC_WIN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0502;_WINDOWS;NDEBUG;_USRDLL;WEBRTC_WIN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
