@@ -248,7 +248,7 @@ bool WebRTC::Invoke(NPObject* obj, NPIdentifier methodName,
 				strWindows += "xxy;;;xxy" + (*windows)[i].title;
 #endif /* if 0 */
 #if WE_UNDER_APPLE
-                CGImageRef imageRef = CGWindowListCreateImage(CGRectNull, kCGWindowListOptionIncludingWindow, (CGWindowID)windows[i].id, kCGWindowImageDefault);
+                CGImageRef imageRef = CGWindowListCreateImage(CGRectNull, kCGWindowListOptionIncludingWindow, (CGWindowID)(*windows)[i].id, kCGWindowImageDefault);
                 if (imageRef) {
                     if (CGImageGetBitsPerComponent(imageRef) == 8 && CGImageGetBitsPerPixel(imageRef) == 32 && CGColorSpaceGetModel(CGImageGetColorSpace(imageRef)) == kCGColorSpaceModelRGB) { // Make sure it's RGBA
                         CFDataRef dataRef = CGDataProviderCopyData(CGImageGetDataProvider(imageRef));
