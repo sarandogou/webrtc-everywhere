@@ -62,7 +62,7 @@ Sample code to select your screen as media source:
 
  - **OSX x86_64**<br />
  ```
- python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=mac
+ python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=mac -Dclang_xcode=1
  ninja -C out/Debug
  ninja -C out/Release
 
@@ -72,7 +72,7 @@ Sample code to select your screen as media source:
  
  - **OSX i386**<br />
  ```
- python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=mac
+ python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=mac -Dclang_xcode=1
  ninja -C out/Debug
  ninja -C out/Release
 
