@@ -23,14 +23,14 @@
  webrtc/voice_engine/channel.cc                     | 11 +++++++++--
  webrtc/voice_engine/channel.h                      |  3 +++
  webrtc/voice_engine/include/voe_external_media.h   |  5 +++++
- webrtc/voice_engine/shared_data.cc                 |  3 ++-
+ webrtc/voice_engine/shared_data.cc                 |  2 ++
  webrtc/voice_engine/shared_data.h                  |  8 ++++++++
  webrtc/voice_engine/transmit_mixer.cc              |  6 ++++--
  webrtc/voice_engine/transmit_mixer.h               |  3 +++
  webrtc/voice_engine/voe_base_impl.cc               |  7 +++++++
  webrtc/voice_engine/voice_engine_impl.cc           | 11 +++++++++++
  webrtc/voice_engine/voice_engine_impl.h            |  6 ++++++
- 32 files changed, 245 insertions(+), 15 deletions(-)
+ 32 files changed, 245 insertions(+), 14 deletions(-)
 
 diff --git a/talk/app/webrtc/audiotrack.cc b/talk/app/webrtc/audiotrack.cc
 index b0c9129..647a2c0 100644
@@ -659,16 +659,17 @@ index 6185540..f52ebf7 100644
    VoEExternalMedia() {}
    virtual ~VoEExternalMedia() {}
 diff --git a/webrtc/voice_engine/shared_data.cc b/webrtc/voice_engine/shared_data.cc
-index ad00e03..74014fa 100644
+index ad00e03..922e8fb 100644
 --- a/webrtc/voice_engine/shared_data.cc
 +++ b/webrtc/voice_engine/shared_data.cc
-@@ -31,7 +31,8 @@ SharedData::SharedData(const Config& config) :
+@@ -30,8 +30,10 @@ SharedData::SharedData(const Config& config) :
+     _engineStatistics(_gInstanceCounter),
      _audioDevicePtr(NULL),
      _moduleProcessThreadPtr(ProcessThread::Create()),
++	_rms(NULL),
      _externalRecording(false),
--    _externalPlayout(false)
-+    _externalPlayout(false),
-+	_rms(NULL)
+     _externalPlayout(false)
++	
  {
      Trace::CreateTrace();
      if (OutputMixer::Create(_outputMixerPtr, _gInstanceCounter) == 0)
