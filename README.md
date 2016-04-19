@@ -59,6 +59,7 @@ Sample code to select your screen as media source:
  cd webrtc-checkout/src
  ```
  - For Windows you'll need to apply [this patch](/webrtc_win.patch)
+ - For all platforms you should apply [this patch](https://codereview.webrtc.org/1257833004/diff/1/webrtc/modules/utility/source/process_thread_impl.cc)
 
  - **OSX x86_64**<br />
  ```
