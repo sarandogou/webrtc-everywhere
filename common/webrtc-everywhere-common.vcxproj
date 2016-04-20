@@ -196,6 +196,7 @@
     <ClCompile Include="_Buffer.cc" />
     <ClCompile Include="_Common.cc" />
     <ClCompile Include="_EncryptCtx.cc" />
+    <ClCompile Include="_Logging.cc" />
     <ClCompile Include="_MediaStream.cc" />
     <ClCompile Include="_MediaStreamConstraints.cc" />
     <ClCompile Include="_MediaStreamTrack.cc" />
@@ -219,6 +220,7 @@
     <ClInclude Include="_Config.h" />
     <ClInclude Include="_Debug.h" />
     <ClInclude Include="_EncryptCtx.h" />
+    <ClInclude Include="_Logging.h" />
     <ClInclude Include="_MediaStream.h" />
     <ClInclude Include="_MediaStreamConstraints.h" />
     <ClInclude Include="_MediaStreamTrack.h" />

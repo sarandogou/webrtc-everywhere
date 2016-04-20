@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Wed Mar 09 23:17:18 2016
+/* at Wed Apr 20 00:19:07 2016
  */
 /* Compiler settings for webrtceverywhere.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -477,6 +477,12 @@ EXTERN_C const IID IID_IWebRTC;
         virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_isWebRtcPlugin( 
             /* [retval][out] */ VARIANT_BOOL *pVal) = 0;
         
+        virtual /* [helpstring][id][propget] */ HRESULT STDMETHODCALLTYPE get_logSeverity( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+        virtual /* [helpstring][id][propput] */ HRESULT STDMETHODCALLTYPE put_logSeverity( 
+            /* [in] */ BSTR newVal) = 0;
+        
     };
     
     
@@ -611,6 +617,14 @@ EXTERN_C const IID IID_IWebRTC;
             IWebRTC * This,
             /* [retval][out] */ VARIANT_BOOL *pVal);
         
+        /* [helpstring][id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_logSeverity )( 
+            IWebRTC * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        /* [helpstring][id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_logSeverity )( 
+            IWebRTC * This,
+            /* [in] */ BSTR newVal);
+        
         END_INTERFACE
     } IWebRTCVtbl;
 
@@ -697,6 +711,12 @@ EXTERN_C const IID IID_IWebRTC;
 
 #define IWebRTC_get_isWebRtcPlugin(This,pVal)	\
     ( (This)->lpVtbl -> get_isWebRtcPlugin(This,pVal) ) 
+
+#define IWebRTC_get_logSeverity(This,pVal)	\
+    ( (This)->lpVtbl -> get_logSeverity(This,pVal) ) 
+
+#define IWebRTC_put_logSeverity(This,newVal)	\
+    ( (This)->lpVtbl -> put_logSeverity(This,newVal) ) 
 
 #endif /* COBJMACROS */
 

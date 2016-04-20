@@ -1,6 +1,7 @@
 /* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "../common/_Utils.h"
 #include "../common/_NavigatorUserMedia.h"
+#include "../common/_Logging.h"
 #include "../common/_Debug.h"
 #include "WebRTC.h"
 #include "MediaStream.h"
@@ -20,6 +21,7 @@
 #define kPropVideoWidth						"videoWidth"
 #define kPropVideoHeight					"videoHeight"
 #define kPropIsWebRtcPlugin					"isWebRtcPlugin"
+#define kPropLogSeverity					"logSeverity"
 
 #define kFuncGetUserMedia					"getUserMedia"
 #define kFuncGetWindowList                  "getWindowList"
@@ -482,7 +484,8 @@ bool WebRTC::HasProperty(NPObject* obj, NPIdentifier propertyName)
 		!strcmp(name, kPropSrc) ||
 		!strcmp(name, kPropVideoWidth) ||
 		!strcmp(name, kPropVideoHeight) ||
-		!strcmp(name, kPropIsWebRtcPlugin);
+		!strcmp(name, kPropIsWebRtcPlugin) ||
+		!strcmp(name, kPropLogSeverity);
     BrowserFuncs->memfree(name);
     return ret_val;
 }
@@ -520,6 +523,14 @@ bool WebRTC::GetProperty(NPObject* obj, NPIdentifier propertyName, NPVariant* re
 		BOOLEAN_TO_NPVARIANT(true, *result);
 		ret_val = true;
 	}
+	else if (!strcmp(name, kPropLogSeverity)) {
+		const char* severity = _Logging::shared()->getSeverity();
+		char* npStr = (char*)Utils::MemDup(severity, we_strlen(severity));
+		if (npStr) {
+			STRINGZ_TO_NPVARIANT(npStr, *result);
+			ret_val = true;
+		}
+	}
 
     BrowserFuncs->memfree(name);
     return ret_val;
@@ -548,6 +559,10 @@ bool WebRTC::SetProperty(NPObject *npobj, NPIdentifier propertyName, const NPVar
 			This->StopVideoRenderer();
 		}
 		ret_val = true;
+	}
+	else if (!strcmp(name, kPropLogSeverity) && NPVARIANT_IS_STRING(*value)) {
+		std::string severity(value->value.stringValue.UTF8Characters, value->value.stringValue.UTF8Length);
+		ret_val = _Logging::shared()->setSeverity(severity.c_str());
 	}
 
 	BrowserFuncs->memfree(name);

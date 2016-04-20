@@ -1,6 +1,7 @@
 /* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_SessionDescription.h"
 #include "_Buffer.h"
+#include "_Logging.h"
 #include "_Debug.h"
 
 #include "webrtc/base/json.h"
@@ -9,6 +10,7 @@ _SessionDescription::_SessionDescription()
 	: m_pSdp(NULL)
 	, m_pType(NULL)
 {
+	WE_LOG_FUNCTION_CALL();
 	Init(NULL, NULL, NULL, NULL);
 }
 
@@ -16,17 +18,20 @@ _SessionDescription::_SessionDescription(const void* sdpPtr, size_t sdpSize, con
 	: m_pSdp(NULL)
 	, m_pType(NULL)
 {
+	WE_LOG_FUNCTION_CALL();
 	Init(sdpPtr, sdpSize, typePtr, typeSize);
 }
 
 _SessionDescription::~_SessionDescription()
 {
+	WE_LOG_FUNCTION_CALL();
     SafeFree(&m_pSdp);
     SafeFree(&m_pType);
 }
 
 WeError _SessionDescription::Init(const void* sdpPtr, size_t sdpSize, const void* typePtr /*= NULL*/, size_t typeSize /*= 0*/)
 {
+	WE_LOG_FUNCTION_CALL();
 #if 1
 	WeError err = WeError_Success;
 	SafeFree(&m_pSdp);

@@ -11,6 +11,7 @@
 #include "_RTCDataChannel.h"
 #include "_utils.h"
 #include "_Common.h"
+#include "_Logging.h"
 #include "_Debug.h"
 
 #include "talk/app/webrtc/mediaconstraintsinterface.h"
@@ -156,6 +157,7 @@ _RTCPeerConnection::_RTCPeerConnection(const _PeerConnection* pcBase, const webr
 	: m_bValid(false)
 	, m_pcBase(pcBase)
 {
+	WE_LOG_FUNCTION_CALL();
 	m_peer_connection_factory = GetPeerConnectionFactory();
 	if (!m_peer_connection_factory.get()) {
 		WE_DEBUG_ERROR("Failed to create factory");
@@ -178,6 +180,7 @@ _RTCPeerConnection::_RTCPeerConnection(const _PeerConnection* pcBase, const webr
 
 bool _RTCPeerConnection::createOffer(_RTCSessionDescriptionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/, const webrtc::MediaConstraintsInterface* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		m_peer_connection->CreateOffer(DummyCreateSessionDescriptionObserver::Create(this, successCallback, failureCallback), constraints);
 		return true;
@@ -187,6 +190,7 @@ bool _RTCPeerConnection::createOffer(_RTCSessionDescriptionCallback successCallb
 
 bool _RTCPeerConnection::createAnswer(_RTCSessionDescriptionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/, const webrtc::MediaConstraintsInterface* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		m_peer_connection->CreateAnswer(DummyCreateSessionDescriptionObserver::Create(this, successCallback, failureCallback), constraints);
 		return true;
@@ -196,6 +200,7 @@ bool _RTCPeerConnection::createAnswer(_RTCSessionDescriptionCallback successCall
 
 bool _RTCPeerConnection::setLocalDescription(webrtc::SessionDescriptionInterface* description, _VoidFunctionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		m_peer_connection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(successCallback, failureCallback), description);
 		return true;
@@ -205,6 +210,7 @@ bool _RTCPeerConnection::setLocalDescription(webrtc::SessionDescriptionInterface
 
 const webrtc::SessionDescriptionInterface* _RTCPeerConnection::localDescription()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		return m_peer_connection->local_description();
 	}
@@ -213,6 +219,7 @@ const webrtc::SessionDescriptionInterface* _RTCPeerConnection::localDescription(
 
 bool _RTCPeerConnection::setRemoteDescription(webrtc::SessionDescriptionInterface* description, _VoidFunctionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		m_peer_connection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(successCallback, failureCallback), description);
 		return true;
@@ -222,6 +229,7 @@ bool _RTCPeerConnection::setRemoteDescription(webrtc::SessionDescriptionInterfac
 
 const webrtc::SessionDescriptionInterface* _RTCPeerConnection::remoteDescription()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		return m_peer_connection->remote_description();
 	}
@@ -230,6 +238,7 @@ const webrtc::SessionDescriptionInterface* _RTCPeerConnection::remoteDescription
 
 const char* _RTCPeerConnection::signalingState()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		switch (m_peer_connection->signaling_state()) {
 		case webrtc::PeerConnectionInterface::kStable : return kSignalingStateStable;
@@ -245,6 +254,7 @@ const char* _RTCPeerConnection::signalingState()
 
 bool _RTCPeerConnection::updateIce(const webrtc::PeerConnectionInterface::RTCConfiguration& configuration, const webrtc::MediaConstraintsInterface* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		return m_peer_connection->UpdateIce(configuration.servers, constraints);
 	}
@@ -253,6 +263,7 @@ bool _RTCPeerConnection::updateIce(const webrtc::PeerConnectionInterface::RTCCon
 
 bool _RTCPeerConnection::addIceCandidate(const webrtc::IceCandidateInterface* candidate, _VoidFunctionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		bool ret = m_peer_connection->AddIceCandidate(candidate);
 		if (ret) {
@@ -275,6 +286,7 @@ bool _RTCPeerConnection::addIceCandidate(const webrtc::IceCandidateInterface* ca
 
 const char* _RTCPeerConnection::iceGatheringState()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		switch (m_peer_connection->ice_gathering_state()) {
 		case webrtc::PeerConnectionInterface::kIceGatheringNew: return kIceGatheringStateNew;
@@ -287,6 +299,7 @@ const char* _RTCPeerConnection::iceGatheringState()
 
 const char* _RTCPeerConnection::iceConnectionState()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		switch (m_peer_connection->ice_connection_state()) {
 		case webrtc::PeerConnectionInterface::kIceConnectionNew: return kIceConnectionStateNew;
@@ -303,6 +316,7 @@ const char* _RTCPeerConnection::iceConnectionState()
 
 rtc::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getLocalStreams()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		return m_peer_connection->local_streams();
 	}
@@ -311,6 +325,7 @@ rtc::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getLoc
 
 rtc::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getRemoteStreams()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		return m_peer_connection->remote_streams();
 	}
@@ -319,6 +334,7 @@ rtc::scoped_refptr<webrtc::StreamCollectionInterface> _RTCPeerConnection::getRem
 
 webrtc::MediaStreamInterface* _RTCPeerConnection::getStreamById(std::string streamId)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		webrtc::MediaStreamInterface* stream = NULL;
 		rtc::scoped_refptr<webrtc::StreamCollectionInterface> streams;
@@ -334,6 +350,7 @@ webrtc::MediaStreamInterface* _RTCPeerConnection::getStreamById(std::string stre
 
 bool _RTCPeerConnection::addStream(webrtc::MediaStreamInterface* stream, const webrtc::MediaConstraintsInterface* constraints)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 #if 0 // Was an bug in Google's code, "addStream" takes a single parameter
 		return m_peer_connection->AddStream(stream, constraints);
@@ -346,6 +363,7 @@ bool _RTCPeerConnection::addStream(webrtc::MediaStreamInterface* stream, const w
 
 bool _RTCPeerConnection::removeStream(webrtc::MediaStreamInterface* stream)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		m_peer_connection->RemoveStream(stream);
 		return true;
@@ -355,6 +373,7 @@ bool _RTCPeerConnection::removeStream(webrtc::MediaStreamInterface* stream)
 
 bool _RTCPeerConnection::close()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		m_peer_connection->Close();
 		return true;
@@ -364,6 +383,7 @@ bool _RTCPeerConnection::close()
 
 bool _RTCPeerConnection::getStats(webrtc::MediaStreamTrackInterface* selector /*= NULL*/, _RTCStatsCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		return m_peer_connection->GetStats(DummyStatsObserver::Create(successCallback, failureCallback), selector, webrtc::PeerConnectionInterface::kStatsOutputLevelStandard);
 	}
@@ -372,6 +392,7 @@ bool _RTCPeerConnection::getStats(webrtc::MediaStreamTrackInterface* selector /*
 
 cpp11::shared_ptr<_RTCDTMFSender> _RTCPeerConnection::createDTMFSender(webrtc::AudioTrackInterface *track)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid() && track) {
 		rtc::scoped_refptr<webrtc::DtmfSenderInterface> sender = m_peer_connection->CreateDtmfSender(track);
 		if (sender) {
@@ -384,6 +405,7 @@ cpp11::shared_ptr<_RTCDTMFSender> _RTCPeerConnection::createDTMFSender(webrtc::A
 
 cpp11::shared_ptr<_RTCDataChannel> _RTCPeerConnection::CreateDataChannel(const std::string& label, const webrtc::DataChannelInit* config)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid() && config) {
 		rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel = m_peer_connection->CreateDataChannel(label, config);
 		if (dataChannel) {
@@ -396,6 +418,7 @@ cpp11::shared_ptr<_RTCDataChannel> _RTCPeerConnection::CreateDataChannel(const s
 
 _RTCPeerConnection::~_RTCPeerConnection()
 {
+	WE_LOG_FUNCTION_CALL();
 	m_peer_connection = NULL;
 	m_peer_connection_factory = NULL;
 
@@ -406,11 +429,13 @@ _RTCPeerConnection::~_RTCPeerConnection()
 //--- PeerConnectionObserver implementation ---//
 void _RTCPeerConnection::OnError()
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnError");
 }
 
 void _RTCPeerConnection::OnStateChange(webrtc::PeerConnectionObserver::StateType state_changed)
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnStateChange");
 	if (m_pcBase) {
 		if (state_changed == kSignalingState && m_pcBase->onsignalingstatechange) {
@@ -424,6 +449,7 @@ void _RTCPeerConnection::OnStateChange(webrtc::PeerConnectionObserver::StateType
 
 void _RTCPeerConnection::OnAddStream(webrtc::MediaStreamInterface* stream)
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_PeerConnection::OnAddStream");
 	if (m_pcBase && m_pcBase->onaddstream && stream) {
         cpp11::shared_ptr<_MediaStreamEvent>_e (new _MediaStreamEvent(cpp11::shared_ptr<_MediaStream>(new _MediaStream(stream))));
@@ -433,6 +459,7 @@ void _RTCPeerConnection::OnAddStream(webrtc::MediaStreamInterface* stream)
 
 void _RTCPeerConnection::OnRemoveStream(webrtc::MediaStreamInterface* stream)
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnRemoveStream");
 	if (m_pcBase && m_pcBase->onremovestream && stream) {
         cpp11::shared_ptr<_MediaStreamEvent>_e (new _MediaStreamEvent(cpp11::shared_ptr<_MediaStream>(new _MediaStream(stream))));
@@ -442,6 +469,7 @@ void _RTCPeerConnection::OnRemoveStream(webrtc::MediaStreamInterface* stream)
 
 void _RTCPeerConnection::OnRenegotiationNeeded()
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnRenegotiationNeeded");
 	if (m_pcBase && m_pcBase->onnegotiationneeded) {
 		m_pcBase->onnegotiationneeded();
@@ -450,6 +478,7 @@ void _RTCPeerConnection::OnRenegotiationNeeded()
 
 void _RTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state)
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnIceConnectionChange");
 	if (m_pcBase && m_pcBase->oniceconnectionstatechange) {
 		m_pcBase->oniceconnectionstatechange();
@@ -458,6 +487,7 @@ void _RTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface::
 
 void _RTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* candidate)
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnIceCandidate");
 
 	if (m_pcBase && m_pcBase->onicecandidate) {
@@ -477,12 +507,14 @@ void _RTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* can
 
 void _RTCPeerConnection::OnIceComplete()
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnIceComplete");
 	OnIceCandidate(NULL); // null candidate used as a hack to signal end of ICe gathering
 }
 
 void _RTCPeerConnection::OnDataChannel(webrtc::DataChannelInterface* data_channel)
 {
+	WE_LOG_FUNCTION_CALL();
 	WE_DEBUG_INFO("_RTCPeerConnection::OnDataChannel");
 	if (m_pcBase && m_pcBase->ondatachannel) {
 		cpp11::shared_ptr<_RTCDataChannel>dataChannel(new _RTCDataChannel(data_channel));
@@ -510,11 +542,13 @@ _PeerConnection::_PeerConnection()
 , m_sdp_local(nullPtr)
 , m_sdp_remote(nullPtr)
 {
+	WE_LOG_FUNCTION_CALL();
 	_Utils::Initialize();
 }
 
 _PeerConnection::~_PeerConnection()
 {
+	WE_LOG_FUNCTION_CALL();
 	DeInit();
 
 	m_sdp_local = nullPtr;
@@ -526,6 +560,7 @@ _PeerConnection::~_PeerConnection()
 // http://www.w3.org/TR/webrtc/#widl-ctor-RTCPeerConnection--RTCConfiguration-configuration-MediaConstraints-constraints
 bool _PeerConnection::Init(const _RTCConfiguration* configuration /*= NULL*/, const _MediaConstraintsObj* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsInitialized()) {
 		WE_DEBUG_INFO("Already initialized");
 		return true;
@@ -565,6 +600,7 @@ bool _PeerConnection::Init(const _RTCConfiguration* configuration /*= NULL*/, co
 // void createOffer (RTCSessionDescriptionCallback successCallback, RTCPeerConnectionErrorCallback failureCallback, optional MediaConstraints constraints);
 bool _PeerConnection::CreateOffer(_RTCSessionDescriptionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/, const _MediaConstraintsObj* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	return m_peer_connection->createOffer(successCallback, failureCallback, BuildConstraints(constraints));
 }
@@ -573,6 +609,7 @@ bool _PeerConnection::CreateOffer(_RTCSessionDescriptionCallback successCallback
 // void createAnswer (RTCSessionDescriptionCallback successCallback, RTCPeerConnectionErrorCallback failureCallback, optional MediaConstraints constraints)
 bool _PeerConnection::CreateAnswer(_RTCSessionDescriptionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/, const _MediaConstraintsObj* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	m_sdp_local = nullPtr;
 	return m_peer_connection->createAnswer(successCallback, failureCallback, BuildConstraints(constraints));
@@ -582,6 +619,7 @@ bool _PeerConnection::CreateAnswer(_RTCSessionDescriptionCallback successCallbac
 // void setLocalDescription (RTCSessionDescription description, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback);
 bool _PeerConnection::SetLocalDescription(const _SessionDescription* description, _VoidFunctionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	if (!description) {
 		WE_DEBUG_ERROR("Invalid argument");
@@ -612,6 +650,7 @@ bool _PeerConnection::SetLocalDescription(const _SessionDescription* description
 // readonly    attribute RTCSessionDescription? localDescription;
 cpp11::shared_ptr<_SessionDescription> _PeerConnection::LocalDescription()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (!IsInitialized()) {
 		WE_DEBUG_ERROR("Not initialized");
 		return nullPtr;
@@ -631,6 +670,7 @@ cpp11::shared_ptr<_SessionDescription> _PeerConnection::LocalDescription()
 // void setRemoteDescription(RTCSessionDescription description, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback);
 bool _PeerConnection::SetRemoteDescription(const _SessionDescription* description, _VoidFunctionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	if (!description) {
 		WE_DEBUG_ERROR("Invalid argument");
@@ -661,6 +701,7 @@ bool _PeerConnection::SetRemoteDescription(const _SessionDescription* descriptio
 // readonly attribute RTCSessionDescription? remoteDescription;
 cpp11::shared_ptr<_SessionDescription> _PeerConnection::RemoteDescription()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (!IsInitialized()) {
 		WE_DEBUG_ERROR("Not initialized");
 		return nullPtr;
@@ -680,6 +721,7 @@ cpp11::shared_ptr<_SessionDescription> _PeerConnection::RemoteDescription()
 // readonly    attribute RTCSignalingState      signalingState;
 const char* _PeerConnection::SignalingState()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsInitialized()) {
 		return m_peer_connection->signalingState();
 	}
@@ -690,6 +732,7 @@ const char* _PeerConnection::SignalingState()
 // void updateIce (optional RTCConfiguration configuration, optional MediaConstraints constraints);
 bool _PeerConnection::UpdateIce(const _RTCConfiguration* configuration /*= NULL*/, const _MediaConstraintsObj* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	webrtc::PeerConnectionInterface::RTCConfiguration _configuration/*(webrtc::PeerConnectionInterface::IceTransportsType::kAll)*/;
 	webrtc::PeerConnectionInterface::IceServers servers;
@@ -710,6 +753,7 @@ bool _PeerConnection::UpdateIce(const _RTCConfiguration* configuration /*= NULL*
 // void addIceCandidate (RTCIceCandidate candidate, VoidFunction successCallback, RTCPeerConnectionErrorCallback failureCallback);
 bool _PeerConnection::AddIceCandidate(const _RTCIceCandidate* candidate, _VoidFunctionCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	if (!candidate) {
 		WE_DEBUG_ERROR("Invalid argument");
@@ -738,6 +782,7 @@ bool _PeerConnection::AddIceCandidate(const _RTCIceCandidate* candidate, _VoidFu
 // readonly attribute RTCIceGatheringState   iceGatheringState;
 const char* _PeerConnection::IceGatheringState()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (!IsInitialized()) {
 		return kIceGatheringStateNew;
 	}
@@ -748,6 +793,7 @@ const char* _PeerConnection::IceGatheringState()
 // readonly attribute RTCIceConnectionState  iceConnectionState;
 const char* _PeerConnection::IceConnectionState()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (!IsInitialized()) {
 		return kIceConnectionStateNew;
 	}
@@ -758,6 +804,7 @@ const char* _PeerConnection::IceConnectionState()
 // sequence<MediaStream> getLocalStreams();
 cpp11::shared_ptr<_Sequence<_MediaStream> > _PeerConnection::GetLocalStreams()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_Sequence<_MediaStream> > seq(new _Sequence<_MediaStream>());
 
 	if (IsInitialized()) {
@@ -779,6 +826,7 @@ cpp11::shared_ptr<_Sequence<_MediaStream> > _PeerConnection::GetLocalStreams()
 // sequence<MediaStream> getRemoteStreams();
 cpp11::shared_ptr<_Sequence<_MediaStream> > _PeerConnection::GetRemoteStreams()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_Sequence<_MediaStream> > seq(new _Sequence<_MediaStream>());
 
 	if (IsInitialized()) {
@@ -800,6 +848,7 @@ cpp11::shared_ptr<_Sequence<_MediaStream> > _PeerConnection::GetRemoteStreams()
 // MediaStream? getStreamById (DOMString streamId);
 cpp11::shared_ptr<_MediaStream> _PeerConnection::GetStreamById(const char* streamId)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsInitialized() && streamId) {
 		webrtc::MediaStreamInterface* stream = m_peer_connection->getStreamById(std::string(streamId));
 		if (stream) {
@@ -813,6 +862,7 @@ cpp11::shared_ptr<_MediaStream> _PeerConnection::GetStreamById(const char* strea
 // void addStream (MediaStream stream, optional MediaConstraints constraints);
 bool _PeerConnection::AddStream(_MediaStream* stream, const _MediaConstraintsObj* constraints /*= NULL*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	return m_peer_connection->addStream(BuildMediaStream(stream), BuildConstraints(constraints));
 }
@@ -821,6 +871,7 @@ bool _PeerConnection::AddStream(_MediaStream* stream, const _MediaConstraintsObj
 // void removeStream (MediaStream stream);
 bool _PeerConnection::RemoveStream(_MediaStream* stream)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	if (!stream) {
 		WE_DEBUG_ERROR("Invalid argument");
@@ -833,6 +884,7 @@ bool _PeerConnection::RemoveStream(_MediaStream* stream)
 // void close ();
 bool _PeerConnection::Close()
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	return m_peer_connection->close();
 }
@@ -842,6 +894,7 @@ bool _PeerConnection::Close()
 
 bool _PeerConnection::GetStats(_MediaStreamTrackBase* selector /*= NULL*/, _RTCStatsCallback successCallback /*= nullPtr*/, _RTCPeerConnectionErrorCallback failureCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	CHECK_INITIALIZED();
 	return m_peer_connection->getStats(selector ? selector->_track() : NULL, successCallback, failureCallback);
 }
@@ -850,6 +903,7 @@ bool _PeerConnection::GetStats(_MediaStreamTrackBase* selector /*= NULL*/, _RTCS
 // RTCDTMFSender createDTMFSender (MediaStreamTrack track);
 cpp11::shared_ptr<_RTCDTMFSender> _PeerConnection::CreateDtmfSender(_MediaStreamTrack *track)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsInitialized() && track && track->type() == _MediaStreamTrackTypeAudio) {
 		return m_peer_connection->createDTMFSender(dynamic_cast<_MediaStreamTrackAudio*>(track)->track());
 	}
@@ -860,6 +914,7 @@ cpp11::shared_ptr<_RTCDTMFSender> _PeerConnection::CreateDtmfSender(_MediaStream
 // RTCDataChannel createDataChannel ([TreatNullAs=EmptyString] DOMString label, optional RTCDataChannelInit dataChannelDict);
 cpp11::shared_ptr<_RTCDataChannel> _PeerConnection::CreateDataChannel(const char* _label/*[TreatNullAs=EmptyString]*/, cpp11::shared_ptr<_RTCDataChannelInit> dataChannelDict /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsInitialized()) {
 		std::string label(_label ? _label : "");
 		webrtc::DataChannelInit config;
@@ -879,6 +934,7 @@ cpp11::shared_ptr<_RTCDataChannel> _PeerConnection::CreateDataChannel(const char
 
 bool _PeerConnection::DeInit()
 {
+	WE_LOG_FUNCTION_CALL();
 	m_peer_connection = NULL;
 
 	return true;

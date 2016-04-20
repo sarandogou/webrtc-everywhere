@@ -16,6 +16,7 @@
 #include "_EncryptCtx.h"
 #include "_Utils.h"
 #include "_Buffer.h"
+#include "_Logging.h"
 #include "_Debug.h"
 
 #ifdef WIN32

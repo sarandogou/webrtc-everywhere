@@ -2,6 +2,7 @@
 // http://www.w3.org/TR/webrtc/#idl-def-RTCDataChannel
 #include "_RTCDataChannel.h"
 #include "_Buffer.h"
+#include "_Logging.h"
 //
 //	DummyDataChannelObserver
 //
@@ -38,6 +39,7 @@ private:
 //
 _RTCDataChannel::_RTCDataChannel(DataChannelInterfacePtr dataChannel)
 {
+	WE_LOG_FUNCTION_CALL();
 	assert(dataChannel);
 	m_dataChannel = static_cast<webrtc::DataChannelInterface*>(dataChannel);
 	m_dataChannel->RegisterObserver(DummyDataChannelObserver::Create(cpp11::bind(&_RTCDataChannel::OnStateChange, this), cpp11::bind(&_RTCDataChannel::OnMessage, this, cpp11::placeholders::_1)));
@@ -50,49 +52,58 @@ _RTCDataChannel::_RTCDataChannel(DataChannelInterfacePtr dataChannel)
 
 _RTCDataChannel::~_RTCDataChannel()
 {
+	WE_LOG_FUNCTION_CALL();
 	m_dataChannel->UnregisterObserver();
 	m_dataChannel = NULL;
 }
 
 const char* _RTCDataChannel::label()const
 {
+	WE_LOG_FUNCTION_CALL();
 	const_cast<_RTCDataChannel*>(this)->m_label = m_dataChannel->label();
 	return m_label.c_str();
 }
 
 bool _RTCDataChannel::ordered()const
 {
+	WE_LOG_FUNCTION_CALL();
 	return m_dataChannel->ordered();
 }
 
 nullable_ushort _RTCDataChannel::maxRetransmitTime()const
 {
+	WE_LOG_FUNCTION_CALL();
 	return m_dataChannel->maxRetransmitTime();
 }
 
 nullable_ushort _RTCDataChannel::maxRetransmits()const
 {
+	WE_LOG_FUNCTION_CALL();
 	return m_dataChannel->maxRetransmits();
 }
 
 const char* _RTCDataChannel::protocol()const
 {
+	WE_LOG_FUNCTION_CALL();
 	const_cast<_RTCDataChannel*>(this)->m_protocol = m_dataChannel->protocol();
 	return m_protocol.c_str();
 }
 
 bool _RTCDataChannel::negotiated()const
 {
+	WE_LOG_FUNCTION_CALL();
 	return m_dataChannel->negotiated();
 }
 
 nullable_ushort _RTCDataChannel::id()const
 {
+	WE_LOG_FUNCTION_CALL();
 	return m_dataChannel->id();
 }
 
 const char* _RTCDataChannel::readyState()const
 {
+	WE_LOG_FUNCTION_CALL();
 	switch (m_dataChannel->state()) {
 	case webrtc::DataChannelInterface::kConnecting:
 		return kRTCDataChannelStateConnecting;
@@ -108,11 +119,13 @@ const char* _RTCDataChannel::readyState()const
 
 unsigned long _RTCDataChannel::bufferedAmount()const
 {
+	WE_LOG_FUNCTION_CALL();
 	return (unsigned long)m_dataChannel->buffered_amount();
 }
 
 const char* _RTCDataChannel::binaryType()const
 {
+	WE_LOG_FUNCTION_CALL();
 	return m_binaryType.c_str();
 }
 
@@ -122,6 +135,7 @@ const char* _RTCDataChannel::binaryType()const
 // default value: "blob"
 bool _RTCDataChannel::binaryTypeSet(const char* _binaryType)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (_binaryType && (stricmp(_binaryType, "blob") == 0 || stricmp(_binaryType, "arraybuffer") == 0)) {
 		m_binaryType = std::string(_binaryType);
 		return true;
@@ -131,11 +145,13 @@ bool _RTCDataChannel::binaryTypeSet(const char* _binaryType)
 
 void _RTCDataChannel::close()
 {
+	WE_LOG_FUNCTION_CALL();
 	m_dataChannel->Close();
 }
 
 bool _RTCDataChannel::send(const _Buffer* data, bool binary /*= true*/)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (data && data->getPtr() && data->getSize()) {
 		rtc::Buffer _data((const uint8_t *)data->getPtr(), data->getSize());
 		webrtc::DataBuffer buffer(_data, binary);
@@ -146,26 +162,31 @@ bool _RTCDataChannel::send(const _Buffer* data, bool binary /*= true*/)
 
 void _RTCDataChannel::onopenSet(_VoidFunctionCallback onopen)
 {
+	WE_LOG_FUNCTION_CALL();
 	m_onopen = onopen;
 }
 
 void _RTCDataChannel::onerrorSet(_StringFunctionCallback onerror)
 {
+	WE_LOG_FUNCTION_CALL();
 	m_onerror = onerror;
 }
 
 void _RTCDataChannel::oncloseSet(_VoidFunctionCallback onclose)
 {
+	WE_LOG_FUNCTION_CALL();
 	m_onclose = onclose;
 }
 
 void _RTCDataChannel::onmessageSet(_onmessageCallback onmessage)
 {
+	WE_LOG_FUNCTION_CALL();
 	m_onmessage = onmessage;
 }
 
 void _RTCDataChannel::OnStateChange()
 {
+	WE_LOG_FUNCTION_CALL();
 	switch (m_dataChannel->state()) {
 	case webrtc::DataChannelInterface::kConnecting :
 		break;
@@ -186,6 +207,7 @@ void _RTCDataChannel::OnStateChange()
 
 void _RTCDataChannel::OnMessage(const webrtc::DataBuffer& buffer)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (m_onmessage) {
 		cpp11::shared_ptr<_MessageEvent>e(new _MessageEvent());
 		e->binary = buffer.binary;

@@ -1,28 +1,31 @@
 /* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "_RTCMediaConstraints.h"
+#include "_Logging.h"
 
 _RTCMediaConstraints::_RTCMediaConstraints()
 {
-
+	WE_LOG_FUNCTION_CALL();
 }
 
 _RTCMediaConstraints::_RTCMediaConstraints(const Constraints& mandatory, const Constraints& optional)
 	: m_mandatory(mandatory)
 	, m_optional(optional)
 {
-
+	WE_LOG_FUNCTION_CALL();
 }
 _RTCMediaConstraints::~_RTCMediaConstraints()
 {
-
+	WE_LOG_FUNCTION_CALL();
 }
 
 void _RTCMediaConstraints::AddOptional(const std::string& key, const std::string& value)
 {
+	WE_LOG_FUNCTION_CALL();
 	m_optional.push_back(webrtc::MediaConstraintsInterface::Constraint(key, value));
 }
 
 bool _RTCMediaConstraints::AddMandatory(const std::string& key, const std::string& value, bool override_if_exists /*= true*/) {
+	WE_LOG_FUNCTION_CALL();
 	for (webrtc::MediaConstraintsInterface::Constraints::iterator iter = m_mandatory.begin();
 		iter != m_mandatory.end();
 		++iter) {

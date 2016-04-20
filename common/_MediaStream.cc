@@ -4,6 +4,7 @@
 #include "_MediaStreamTrack.h"
 #include "_Common.h"
 #include "_Utils.h"
+#include "_Logging.h"
 #include "_Debug.h"
 
 #include "talk/app/webrtc/mediastreaminterface.h"
@@ -50,6 +51,7 @@ _MediaStream* _MediaStream::AllocateDefault()
 
 cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > _MediaStream::getAudioTracks()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > seq(new _Sequence<_MediaStreamTrack>());
 
 	if (IsValid()) {
@@ -66,6 +68,7 @@ cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > _MediaStream::getAudioTracks()
 
 cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > _MediaStream::getVideoTracks()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > seq(new _Sequence<_MediaStreamTrack>());
 
 	if (IsValid()) {
@@ -84,6 +87,7 @@ cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > _MediaStream::getVideoTracks()
 // http://www.w3.org/TR/mediacapture-streams/#widl-MediaStream-addTrack-void-MediaStreamTrack-track
 void _MediaStream::addTrack(_MediaStreamTrack* p_track)
 {
+	WE_LOG_FUNCTION_CALL();
 	RETURN_IF_NOT_VALID();
 	if (!p_track) {
 		WE_DEBUG_ERROR("Invalid parameter");
@@ -111,7 +115,7 @@ void _MediaStream::addTrack(_MediaStreamTrack* p_track)
 		}
 	}
 	else {
-		WE_DEBUG_ERROR("Invalid stream track");
+		WE_LOG_ERROR("Invalid stream track");
 	}
 
 	if (added && m_onaddtrack) {
@@ -123,9 +127,10 @@ void _MediaStream::addTrack(_MediaStreamTrack* p_track)
 // http://www.w3.org/TR/mediacapture-streams/#widl-MediaStream-removeTrack-void-MediaStreamTrack-track
 void _MediaStream::removeTrack(_MediaStreamTrack* p_track)
 {
+	WE_LOG_FUNCTION_CALL();
 	RETURN_IF_NOT_VALID();
 	if (!p_track) {
-		WE_DEBUG_ERROR("Invalid parameter");
+		_Logging::shared()->logError("Invalid parameter");
 		return;
 	}
 
@@ -146,7 +151,7 @@ void _MediaStream::removeTrack(_MediaStreamTrack* p_track)
 		}
 	}
 	else {
-		WE_DEBUG_ERROR("Invalid stream track");
+		WE_LOG_ERROR("Invalid stream track");
 	}
 
 	if (removed && m_onremovetrack) {
@@ -156,6 +161,7 @@ void _MediaStream::removeTrack(_MediaStreamTrack* p_track)
 
 cpp11::shared_ptr<_MediaStreamTrack> _MediaStream::getTrackById(const char* trackId)
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_MediaStreamTrack> track = nullPtr;
 	if (trackId && IsValid()) {
 		rtc::scoped_refptr<webrtc::AudioTrackInterface> track_audio = m_stream->FindAudioTrack(std::string(trackId));
@@ -176,6 +182,7 @@ cpp11::shared_ptr<_MediaStreamTrack> _MediaStream::getTrackById(const char* trac
 cpp11::shared_ptr<_MediaStream> _MediaStream::clone()
 {
 	// http://www.w3.org/TR/mediacapture-streams/#widl-MediaStream-clone-MediaStream
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_MediaStream> _clone = nullPtr;
 	if (IsValid()) {
 		_clone = cpp11::shared_ptr<_MediaStream>(new _MediaStream());
@@ -205,6 +212,7 @@ cpp11::shared_ptr<_MediaStream> _MediaStream::clone()
 
 bool _MediaStream::ended()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (IsValid()) {
 		return m_stream == NULL;
 	}
@@ -213,6 +221,7 @@ bool _MediaStream::ended()
 
 void _MediaStream::stop()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_Sequence<_MediaStreamTrack> > _tracks[] = { getAudioTracks(), getVideoTracks() };
 	for (size_t i = 0; i < sizeof(_tracks) / sizeof(_tracks[0]); ++i) {
 		if (_tracks[i]){
@@ -227,6 +236,7 @@ void _MediaStream::stop()
 
 VideoTrackInterfacePtr _MediaStream::GetVideoTrack(int index /*= 0*/)const
 {
+	WE_LOG_FUNCTION_CALL();
 	if (m_stream && index >= 0 && index < (int)m_stream->GetVideoTracks().size()) {
 		return m_stream->GetVideoTracks().at(index);
 	}

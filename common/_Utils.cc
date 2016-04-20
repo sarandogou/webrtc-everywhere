@@ -3,6 +3,7 @@
 #include "_RTCDisplay.h"
 #include "_AsyncEvent.h"
 #include "_Buffer.h"
+#include "_Logging.h"
 #include "_Debug.h"
 #include "_EncryptCtx.h"
 #include "_Common.h"
@@ -75,6 +76,8 @@ WeError _Utils::Initialize(WeError(*InitializeAdditionals) (void) /*= NULL*/)
         static rtc::SocketServerScope ss_scope(&ss);
 #endif
         
+		_Logging::initialize();
+
 		rtc::InitializeSSL();
 		rtc::InitializeSSLThread();
         
@@ -99,6 +102,7 @@ WeError _Utils::DeInitialize(void)
 		}
 #endif
         s_InitThread = nullptr;
+		_Logging::deInitialize();
 	}
 	return WeError_Success;
 }

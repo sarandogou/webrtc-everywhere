@@ -169,6 +169,9 @@ public:
 	STDMETHOD(get_videoHeight)(__out LONG* pVal);
 	STDMETHOD(get_isWebRtcPlugin)(__out VARIANT_BOOL* pVal);
 
+	STDMETHOD(get_logSeverity)(__out BSTR* pVal);
+	STDMETHOD(put_logSeverity)(__in BSTR newVal);
+
 	// IOleObjectImpl::SetClientSite()
 	STDMETHOD(SetClientSite)(_Inout_opt_ IOleClientSite *pClientSite);
 	

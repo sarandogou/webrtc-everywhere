@@ -4,6 +4,7 @@
 #include "_ScreenVideoCapturer.h"
 #include "_Common.h"
 #include "_Utils.h"
+#include "_Logging.h"
 #include "_Debug.h"
 
 #include "talk/app/webrtc/videosourceinterface.h"
@@ -28,6 +29,7 @@ _MediaStreamTrack::_MediaStreamTrack(_MediaStreamTrackType eType, MediaStreamTra
 	, m_bRemote(!!track)
 	, m_pConstraints(nullPtr)
 {
+	WE_LOG_FUNCTION_CALL();
 	static long __label = 1;
 
 	m_label = _Utils::ToString(we_atomic_inc(&__label));
@@ -35,11 +37,12 @@ _MediaStreamTrack::_MediaStreamTrack(_MediaStreamTrackType eType, MediaStreamTra
 
 _MediaStreamTrack::~_MediaStreamTrack()
 {
-	WE_DEBUG_INFO("_MediaStreamTrack::~_MediaStreamTrack");
+	WE_LOG_FUNCTION_CALL();
 }
 
 cpp11::shared_ptr<_Sequence<_SourceInfo> > _MediaStreamTrack::getSourceInfos()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_Sequence<_SourceInfo> > infos(new _Sequence<_SourceInfo>());
 	cpp11::shared_ptr<_SourceInfo> info;
 
@@ -118,11 +121,12 @@ cpp11::shared_ptr<_Sequence<_SourceInfo> > _MediaStreamTrack::getSourceInfos()
 _MediaStreamTrackBase::_MediaStreamTrackBase(_MediaStreamTrackType eType, MediaStreamTrackInterfacePtr track /*= NULL*/, const _MediaTrackConstraints* constrains /*= NULL*/)
 	: _MediaStreamTrack(eType, track, constrains)
 {
+	WE_LOG_FUNCTION_CALL();
 }
 
 _MediaStreamTrackBase::~_MediaStreamTrackBase()
 {
-
+	WE_LOG_FUNCTION_CALL();
 }
 
 void _MediaStreamTrackBase::InitLocalVarsToAvoidDanglingPointerIssue()
@@ -137,6 +141,7 @@ void _MediaStreamTrackBase::InitLocalVarsToAvoidDanglingPointerIssue()
 
 bool _MediaStreamTrackBase::enabledSet(bool enabled)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (_track()) {
 		return _track()->set_enabled(enabled);
 	}
@@ -144,6 +149,7 @@ bool _MediaStreamTrackBase::enabledSet(bool enabled)
 }
 bool _MediaStreamTrackBase::enabled()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (_track()) {
 		return _track()->enabled();
 	}
@@ -152,6 +158,7 @@ bool _MediaStreamTrackBase::enabled()
 
 bool _MediaStreamTrackBase::readonly()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (_track()) {
 		return false;
 	}
@@ -160,6 +167,7 @@ bool _MediaStreamTrackBase::readonly()
 
 const char* _MediaStreamTrackBase::readyState()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (_track()) {
 		switch (_track()->state()) {
 		case webrtc::MediaStreamTrackInterface::kEnded:
@@ -177,39 +185,42 @@ const char* _MediaStreamTrackBase::readyState()
 
 cpp11::shared_ptr<_MediaSourceStates> _MediaStreamTrackBase::states()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_MediaSourceStates> _states;
 
 	// FIXME: not implemented yet
-	WE_DEBUG_ERROR("Not implemented yet");
+	_Logging::shared()->logError("Not implemented yet");
 
 	return _states;
 }
 
 cpp11::shared_ptr<_AllCapabilities> _MediaStreamTrackBase::capabilities()
 {
+	WE_LOG_FUNCTION_CALL();
 	cpp11::shared_ptr<_AllCapabilities> _capabilities;
 
 	// FIXME: not implemented yet
-	WE_DEBUG_ERROR("Not implemented yet");
+	WE_LOG_ERROR("Not implemented yet");
 
 	return _capabilities;
 }
 
 void _MediaStreamTrackBase::applyConstraints(const _MediaTrackConstraints* constrains)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (_track()) {
 
 	}
 
 	// http://www.w3.org/TR/mediacapture-streams/#widl-MediaStreamTrack-applyConstraints-void-MediaTrackConstraints-constraints
 	// FIXME: not implemented yet
-	WE_DEBUG_ERROR("Not implemented yet");
+	_Logging::shared()->logError("Not implemented yet");
 }
 
 cpp11::shared_ptr<_MediaStreamTrack> _MediaStreamTrackBase::clone()
 {
 	// http://www.w3.org/TR/mediacapture-streams/#widl-MediaStreamTrack-clone-MediaStreamTrack
-
+	WE_LOG_FUNCTION_CALL();
     if (m_eType == _MediaStreamTrackTypeVideo) {
         return cpp11::shared_ptr<_MediaStreamTrack>(new _MediaStreamTrackVideo(dynamic_cast<_MediaStreamTrackVideo*>(this)->track()));
     }
@@ -221,6 +232,7 @@ cpp11::shared_ptr<_MediaStreamTrack> _MediaStreamTrackBase::clone()
 
 void _MediaStreamTrackBase::stop()
 {
+	WE_LOG_FUNCTION_CALL();
     if (_track()) {
         enabledSet(false);
         _track()->set_state(webrtc::MediaStreamTrackInterface::kEnded);
@@ -250,6 +262,7 @@ _MediaStreamTrackAudio::_MediaStreamTrackAudio(rtc::scoped_refptr<webrtc::AudioT
 	: _MediaStreamTrackBase(_MediaStreamTrackTypeAudio, track, constrains)
 	, m_track(track)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (!m_track) {
 		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
 		if (peer_connection_factory) {
@@ -271,6 +284,7 @@ _MediaStreamTrackAudio::_MediaStreamTrackAudio(rtc::scoped_refptr<webrtc::AudioT
 
 _MediaStreamTrackAudio::~_MediaStreamTrackAudio()
 {
+	WE_LOG_FUNCTION_CALL();
 	if (m_track) {
 #if WE_RMS
 		m_track->RemoveRMS(m_RMS);
@@ -288,6 +302,7 @@ _MediaStreamTrackAudio::~_MediaStreamTrackAudio()
 bool _MediaStreamTrackAudio::muted()
 {
 	// TODO: no "muted()" function in "AudioTrackInterface"
+	WE_LOG_FUNCTION_CALL();
 	if (m_track) {
 		return !enabled();
 	}
@@ -296,6 +311,7 @@ bool _MediaStreamTrackAudio::muted()
 
 int _MediaStreamTrackAudio::micLevel()
 {
+	WE_LOG_FUNCTION_CALL();
 #if WE_RMS
 	if (m_RMS) {
 		return m_RMS->rms();
@@ -313,6 +329,7 @@ _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoT
 	: _MediaStreamTrackBase(_MediaStreamTrackTypeVideo, track, constrains)
 	, m_track(track)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (!m_track) {
 		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory = GetPeerConnectionFactory();
 		if (peer_connection_factory) {
@@ -343,6 +360,7 @@ _MediaStreamTrackVideo::_MediaStreamTrackVideo(rtc::scoped_refptr<webrtc::VideoT
 
 _MediaStreamTrackVideo:: ~_MediaStreamTrackVideo()
 {
+	WE_LOG_FUNCTION_CALL();
 	m_track = NULL;
 
 	WE_DEBUG_INFO("_MediaStreamTrackVideo::~_MediaStreamTrackVideo");
@@ -370,6 +388,7 @@ public:
 
 static cricket::VideoCapturer* OpenVideoCaptureDevice(std::string _deviceId, std::string _windowId /*= ""*/) {
 	// Create device manager
+	WE_LOG_FUNCTION_CALL();
 	rtc::scoped_ptr<cricket::DeviceManagerInterface> dev_manager(
 		cricket::DeviceManagerFactory::Create());
 	

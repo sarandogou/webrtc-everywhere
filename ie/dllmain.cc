@@ -10,7 +10,7 @@ CwebrtceverywhereModule _AtlModule;
 // DLL Entry Point
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
-#if 0
+#if 1
 	switch (dwReason) {
 	case DLL_PROCESS_ATTACH:
 	{
@@ -19,7 +19,7 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpRes
 	}
 	case DLL_PROCESS_DETACH:
 	{
-		_Utils::DeInitialize();
+		_Utils::DeInitialize(); //!\ This is required
 		break;
 	}
 	case DLL_THREAD_ATTACH:

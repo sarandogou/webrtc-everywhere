@@ -4,6 +4,7 @@
 #include "_Buffer.h"
 #include "_MediaStream.h"
 #include "_ScreenVideoCapturer.h"
+#include "_Logging.h"
 #include "_Debug.h"
 
 #include "webrtc/system_wrappers/interface/critical_section_wrapper.h"
@@ -158,6 +159,7 @@ WEBRTC_EVERYWHERE_API void ReleaseFakePeerConnectionFactory()
 
 WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList** windowList)
 {
+	WE_LOG_FUNCTION_CALL();
 	// "windowList" must be allocate and freeded by the DLL to avoid DLL crossing issue
 	if (!windowList) {
 		WE_DEBUG_ERROR("Invalid parameter");
@@ -183,6 +185,7 @@ WEBRTC_EVERYWHERE_API bool GetWindowList(_WindowList** windowList)
 
 bool ReleaseWindowList(_WindowList** windowList)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (windowList && *windowList) {
 		delete *windowList;
 		*windowList = NULL;
@@ -227,6 +230,7 @@ rtc::scoped_refptr<_RTCMediaConstraints> BuildConstraints(const _MediaConstraint
 
 webrtc::MediaStreamInterface* BuildMediaStream(const _MediaStream* stream)
 {
+	WE_LOG_FUNCTION_CALL();
 	if (!stream) {
 		return NULL;
 	}

@@ -13,6 +13,7 @@
 #include "Utils.h"
 
 #include "../common/_NavigatorUserMedia.h"
+#include "../common/_Logging.h"
 #include "../common/_Debug.h"
 
 static const wchar_t kWindowlessClassName[] = L"WindowlessClass";
@@ -848,6 +849,26 @@ STDMETHODIMP CWebRTC::get_isWebRtcPlugin(__out VARIANT_BOOL* pVal)
 {
 	*pVal = VARIANT_TRUE;
 	return S_OK;
+}
+
+STDMETHODIMP CWebRTC::get_logSeverity(__out BSTR* pVal)
+{
+	const char* severity = _Logging::shared()->getSeverity();
+	if (severity) {
+		return Utils::CopyAnsiString(std::string(severity), pVal);
+	}
+	return E_FAIL;
+}
+
+STDMETHODIMP CWebRTC::put_logSeverity(__in BSTR newVal)
+{
+	char* lpszSeverity = _com_util::ConvertBSTRToString(newVal);
+	if (!lpszSeverity) {
+		CHECK_HR_RETURN(E_OUTOFMEMORY);
+	}
+	bool bRet = _Logging::shared()->setSeverity(lpszSeverity);
+	delete[] lpszSeverity;
+	return bRet ? S_OK : E_FAIL;
 }
 
 HRESULT CWebRTC::GetDispatch(CComPtr<IDispatch> &spDispatch)

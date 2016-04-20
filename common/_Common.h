@@ -102,6 +102,11 @@ static const char kDoubangoScreenshareSourceId[] = "X978DoubangoTelecomScreenCap
 static const char kDoubangoScreenshareLabel[] = "ScreenCapturer (Doubango Telecom)";
 static const char kDoubangoScreenshareKind[] = "video";
 
+// Logging
+static const char kRTCLoggingSeverityInfo[] = "info";
+static const char kRTCLoggingSeverityWarning[] = "warning";
+static const char kRTCLoggingSeverityError[] = "error";
+
 #define kMaxParamArgs 10
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays

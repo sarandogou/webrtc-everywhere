@@ -6,6 +6,7 @@
 #include "_MediaTrackConstraints.h"
 #include "_MediaStreamConstraints.h"
 #include "_Utils.h"
+#include "_Logging.h"
 #include "_Debug.h"
 
 #include "talk/app/webrtc/videosourceinterface.h"
@@ -18,6 +19,7 @@
 // void getUserMedia (MediaStreamConstraints? constraints, NavigatorUserMediaSuccessCallback successCallback, NavigatorUserMediaErrorCallback errorCallback);
 void _NavigatorUserMedia::getUserMedia(const _MediaStreamConstraints* constraints/*= NULL*/, _NavigatorUserMediaSuccessCallback successCallback/*= nullPtr*/, _NavigatorUserMediaErrorCallback errorCallback /*= nullPtr*/)
 {
+	WE_LOG_FUNCTION_CALL();
 #define RAISE_ERR(e) { \
 		WE_DEBUG_ERROR(e); \
 		if (errorCallback) { \

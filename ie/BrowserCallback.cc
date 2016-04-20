@@ -1,6 +1,7 @@
 /* Copyright(C) 2014-2016 Doubango Telecom <https://github.com/sarandogou/webrtc-everywhere> */
 #include "BrowserCallback.h"
 #include "../common/_AsyncEvent.h"
+#include "../common/_Logging.h"
 #include "../common/_Debug.h"
 
 BrowserCallback::BrowserCallback(unsigned msgid, CComPtr<IDispatch> disp)

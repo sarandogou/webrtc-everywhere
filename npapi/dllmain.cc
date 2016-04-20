@@ -14,14 +14,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call) {
 	case DLL_PROCESS_ATTACH:
 	{
-		//CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		_Utils::Initialize();
 		break;
 	}
 	case DLL_PROCESS_DETACH:
 	{
-		_Utils::DeInitialize();
-		//CoUninitialize();
+		_Utils::DeInitialize();  //!\ This is required
 		break;
 	}
 	case DLL_THREAD_ATTACH:

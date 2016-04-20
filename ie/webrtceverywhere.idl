@@ -37,6 +37,9 @@ interface IWebRTC : IDispatch{
 	[id(53), helpstring("method fillImageData")] HRESULT fillImageData([in] VARIANT imageData);
 	[id(54), helpstring("method getScreenShot")] HRESULT getScreenShot([out, retval] BSTR* base64BitmapData);
 	[propget, id(55), helpstring("property isWebRtcPlugin")] HRESULT isWebRtcPlugin([out, retval] VARIANT_BOOL* pVal);
+
+	[propget, id(60), helpstring("property logSeverity")] HRESULT logSeverity([out, retval] BSTR* pVal);
+	[propput, id(60), helpstring("property logSeverity")] HRESULT logSeverity([in] BSTR newVal);
 };
 
 [

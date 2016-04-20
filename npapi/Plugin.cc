@@ -92,6 +92,7 @@ NP_EXPORT(NPError) OSCALL
 NP_Shutdown()
 {
 	ReleaseFakePeerConnectionFactory();
+	_Utils::DeInitialize();
 
     return NPERR_NO_ERROR;
 }
