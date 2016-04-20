@@ -12,6 +12,8 @@
 #	include <shlobj.h>
 #	include <AtlConv.h>
 # elif WE_UNDER_MAC
+#   import <Foundation/Foundation.h>
+#   import <CoreFoundation/CoreFoundation.h>
 #	include <dirent.h>
 #endif
 
@@ -94,7 +96,7 @@ public:
 				return path;
 			}
 		}
-#elif WE_UNDER_APPLE
+# elif WE_UNDER_MAC
 		NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 		NSString *documentsDir = [[documentPaths objectAtIndex : 0] stringByAppendingPathComponent:@"webrtc-everywhere"];
 		NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -108,7 +110,7 @@ public:
 				return "";
 			}
 		}
-		return std::string((const char*)[documentsDir UTF8String]);
+        return std::string((const char*)[documentsDir UTF8String]) + std::string("/");
 #else
 #error "Not implemented"
 #endif
@@ -121,7 +123,11 @@ public:
 			std::string dir = _LoggingFiles::GetDir();
 			if (!dir.empty()) {
 				char micsecond[64];
+#if defined(_MSC_VER)
 				sprintf_s(micsecond, sizeof(micsecond), "%I64d", webrtc::TickTime::Now().MicrosecondTimestamp());
+#else
+                sprintf(micsecond, "%lld", webrtc::TickTime::Now().MicrosecondTimestamp());
+#endif
 				return dir + filename;
 			}
 		}
@@ -131,7 +137,11 @@ public:
 	static std::string GetUniqueFileName()
 	{
 		char micsecond[64];
+#if defined(_MSC_VER)
 		sprintf_s(micsecond, sizeof(micsecond), "%I64d", webrtc::TickTime::Now().MicrosecondTimestamp());
+#else
+        sprintf(micsecond, "%lld", webrtc::TickTime::Now().MicrosecondTimestamp());
+#endif
 		return _LoggingTime::GetNowTimeStamp() + std::string("_") + std::string(micsecond) + std::string(".log");
 	}
 
@@ -272,7 +282,7 @@ static const char* kDefaultLoggingSeverity = kRTCLoggingSeverityError;
 
 _Logging::_Logging()
 {
-	m_sink = cpp11::make_shared<_LogSink>();
+	m_sink = cpp11::shared_ptr<_LogSink>(new _LogSink());
 	setSeverity(kDefaultLoggingSeverity);
 }
 
@@ -291,7 +301,7 @@ bool _Logging::initialize()
 		// Remove old logging files
 		_LoggingFiles::RemoveOldLogFiles();
 
-		g_bInitialized = (g_shared != nullPtr);
+		g_bInitialized = (g_shared != NULL);
 	}
 	return g_bInitialized;
 }

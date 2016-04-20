@@ -31,6 +31,8 @@
 		152833291B7D248B00099EF2 /* videocapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 152833271B7D248B00099EF2 /* videocapturer.cc */; };
 		1528332A1B7D248B00099EF2 /* videocapturer.h in Headers */ = {isa = PBXBuildFile; fileRef = 152833281B7D248B00099EF2 /* videocapturer.h */; };
 		1528332C1B7D24E300099EF2 /* messagehandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1528332B1B7D24E300099EF2 /* messagehandler.cc */; };
+		15C95D561CC714D8004050F6 /* _Logging.cc in Sources */ = {isa = PBXBuildFile; fileRef = 15C95D541CC714D8004050F6 /* _Logging.cc */; settings = {ASSET_TAGS = (); }; };
+		15C95D571CC714D8004050F6 /* _Logging.h in Headers */ = {isa = PBXBuildFile; fileRef = 15C95D551CC714D8004050F6 /* _Logging.h */; settings = {ASSET_TAGS = (); }; };
 		15F1FCC71B8D508900CCB05F /* _ScreenVideoCapturer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 15F1FCC51B8D508900CCB05F /* _ScreenVideoCapturer.cc */; };
 		15F1FCC81B8D508900CCB05F /* _ScreenVideoCapturer.h in Headers */ = {isa = PBXBuildFile; fileRef = 15F1FCC61B8D508900CCB05F /* _ScreenVideoCapturer.h */; };
 		15F1FCCB1B8D54C900CCB05F /* thread.cc in Sources */ = {isa = PBXBuildFile; fileRef = 15F1FCC91B8D54C900CCB05F /* thread.cc */; };
@@ -137,6 +139,8 @@
 		152833271B7D248B00099EF2 /* videocapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = videocapturer.cc; path = "../../../webrtc-checkout/src/talk/media/base/videocapturer.cc"; sourceTree = "<group>"; };
 		152833281B7D248B00099EF2 /* videocapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = videocapturer.h; path = "../../../webrtc-checkout/src/talk/media/base/videocapturer.h"; sourceTree = "<group>"; };
 		1528332B1B7D24E300099EF2 /* messagehandler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = messagehandler.cc; path = "../../../webrtc-checkout/src/webrtc/base/messagehandler.cc"; sourceTree = "<group>"; };
+		15C95D541CC714D8004050F6 /* _Logging.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = _Logging.cc; sourceTree = "<group>"; };
+		15C95D551CC714D8004050F6 /* _Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _Logging.h; sourceTree = "<group>"; };
 		15F1FCC51B8D508900CCB05F /* _ScreenVideoCapturer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _ScreenVideoCapturer.cc; sourceTree = "<group>"; };
 		15F1FCC61B8D508900CCB05F /* _ScreenVideoCapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ScreenVideoCapturer.h; sourceTree = "<group>"; };
 		15F1FCC91B8D54C900CCB05F /* thread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = thread.cc; path = "../../../webrtc-checkout/src/webrtc/base/thread.cc"; sourceTree = "<group>"; };
@@ -441,6 +445,8 @@
 				ECE4C3A619927D4D00FFD159 /* _RTCDTMFSender.cc */,
 				ECE4C3A719927D4D00FFD159 /* _RTCDTMFSender.h */,
 				EC2AEB921973457600360EC6 /* _Debug.h */,
+				15C95D541CC714D8004050F6 /* _Logging.cc */,
+				15C95D551CC714D8004050F6 /* _Logging.h */,
 				EC2AEB941973457600360EC6 /* _MediaStream.cc */,
 				EC2AEB951973457600360EC6 /* _MediaStream.h */,
 				EC2AEB961973457600360EC6 /* _MediaStreamConstraints.cc */,
@@ -508,6 +514,7 @@
 				EC23B4051974E0E2000DFA4B /* Utils.h in Headers */,
 				15F1FCCC1B8D54C900CCB05F /* thread.h in Headers */,
 				EC23B3F21974E0E2000DFA4B /* NPCommon.h in Headers */,
+				15C95D571CC714D8004050F6 /* _Logging.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,6 +625,7 @@
 				15F1FCC71B8D508900CCB05F /* _ScreenVideoCapturer.cc in Sources */,
 				152833291B7D248B00099EF2 /* videocapturer.cc in Sources */,
 				EC23B3FE1974E0E2000DFA4B /* RTCStatsReport.cc in Sources */,
+				15C95D561CC714D8004050F6 /* _Logging.cc in Sources */,
 				EC2AEBF919734C6E00360EC6 /* _MediaStream.cc in Sources */,
 				15F1FCCF1B8D550200CCB05F /* messagequeue.cc in Sources */,
 				EC23B3EA1974E0E2000DFA4B /* MediaSourceStates.cc in Sources */,
