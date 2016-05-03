@@ -29,7 +29,7 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
 
 
 # Using our plugin in your own project
- - Download and install the plugin for <a href="https://doubango.org/webrtc/webrtc-everywhere-i386-10.4.dmg" target="_blank">MAC OSX</a> or <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
+ - Download and install the plugin for <a href="https://doubango.org/webrtc/webrtc-everywhere-10.6.dmg" target="_blank">MAC OSX</a> or <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
  - Include <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> in your code.
  - Change the code you're using to attach a stream to a &lt;audio/&gt; or &lt;video /&gt; HTML5 element: <br />
  from:
