@@ -5,7 +5,7 @@
  - <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
 
 # Online samples 
-The following samples use our <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> and could be tested on Safari and Internet Explorer (off course they also work on Firefox and Chrome): 
+The following samples use our <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> and could be tested on Safari and Internet Explorer (of course they also work on Firefox and Chrome): 
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia" target="_blank">getUserMedia()</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-resolution" target="_blank">Choose camera resolution</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone </a> (on version 2.0.0 it's also used to test screenshare)
