@@ -53,11 +53,29 @@ Sample code to select your screen as media source:
  ```
 
 # Building source code
- - fetch webrtc code as explained at [http://www.webrtc.org/native-code/development](http://www.webrtc.org/native-code/development) in the **same folder** as webrtc-everywhere.
+ - fetch webrtc code as explained at [http://www.webrtc.org/native-code/development](http://www.webrtc.org/native-code/development) in the **same folder** as webrtc-everywhere. Folder structure should be as following: <br />
+ ```
+  + projects (or any other name)
+    - webrtc-checkout
+      - src
+    - webrtc-everywhere
+      - ie
+      - npapi
+      - common
+      - thirdparties
+      - ...
+ ```
+
  - Move into **webrtc-checkout/src** directory <br />
  ```
  cd webrtc-checkout/src
  ```
+ - Checkout the correct WebRTC version (**c2ee2c86f905991a8cd05ee1f35bea105b41e4e0**):
+ ```
+ git checkout -b webrtc-everywhere c2ee2c86f905991a8cd05ee1f35bea105b41e4e0
+ gclient sync
+ ```
+
  - For Windows you'll need to apply [this patch](/webrtc_win.patch)
  - For all platforms you should apply [this patch](https://codereview.webrtc.org/1257833004/diff/1/webrtc/modules/utility/source/process_thread_impl.cc)
 
