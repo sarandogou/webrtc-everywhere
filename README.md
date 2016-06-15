@@ -1,11 +1,11 @@
 **webrtc-everywhere** is an open source project (with **business-friendly** <a href="#license">license</a>) to add support for WebRTC features to Safari (Windows and MAC OSX) and Internet Explorer (Windows).
 
 # Downloads
- - <a href="https://doubango.org/webrtc/webrtc-everywhere-10.6.dmg" target="_blank">MAC OSX</a> 
+ - <a href="https://doubango.org/webrtc/webrtc-everywhere-10.6.dmg" target="_blank">MAC OSX</a>
  - <a href="https://doubango.org/webrtc/setup.exe" target="_blank">Windows</a>
 
-# Online samples 
-The following samples use our <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> and could be tested on Safari and Internet Explorer (off course they also work on Firefox and Chrome): 
+# Online samples
+The following samples use our <a href="https://github.com/sarandogou/webrtc/blob/master/samples/web/js/adapter.js" target="_blank">adapter.js</a> and could be tested on Safari and Internet Explorer (off course they also work on Firefox and Chrome):
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia" target="_blank">getUserMedia()</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-resolution" target="_blank">Choose camera resolution</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/getusermedia-source" target="_blank">Choose camera and microphone </a> (on version 2.0.0 it's also used to test screenshare)
@@ -25,7 +25,7 @@ The following samples use our <a href="https://github.com/sarandogou/webrtc/blob
  - <a href="https://doubango.org/webrtc/samples/web/content/create-offer" target="_blank">Display createOffer output</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/trickle-ice" target="_blank">ICE candidate gathering</a>
  - <a href="https://doubango.org/webrtc/samples/web/content/trickle-ice" target="_blank">DTMF</a> (<font color="red">requires version 1.2.0</font>)
- 
+
 
 
 # Using our plugin in your own project
@@ -47,17 +47,35 @@ Support for screenshare was added in version 2.0. To choose your screen as video
 ![alt Screenshare](ScreenShare.png)
 
 
-Sample code to select your screen as media source: 
+Sample code to select your screen as media source:
  ```
  navigator.getUserMedia({ "video": {optional: [{sourceId: "X978DoubangoTelecomScreenCapturer785"}]}}, okfn, errfn);
  ```
 
 # Building source code
- - fetch webrtc code as explained at [http://www.webrtc.org/native-code/development](http://www.webrtc.org/native-code/development) in the **same folder** as webrtc-everywhere.
+ - fetch webrtc code as explained at [http://www.webrtc.org/native-code/development](http://www.webrtc.org/native-code/development) in the **same folder** as webrtc-everywhere. Folder structure should be as following: <br />
+ ```
+  + projects (or any other name)
+    - webrtc-checkout
+      - src
+    - webrtc-everywhere
+      - ie
+      - npapi
+      - common
+      - thirdparties
+      - ...
+ ```
+
  - Move into **webrtc-checkout/src** directory <br />
  ```
  cd webrtc-checkout/src
  ```
+ - Checkout the correct WebRTC version (**c2ee2c86f905991a8cd05ee1f35bea105b41e4e0**):
+ ```
+ git checkout -b webrtc-everywhere c2ee2c86f905991a8cd05ee1f35bea105b41e4e0
+ gclient sync
+ ```
+
  - For Windows you'll need to apply [this patch](/webrtc_win.patch)
  - For all platforms you should apply [this patch](https://codereview.webrtc.org/1257833004/diff/1/webrtc/modules/utility/source/process_thread_impl.cc)
 
@@ -70,7 +88,7 @@ Sample code to select your screen as media source:
  mv out/Debug out/Debug_x64
  mv out/Release out/Release_x64
  ```
- 
+
  - **OSX i386**<br />
  ```
  python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=mac -Dclang_xcode=1
@@ -80,21 +98,21 @@ Sample code to select your screen as media source:
  mv out/Debug out/Debug_i386
  mv out/Release out/Release_i386
  ```
- 
+
  - **WIN64**<br />
  ```
- python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=win
+ python webrtc/build/gyp_webrtc -Dtarget_arch=x64 -DOS=win -G msvs_version=2013
  ninja -C out/Debug_x64
  ninja -C out/Release_x64
  ```
- 
+
  - **WIN32**<br />
  ```
- python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=win
+ python webrtc/build/gyp_webrtc -Dtarget_arch=ia32 -DOS=win -G msvs_version=2013
  ninja -C out/Debug
  ninja -C out/Release
  ```
- 
+
 <br />
 <br />
 To build the source code you'll need Visual Studio 2013+ (Windows) or Xcode (MAC OSX):
